@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.0
+    ports:
+      - 6379:6379
+
+  video-source-1:
+    image: ghcr.io/starwit/video-source-py:0.2.0
+    volumes:
+      - /home/florian/workspaces/carmel/videos/RangelineSMedicalDr.mp4:/video
+      - ./video-source-1.settings.yaml:/code/settings.yaml
+
+  video-source-2:
+    image: ghcr.io/starwit/video-source-py:0.2.0
+    volumes:
+      - /home/florian/workspaces/carmel/videos/ArchWestMainStreetEB.mp4:/video
+      - ./video-source-2.settings.yaml:/code/settings.yaml
+
+  object-detector:
+    image: ghcr.io/starwit/object-detector:0.2.0
+    volumes:
+      - ./object-detector.settings.yaml:/code/settings.yaml
