@@ -1,0 +1,5 @@
+numpy
+opencv-python
+ultralytics
+redis
+git+https://github.com/starwit/vision-api.git@0.3.3#subdirectory=python/visionapi

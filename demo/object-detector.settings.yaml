@@ -2,10 +2,11 @@ model_config:
   size: n
   device: "cpu"
 inference_size: [ 640, 640 ]
+classes: [ 2 ]
 log_level: DEBUG
 redis:
   host: redis
   port: 6379
-  video_source_ids:
-    - video1
-    - video2
+  stream_ids:
+    - Rangeline
+    - ArchWestMain

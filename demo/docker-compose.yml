@@ -22,3 +22,13 @@ services:
     image: ghcr.io/starwit/object-detector:0.2.0
     volumes:
       - ./object-detector.settings.yaml:/code/settings.yaml
+
+  object-tracker-1:
+    image: ghcr.io/starwit/object-tracker:0.2.0
+    volumes:
+      - ./object-tracker-1.settings.yaml:/code/settings.yaml
+
+  object-tracker-2:
+    image: ghcr.io/starwit/object-tracker:0.2.0
+    volumes:
+      - ./object-tracker-2.settings.yaml:/code/settings.yaml
