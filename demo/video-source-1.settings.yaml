@@ -1,4 +1,4 @@
-id: Rangeline
+id: video1
 uri: /video
 # This limits fps to the fps of the source (only really makes sense with video files, if a camera shall be simulated)
 use_source_fps: True

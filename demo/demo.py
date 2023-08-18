@@ -35,17 +35,19 @@ def annotate(image, track_proto: TrackingOutput):
 
     return ann.result()
 
-def output_handler(tracking):
+def output_handler(tracking, stream_id):
     track_proto = deserialize_proto(tracking)
     print(f'Inference times - detection: {track_proto.metrics.detection_inference_time_us} us, tracking: {track_proto.metrics.tracking_inference_time_us} us')
-    cv2.namedWindow('window', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('window', 1920, 1080)
-    cv2.imshow('window', create_output_image(track_proto))
+    cv2.namedWindow(f'{stream_id}', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(f'{stream_id}', 1920, 1080)
+    cv2.imshow(f'{stream_id}', create_output_image(track_proto))
     if cv2.waitKey(1) == ord('q'):
         stop_event.set()
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
+
+    STREAM_IDS = [ 'video1', 'video2' ]
 
     stop_event = threading.Event()
     last_retrieved_id = None
@@ -62,19 +64,24 @@ if __name__ == '__main__':
             result = redis_conn.xread(
                 count=1,
                 block=5000,
-                streams={f'objecttracker:ArchWestMain': '$' if last_retrieved_id is None else last_retrieved_id}
+                streams={f'objecttracker:{id}': '$' if last_retrieved_id is None else last_retrieved_id
+                         for id in STREAM_IDS}
             )
         
             if result is None or len(result) == 0:
                 continue
 
-            # These unpacking incantations are apparently necessary...
             last_retrieved_id = result[0][1][0][0].decode('utf-8')
-            tracker_proto = result[0][1][0][1][b'proto_data']
-
             input_okay = True
+
+        for item in result:
+            # These unpacking incantations are apparently necessary...
+            tracker_proto = item[1][0][1][b'proto_data']
+            stream_id = item[0].decode('utf-8')
+
+            output_handler(tracker_proto, stream_id)
+
         
-        output_handler(tracker_proto)
 
         
     
