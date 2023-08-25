@@ -1,0 +1,8 @@
+id: videostream
+uri: rtsp://streaming-server:8554/ondemand
+# This limits fps to the fps of the source (only really makes sense with video files, if a camera shall be simulated)
+use_source_fps: True
+log_level: DEBUG
+redis:
+  host: redis
+  port: 6379
