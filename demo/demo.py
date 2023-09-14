@@ -1,9 +1,11 @@
+import threading
+
 import cv2
 import numpy as np
 import redis
 from ultralytics.yolo.utils.plotting import Annotator
 from visionapi.messages_pb2 import TrackingOutput
-import threading
+from visionlib.pipeline.consumer import RedisConsumer
 
 
 def deserialize_proto(message):
@@ -47,39 +49,22 @@ def output_handler(tracking, stream_id):
 
 if __name__ == '__main__':
 
-    STREAM_IDS = [ 'video1', 'video2' ]
+    STREAM_IDS = [ 'objecttracker:video1', 'objecttracker:video2' ]
 
     stop_event = threading.Event()
     last_retrieved_id = None
 
-    redis_conn = redis.Redis(
-        host='localhost',
-        port=6379,
-    )
+    consume = RedisConsumer('localhost', 6379, STREAM_IDS)
 
-    while not stop_event.is_set():
-        
-        input_okay = False
-        while not stop_event.is_set() and not input_okay:
-            result = redis_conn.xread(
-                count=1,
-                block=5000,
-                streams={f'objecttracker:{id}': '$' if last_retrieved_id is None else last_retrieved_id
-                         for id in STREAM_IDS}
-            )
-        
-            if result is None or len(result) == 0:
+    with consume:
+        for stream_id, proto_data in consume():
+            if stop_event.is_set():
+                break
+
+            if stream_id is None:
                 continue
 
-            last_retrieved_id = result[0][1][0][0].decode('utf-8')
-            input_okay = True
-
-        for item in result:
-            # These unpacking incantations are apparently necessary...
-            tracker_proto = item[1][0][1][b'proto_data']
-            stream_id = item[0].decode('utf-8')
-
-            output_handler(tracker_proto, stream_id)
+            output_handler(proto_data, stream_id)
 
         
 
