@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nvidia-test
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nvidia-test
+  template:
+    metadata:
+      labels:
+        app: nvidia-test
+    spec:
+      runtimeClassName: nvidia
+      containers:
+      - name: cuda-container
+        image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda10.2
+        resources:
+          limits:
+            nvidia.com/gpu: 1

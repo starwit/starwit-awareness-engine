@@ -1,0 +1,13 @@
+runtimeClassName: nvidia
+
+config:
+  map:
+    config: |-
+      version: v1
+      sharing:
+        timeSlicing:
+          renameByDefault: false
+          failRequestsGreaterThanOne: true
+          resources:
+          - name: nvidia.com/gpu
+            replicas: 10
