@@ -1,60 +1,104 @@
+import argparse
 import threading
+from typing import List
 
 import cv2
 import numpy as np
-import redis
-from ultralytics.yolo.utils.plotting import Annotator
-from visionapi.messages_pb2 import TrackingOutput
+from visionapi.messages_pb2 import (Detection, DetectionOutput,
+                                    TrackedDetection, TrackingOutput,
+                                    VideoFrame)
 from visionlib.pipeline.consumer import RedisConsumer
 
+ANNOTATION_COLOR = (0, 0, 255)
 
-def deserialize_proto(message):
-    track_output = TrackingOutput()
-    track_output.ParseFromString(message)
-    return track_output
-
-def create_output_image(track_proto: TrackingOutput):
-    img_shape = track_proto.frame.shape
-    img_bytes = track_proto.frame.frame_data
+def create_output_image(frame: VideoFrame):
+    img_shape = frame.shape
+    img_bytes = frame.frame_data
     img = np.frombuffer(img_bytes, dtype=np.uint8) \
         .reshape((img_shape.height, img_shape.width, img_shape.channels))
+    return img
 
-    return annotate(img, track_proto)
+def annotate(image, detection: Detection, object_id: bytes = None):
+    bbox_x1 = detection.bounding_box.min_x
+    bbox_y1 = detection.bounding_box.min_y
+    bbox_x2 = detection.bounding_box.max_x
+    bbox_y2 = detection.bounding_box.max_y
 
-def annotate(image, track_proto: TrackingOutput):
-    ann = Annotator(image, line_width=4)
-    for detection in track_proto.tracked_detections:
-        bbox_x1 = detection.detection.bounding_box.min_x
-        bbox_y1 = detection.detection.bounding_box.min_y
-        bbox_x2 = detection.detection.bounding_box.max_x
-        bbox_y2 = detection.detection.bounding_box.max_y
+    class_id = detection.class_id
+    conf = detection.confidence
 
-        class_id = detection.detection.class_id
-        conf = detection.detection.confidence
-        object_id = detection.object_id.hex()[:4]
+    label = f'{class_id} - {round(conf,2)}'
 
-        ann.box_label((bbox_x1, bbox_y1, bbox_x2, bbox_y2), f'ID {object_id} - {class_id} - {round(conf,2)}')
+    if object_id is not None:
+        object_id = object_id.hex()[:4]
+        label = f'ID {object_id} - {class_id} - {round(conf,2)}'
 
-    return ann.result()
+    line_width = max(round(sum(image.shape) / 2 * 0.002), 2)
 
-def output_handler(tracking, stream_id):
-    track_proto = deserialize_proto(tracking)
-    print(f'Inference times - detection: {track_proto.metrics.detection_inference_time_us} us, tracking: {track_proto.metrics.tracking_inference_time_us} us')
-    cv2.namedWindow(f'{stream_id}', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(f'{stream_id}', 1920, 1080)
-    cv2.imshow(f'{stream_id}', create_output_image(track_proto))
+    cv2.rectangle(image, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), color=ANNOTATION_COLOR, thickness=line_width, lineType=cv2.LINE_AA)
+    cv2.putText(image, label, (bbox_x1, bbox_y1 - 10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=ANNOTATION_COLOR, thickness=round(line_width/3), fontScale=line_width/4, lineType=cv2.LINE_AA)
+
+def showImage(window_name, image):
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_name, 1920, 1080)
+    cv2.imshow(window_name, image)
     if cv2.waitKey(1) == ord('q'):
         stop_event.set()
         cv2.destroyAllWindows()
 
+def source_output_handler(frame_message, stream_id):
+    frame_proto = VideoFrame()
+    frame_proto.ParseFromString(frame_message)
+    image = create_output_image(frame_proto)
+
+    showImage(stream_id, image)
+
+def detection_output_handler(detection_message, stream_id):
+    detection_proto = DetectionOutput()
+    detection_proto.ParseFromString(detection_message)
+    print(f'Inference times - detection: {detection_proto.metrics.detection_inference_time_us} us')
+    image = create_output_image(detection_proto.frame)
+
+    for detection in detection_proto.detections:
+        annotate(image, detection)
+
+    showImage(stream_id, image)
+
+def tracking_output_handler(tracking_message, stream_id):
+    track_proto = TrackingOutput()
+    track_proto.ParseFromString(tracking_message)
+    print(f'Inference times - detection: {track_proto.metrics.detection_inference_time_us} us, tracking: {track_proto.metrics.tracking_inference_time_us} us')
+    image = create_output_image(track_proto.frame)
+
+    for tracked_det in track_proto.tracked_detections:
+        annotate(image, tracked_det.detection, tracked_det.object_id)
+
+    showImage(stream_id, image)
+
+STREAM_TYPE_HANDLER = {
+    'videosource': source_output_handler,
+    'objectdetector': detection_output_handler,
+    'objecttracker': tracking_output_handler,
+}
+
+
 if __name__ == '__main__':
 
-    STREAM_IDS = [ 'objecttracker:video1', 'objecttracker:video2' ]
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('-s', '--stream', type=str, required=True)
+    arg_parser.add_argument('--redis-host', type=str, default='localhost')
+    arg_parser.add_argument('--redis-port', type=int, default=6379)
+    args = arg_parser.parse_args()
+
+    STREAM_ID = args.stream
+    STREAM_TYPE = STREAM_ID.split(':')[0]
+    REDIS_HOST = args.redis_host
+    REDIS_PORT = args.redis_port
 
     stop_event = threading.Event()
     last_retrieved_id = None
 
-    consume = RedisConsumer('localhost', 6379, STREAM_IDS)
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_ID])
 
     with consume:
         for stream_id, proto_data in consume():
@@ -64,7 +108,7 @@ if __name__ == '__main__':
             if stream_id is None:
                 continue
 
-            output_handler(proto_data, stream_id)
+            STREAM_TYPE_HANDLER[STREAM_TYPE](proto_data, stream_id)
 
         
 
