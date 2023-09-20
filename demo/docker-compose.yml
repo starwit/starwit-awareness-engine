@@ -19,19 +19,19 @@ services:
       - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
 
   video-source-1:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${IMAGE_VERSION}
+    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
       - /home/florian/workspaces/carmel/videos/RangelineSMedicalDr.mp4:/video
       - ./video-source-py/video-source-1.settings.yaml:/code/settings.yaml
 
   video-source-2:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${IMAGE_VERSION}
+    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
       - /home/florian/workspaces/carmel/videos/ArchWestMainStreetEB.mp4:/video
       - ./video-source-py/video-source-2.settings.yaml:/code/settings.yaml
 
   video-source-stream:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${IMAGE_VERSION}
+    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
       - ./video-source-py/video-source-stream.settings.yaml:/code/settings.yaml
 
@@ -54,8 +54,16 @@ services:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      - /home/florian/workspaces/carmel/videos/ArchWestMainStreetEB.mp4:/video
+      - /home/florian/workspaces/carmel/videos/ArchWestMainStreetEB.mp4:/video_1080
+      - /home/florian/workspaces/carmel/videos/RangelineSMedicalDr.mp4:/video_4k
     environment:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
