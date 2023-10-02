@@ -43,3 +43,8 @@ services:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
+
+  anomaly-detector:
+    image: ${IMAGE_REGISTRY}/sae/anomaly-detector:1.0-SNAPSHOT
+    volumes:
+      - ./anomaly-detector/anomaly-detector.settings.yaml:/code/settings.yaml
