@@ -8,5 +8,4 @@ redis:
   host: redis
   port: 6379
   stream_ids:
-    - video1
-    - video2
+    - stream1

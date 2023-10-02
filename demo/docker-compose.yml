@@ -18,37 +18,20 @@ services:
     volumes:
       - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
 
-  video-source-1:
+  video-source-stream1:
     image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
-      - /home/florian/workspaces/carmel/videos/RangelineSMedicalDr.mp4:/video
-      - ./video-source-py/video-source-1.settings.yaml:/code/settings.yaml
-
-  video-source-2:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - /home/florian/workspaces/carmel/videos/ArchWestMainStreetEB.mp4:/video
-      - ./video-source-py/video-source-2.settings.yaml:/code/settings.yaml
-
-  video-source-stream:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
-    volumes:
-      - ./video-source-py/video-source-stream.settings.yaml:/code/settings.yaml
+      - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
 
   object-detector:
     image: ${IMAGE_REGISTRY}/sae/object-detector:${IMAGE_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
 
-  object-tracker-1:
+  object-tracker-stream1:
     image: ${IMAGE_REGISTRY}/sae/object-tracker:${IMAGE_VERSION}
     volumes:
-      - ./object-tracker/object-tracker-1.settings.yaml:/code/settings.yaml
-
-  object-tracker-2:
-    image: ${IMAGE_REGISTRY}/sae/object-tracker:${IMAGE_VERSION}
-    volumes:
-      - ./object-tracker/object-tracker-2.settings.yaml:/code/settings.yaml
+      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
 
   streaming-server:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
@@ -60,10 +43,3 @@ services:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
-
-  prometheus:
-    image: prom/prometheus:v2.47.0
-    ports:
-      - 9090:9090
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

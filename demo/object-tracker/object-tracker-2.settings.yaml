@@ -1,9 +1,0 @@
-tracking_params:
-  det_thresh: 0.25
-  model_weights: osnet_x0_25_msmt17.pt
-device: "cpu"
-log_level: DEBUG
-redis:
-  host: redis
-  port: 6379
-  stream_id: video2

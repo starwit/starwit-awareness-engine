@@ -1,7 +1,0 @@
-id: video1
-uri: /video
-reconnect_backoff_time: 1
-log_level: DEBUG
-redis:
-  host: redis
-  port: 6379
