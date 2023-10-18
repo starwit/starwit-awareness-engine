@@ -8,15 +8,9 @@ from visionapi.messages_pb2 import (Detection, DetectionOutput,
                                     TrackedDetection, TrackingOutput,
                                     VideoFrame)
 from visionlib.pipeline.consumer import RedisConsumer
+from visionlib.pipeline.tools import get_raw_frame_data
 
 ANNOTATION_COLOR = (0, 0, 255)
-
-def create_output_image(frame: VideoFrame):
-    img_shape = frame.shape
-    img_bytes = frame.frame_data
-    img = np.frombuffer(img_bytes, dtype=np.uint8) \
-        .reshape((img_shape.height, img_shape.width, img_shape.channels))
-    return img
 
 def annotate(image, detection: Detection, object_id: bytes = None):
     bbox_x1 = detection.bounding_box.min_x
@@ -49,7 +43,7 @@ def showImage(window_name, image):
 def source_output_handler(frame_message, stream_id):
     frame_proto = VideoFrame()
     frame_proto.ParseFromString(frame_message)
-    image = create_output_image(frame_proto)
+    image = get_raw_frame_data(frame_proto)
 
     showImage(stream_id, image)
 
@@ -57,7 +51,7 @@ def detection_output_handler(detection_message, stream_id):
     detection_proto = DetectionOutput()
     detection_proto.ParseFromString(detection_message)
     print(f'Inference times - detection: {detection_proto.metrics.detection_inference_time_us} us')
-    image = create_output_image(detection_proto.frame)
+    image = get_raw_frame_data(detection_proto.frame)
 
     for detection in detection_proto.detections:
         annotate(image, detection)
@@ -68,7 +62,7 @@ def tracking_output_handler(tracking_message, stream_id):
     track_proto = TrackingOutput()
     track_proto.ParseFromString(tracking_message)
     print(f'Inference times - detection: {track_proto.metrics.detection_inference_time_us} us, tracking: {track_proto.metrics.tracking_inference_time_us} us')
-    image = create_output_image(track_proto.frame)
+    image = get_raw_frame_data(track_proto.frame)
 
     for tracked_det in track_proto.tracked_detections:
         annotate(image, tracked_det.detection, tracked_det.object_id)
