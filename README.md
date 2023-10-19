@@ -16,6 +16,7 @@ The components of the vision pipeline can be found in the following repositories
 ## Contents
 - `/doc` - Documentation of the architecture and some details of the technical setup
 - `/helm/sae` - The main Helm chart
-- `/docker-compose` - A docker compose version of the pipeline with some basic debugging tools (should be more or less up-to-date with the Helm chart)
+- `/docker-compose` - A docker compose version of the pipeline (should be more or less up-to-date with the Helm chart)
+- `/tools` - Contains the `watch` script which makes visually introspecting the pipeline easy (can render image output for every stage)
 - `/nvidia` - Some rough documentation about setting up K3s with Nvidia properly (needs to be extended / automated)
 - `/dashboards` - A place to save created dashboards for viewing the pipeline metrics (not part of the demo setup yet)

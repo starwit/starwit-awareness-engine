@@ -1,9 +1,10 @@
 import argparse
+import signal
 import threading
-from typing import List
 
 import cv2
-import numpy as np
+import redis
+from simple_term_menu import TerminalMenu
 from visionapi.messages_pb2 import (Detection, DetectionOutput,
                                     TrackedDetection, TrackingOutput,
                                     VideoFrame)
@@ -11,6 +12,14 @@ from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 
 ANNOTATION_COLOR = (0, 0, 255)
+
+def choose_stream(redis_client):
+    available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
+    menu = TerminalMenu(available_streams)
+    selected_idx = menu.show()
+    if selected_idx is None:
+        exit(0)
+    return available_streams[selected_idx]
 
 def annotate(image, detection: Detection, object_id: bytes = None):
     bbox_x1 = detection.bounding_box.min_x
@@ -79,20 +88,33 @@ STREAM_TYPE_HANDLER = {
 if __name__ == '__main__':
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-s', '--stream', type=str, required=True)
+    arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('--redis-host', type=str, default='localhost')
     arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
     STREAM_ID = args.stream
-    STREAM_TYPE = STREAM_ID.split(':')[0]
     REDIS_HOST = args.redis_host
     REDIS_PORT = args.redis_port
+
+    if STREAM_ID is None:
+        redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
+        STREAM_ID = choose_stream(redis_client)
+    
+    STREAM_TYPE = STREAM_ID.split(':')[0]
 
     stop_event = threading.Event()
     last_retrieved_id = None
 
-    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_ID])
+    def sig_handler(signum, _):
+        signame = signal.Signals(signum).name
+        print(f'Caught signal {signame} ({signum}). Exiting...')
+        stop_event.set()
+
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
+
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_ID], block=200)
 
     with consume:
         for stream_id, proto_data in consume():
