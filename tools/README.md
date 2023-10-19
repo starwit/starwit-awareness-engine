@@ -6,6 +6,7 @@ On a technical level, it attaches to a Redis stream of your choice and then trie
 It will then render (and annotate, if possible) every output object / proto it receives from Redis.
 You can exit the program by pressing `q`.
 Example:
+- `python watch.py` displays a menu with all available streams for ease of use (and after selection renders content of that stream)
 - `python demo.py -s objectdetector:video1` renders frames with detected objects (assuming that `objectdetector:*` contains outputs of the objectdetector stage, which is default)
 
 ### Caveats
