@@ -1,0 +1,19 @@
+name: Release SAE chart
+on:
+  push:
+    # branches:
+    #   - main
+jobs:
+  ReleaseSAEChart:
+    runs-on: 
+      labels: infra
+    container:
+      image: docker.internal.starwit-infra.de/helm-build:0.1.0
+      credentials:
+        username: docker
+        password: ${{ starwit_internal_password }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Show files
+        run: ls -lah $GITHUB_WORKSPACE
