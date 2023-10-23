@@ -12,6 +12,9 @@ jobs:
       credentials:
         username: docker
         password: ${{ secrets.STARWIT_INTERNAL_PASSWORD }}
+      env:
+        HELM_REPO_USER: ${{ secrets.HELM_REPO_USER }}
+        HELM_REPO_PASSWORD: ${{ secrets.HELM_REPO_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
