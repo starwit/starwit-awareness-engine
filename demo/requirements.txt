@@ -1,4 +1,0 @@
-numpy
-opencv-python
-git+https://github.com/starwit/vision-api.git@0.3.3#subdirectory=python/visionapi
-git+https://github.com/starwit/vision-lib.git#subdirectory=python
