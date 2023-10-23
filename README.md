@@ -20,3 +20,6 @@ The components of the vision pipeline can be found in the following repositories
 - `/tools` - Contains the `watch` script which makes visually introspecting the pipeline easy (can render image output for every stage)
 - `/nvidia` - Some rough documentation about setting up K3s with Nvidia properly (needs to be extended / automated)
 - `/dashboards` - A place to save created dashboards for viewing the pipeline metrics (not part of the demo setup yet)
+
+## Helm Chart Release
+The Helm chart is automatically released to our internal Helm repository on every push into `main`. Also, if you want to build and release locally, you can just run `helm/do_release.sh`.
