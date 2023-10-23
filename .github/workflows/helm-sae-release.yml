@@ -1,8 +1,8 @@
 name: Release SAE chart
 on:
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
 jobs:
   ReleaseSAEChart:
     runs-on: 
