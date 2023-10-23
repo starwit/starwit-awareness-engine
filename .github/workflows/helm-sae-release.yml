@@ -7,13 +7,15 @@ jobs:
   ReleaseSAEChart:
     runs-on: 
       labels: infra
-    container:
-      image: docker.internal.starwit-infra.de/helm-build:0.1.0
-      credentials:
-        username: docker
-        password: ${{ secrets.STARWIT_INTERNAL_PASSWORD }}
+    # container:
+    #   image: docker.internal.starwit-infra.de/helm-build:0.1.0
+    #   credentials:
+    #     username: docker
+    #     password: ${{ secrets.STARWIT_INTERNAL_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Show files
         run: ls -lah $GITHUB_WORKSPACE
+      - name: Debug
+        run: docker ps
