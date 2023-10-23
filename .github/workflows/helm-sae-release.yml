@@ -15,7 +15,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Show files
-        run: ls -lah
-      - name: Check helm
-        run: helm version
+      - name: Build and release helm chart
+        run: ./helm/do_release.sh
