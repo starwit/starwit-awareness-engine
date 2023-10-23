@@ -31,7 +31,7 @@ FILES=(sae-*.tgz)
 CHART_FILE=${FILES[0]}
 
 echo "Uploading chart package..."
-cat $CHART_FILE | curl -i -u $HELM_REPO_USER:$HELM_REPO_PASSWORD --data-binary @- https://helm.internal.starwit-infra.de/api/charts || exit 1
+cat $CHART_FILE | curl -i --fail-with-body -u $HELM_REPO_USER:$HELM_REPO_PASSWORD --data-binary @- https://helm.internal.starwit-infra.de/api/charts || exit 1
 echo ""
 
 rm sae-*.tgz
