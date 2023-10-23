@@ -1,0 +1,80 @@
+{{- with .Values.objectDetector }}
+{{- $imageRepo := required "image repository for object-detector is required" .image.repository }}
+{{- $imageTag := required "image tag for object-detector is required" .image.tag }}
+{{- with .config }}
+{{- $isUsingGpu := hasPrefix "cuda" .model.device }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sae.fullname" $ }}-object-detector
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: object-detector
+spec:
+  selector:
+    matchLabels:
+      {{- include "sae.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: object-detector
+  template:
+    metadata:
+      annotations:
+        sae.starwit.de/stage: object-detector
+      labels:
+        {{- include "sae.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: object-detector
+    spec:
+      serviceAccountName: {{ include "sae.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- if $isUsingGpu }}
+      runtimeClassName: nvidia
+      {{- end }}
+      initContainers:
+        - name: wait-for-redis
+          image: redis:7.2-alpine
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
+      containers:
+        - name: object-detector
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: IfNotPresent
+          {{- if $isUsingGpu }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- end }}
+          env:
+            - name: MODEL__SIZE
+              value: {{ .model.size | quote }}
+            - name: MODEL__DEVICE
+              value: {{ .model.device | quote }}
+            - name: INFERENCE_SIZE
+              value: {{ toJson .inferenceSize | quote }}
+            - name: CLASSES
+              value: {{ toJson .classes | quote }}
+            - name: LOG_LEVEL
+              value: {{ .logLevel | quote }}
+            - name: REDIS__HOST
+              value: {{ include "sae.redisServiceName" $ }}
+            - name: REDIS__PORT
+              value: {{ include "sae.redisServicePort" $ }}
+            - name: REDIS__STREAM_IDS
+              value: {{ toJson .redis.streamIds | quote }}
+          ports:
+            - name: prometheus
+              containerPort: 8000
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}

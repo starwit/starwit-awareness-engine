@@ -1,0 +1,9 @@
+id: stream1
+uri: rtsp://streaming-server:8554/ondemand-4k
+reconnect_backoff_time: 1
+max_fps: 5
+jpeg_encode: True
+log_level: DEBUG
+redis:
+  host: redis
+  port: 6379
