@@ -50,3 +50,5 @@ services:
       - ./anomaly-detector/anomaly-detector.settings.yaml:/code/settings.yaml
       - /home/hanna/Schreibtisch/Starwit/anomaly_detection/outputDocker:/app/generated    # not working
       - /home/hanna/Schreibtisch/Starwit/anomaly_detection/.env:/app/.env
+    environment:
+      REDIS_HOST: redis
