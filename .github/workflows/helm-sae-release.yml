@@ -20,4 +20,4 @@ jobs:
       - name: Show files
         run: ls -lah $GITHUB_WORKSPACE
       - name: Debug
-        run: echo $DOCKER_PASSWORD | /usr/bin/docker --config /opt/actions-runner/_work/_temp/.docker_53f82986-51d6-4b52-a0a0-91e0fde2f25f login docker.internal.starwit-infra.de -u docker
+        run: echo $DOCKER_PASSWORD | /usr/bin/docker --config /opt/actions-runner/_work/_temp/.docker_53f82986-51d6-4b52-a0a0-91e0fde2f25f login docker.internal.starwit-infra.de -u docker --password-stdin
