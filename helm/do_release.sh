@@ -18,15 +18,25 @@ if [[ -z "$HELM_REPO_PASSWORD" ]]; then
     fi
 fi
 
-SCRIPT_DIR=$(dirname "$0")
+OLD_PWD=$(pwd)
+CHART_DIR=$(dirname "$0")/sae
 
-helm package $SCRIPT_DIR/sae -d $SCRIPT_DIR || exit 1
+echo "Changing into chart directory directory: $CHART_DIR"
+cd $CHART_DIR
 
-FILES=($SCRIPT_DIR/sae-*)
+helm dependency build || exit 1
+helm package . || exit 1
+
+FILES=(sae-*.tgz)
 CHART_FILE=${FILES[0]}
 
+echo "Uploading chart package..."
 cat $CHART_FILE | curl -i -u $HELM_REPO_USER:$HELM_REPO_PASSWORD --data-binary @- https://helm.internal.starwit-infra.de/api/charts || exit 1
+echo ""
 
-rm $SCRIPT_DIR/sae-*
+rm sae-*.tgz
+
+echo "Restoring old PWD: $OLD_PWD"
+cd $OLD_PWD
 
 exit 0
