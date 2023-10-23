@@ -1,0 +1,17 @@
+annotated-types==0.6.0
+async-timeout==4.0.3
+numpy==1.26.1
+opencv-python==4.8.1.78
+protobuf==4.24.4
+pybase64==1.3.1
+pydantic==2.4.2
+pydantic-settings==2.0.3
+pydantic_core==2.10.1
+python-dotenv==1.0.0
+PyTurboJPEG==1.7.2
+PyYAML==6.0.1
+redis==5.0.1
+simple-term-menu==1.6.1
+typing_extensions==4.8.0
+git+https://github.com/starwit/vision-api.git@0.4.0#subdirectory=python/visionapi
+git+https://github.com/starwit/vision-lib.git@0.3.0#subdirectory=python

@@ -1,0 +1,77 @@
+{{- with .Values.databaseWriter }}
+{{- $imageRepo := required "image repository for database-writer is required" .image.repository }}
+{{- $imageTag := required "image tag for database-writer is required" .image.tag }}
+{{- with .config -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sae.fullname" $ }}-database-writer
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: database-writer
+spec:
+  selector:
+    matchLabels:
+      {{- include "sae.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: database-writer
+  template:
+    metadata:
+      annotations:
+        sae.starwit.de/stage: database-writer
+      labels:
+        {{- include "sae.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: database-writer
+    spec:
+      serviceAccountName: {{ include "sae.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-redis
+          image: redis:7.2-alpine
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
+      containers:
+        - name: database-writer
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          env:
+            - name: DB_OUTPUT_ENABLED
+              value: "true"
+            - name: DB_JDBC_URL
+              value: {{ .db.jdbcUrl | quote }}
+            - name: DB_SCHEMA
+              value: {{ .db.schema | quote }}
+            - name: DB_USERNAME
+              value: {{ .db.username | quote }}
+            - name: DB_PASSWORD
+              value: {{ .db.password | quote }}
+            - name: DB_HYPERTABLE
+              value: {{ .db.hypertable | quote }}
+            - name: REDIS_INPUT_ENABLED
+              value: "true"
+            - name: REDIS_HOST
+              value: {{ include "sae.redisServiceName" $ }}
+            - name: REDIS_PORT
+              value: {{ include "sae.redisServicePort" $ }}
+            - name: REDIS_STREAM_IDS
+              value: {{ join "," .redisStreamIds | quote }}
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Xmx512m"
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}

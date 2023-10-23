@@ -1,0 +1,15 @@
+dependencies:
+- name: redis
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 17.16.0
+- name: prometheus
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 0.2.2
+- name: grafana
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 9.2.1
+- name: node-exporter
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 3.8.0
+digest: sha256:deabf2c7869cff4e0b986755dfd6369ee0e97472fe163fe946dd0e9df49a62fd
+generated: "2023-09-19T17:27:54.913431971+02:00"

@@ -1,0 +1,43 @@
+# Credentials for docker.internal.starwit-infra.de
+pullSecret:
+  user: user
+  password: password
+
+videoSource:
+  configs: 
+  - id: video1
+    uri: 'uri'
+    maxFps: 5
+    logLevel: DEBUG
+
+objectDetector:
+  config:
+    model:
+      size: "n"
+      device: cpu
+    inferenceSize: [ 640, 640 ]
+    classes: [ 2 ]
+    logLevel: DEBUG
+    redis:
+      streamIds:
+        - video1
+
+objectTracker:
+  configs:
+    - streamId: video1
+      trackingParams:
+        detThresh: 0.25
+        modelWeights: osnet_x0_25_msmt17.pt
+      device: cpu
+      logLevel: DEBUG
+
+databaseWriter:
+  config:
+    redisStreamIds:
+      - video1
+    db:
+      jdbcUrl: jdbc:postgresql://host:port/
+      schema: schema
+      username: username
+      password: password
+      hypertable: tablename

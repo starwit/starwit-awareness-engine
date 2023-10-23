@@ -1,0 +1,121 @@
+nameOverride: ""
+fullnameOverride: ""
+
+pullSecret:
+  user: user
+  password: password
+
+# extraImagePullSecrets:
+#   - name: extra-pull-secret
+
+videoSource:
+  image: 
+    repository: docker.internal.starwit-infra.de/sae/video-source-py
+    tag: 0.8.0
+  # configs: []
+  configs: 
+  - id: video1
+    uri: 'uri'
+    logLevel: DEBUG
+
+objectDetector:
+  image:
+    repository: docker.internal.starwit-infra.de/sae/object-detector
+    tag: 0.7.0
+  config:
+    model:
+      size: "n"
+      device: cpu
+    inferenceSize: [ 640, 640 ]
+    classes: [ 2 ]
+    logLevel: DEBUG
+    redis:
+      streamIds:
+        - video1
+
+objectTracker:
+  image:
+    repository: docker.internal.starwit-infra.de/sae/object-tracker
+    tag: 0.7.0
+  configs:
+    - streamId: video1
+      trackingParams:
+        detThresh: 0.25
+        modelWeights: osnet_x0_25_msmt17.pt
+      device: cpu
+      logLevel: DEBUG
+
+databaseWriter:
+  image:
+    repository: docker.internal.starwit-infra.de/sae/vision-api-jms-client
+    tag: 0.4.2
+  config:
+    redisStreamIds:
+      - video1
+    db:
+      jdbcUrl: jdbc:postgresql://100.70.113.34:30001/
+      schema: sae
+      username: sae
+      password: sae
+      hypertable: detection2
+
+redis:
+  architecture: standalone
+  auth:
+    enabled: false
+  commonConfiguration: |-
+    save ""
+    appendonly no
+  master:
+    persistence:
+      enabled: false
+  metrics:
+    enabled: true
+
+prometheus:
+  alertmanager:
+    enabled: false
+  server:
+    service:
+      type: ClusterIP
+    scrapeInterval: 10s
+    evaluationInterval: 10s
+    extraScrapeConfigs:
+      - job_name: redis_exporter
+        static_configs:
+          - targets: ['{{ include "sae.redisMetricsServiceName" $ }}:9121']
+      - job_name: node_exporter
+        static_configs:
+          - targets: ['{{ include "sae.nodeExporterServiceName" $ }}:9100']
+      - job_name: sae_pods
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              own_namespace: true
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+            action: keep
+            regex: (video-source|object-detector|object-tracker)
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
+          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+            action: replace
+            target_label: stage
+          
+
+grafana:
+  admin:
+    password: admin
+  datasources:
+    secretDefinition: 
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://{{ include "sae.prometheusServiceName" . }}
+
+
+nodeexporter:
+  enabled: true
