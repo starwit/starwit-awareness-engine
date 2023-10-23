@@ -7,6 +7,8 @@ jobs:
   ReleaseSAEChart:
     runs-on: 
       labels: infra
+    env:
+      DOCKER_PASSWORD: ${{ secrets.STARWIT_INTERNAL_PASSWORD }}
     # container:
     #   image: docker.internal.starwit-infra.de/helm-build:0.1.0
     #   credentials:
@@ -18,4 +20,4 @@ jobs:
       - name: Show files
         run: ls -lah $GITHUB_WORKSPACE
       - name: Debug
-        run: docker ps
+        run: echo $DOCKER_PASSWORD | $/usr/bin/docker --config /opt/actions-runner/_work/_temp/.docker_53f82986-51d6-4b52-a0a0-91e0fde2f25f login docker.internal.starwit-infra.de -u docker
