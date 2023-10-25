@@ -29,6 +29,7 @@
     ```
 - Install nvidia-device-plugin (and enable CUDA time slicing)
     ```sh
+    helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
     helm install nvdp nvdp/nvidia-device-plugin \
         --namespace nvidia-device-plugin --create-namespace \
         --version 0.14.1 -f nvidia-device-plugin.values.yaml
