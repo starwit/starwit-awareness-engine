@@ -12,6 +12,14 @@ from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 
 ANNOTATION_COLOR = (0, 0, 255)
+DEFAULT_WINDOW_SIZE = (1280, 720)
+
+def isWindowVisible(window_name):
+    try:
+        windowVisibleProp = int(cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE))
+        return windowVisibleProp == 1
+    except:
+        return False
 
 def choose_stream(redis_client):
     available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
@@ -41,10 +49,12 @@ def annotate(image, detection: Detection, object_id: bytes = None):
     cv2.rectangle(image, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), color=ANNOTATION_COLOR, thickness=line_width, lineType=cv2.LINE_AA)
     cv2.putText(image, label, (bbox_x1, bbox_y1 - 10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=ANNOTATION_COLOR, thickness=round(line_width/3), fontScale=line_width/4, lineType=cv2.LINE_AA)
 
-def showImage(window_name, image):
-    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(window_name, 1920, 1080)
-    cv2.imshow(window_name, image)
+def showImage(stream_id, image):
+    if not isWindowVisible(window_name=stream_id):
+        cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
+        cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
+        
+    cv2.imshow(stream_id, image)
     if cv2.waitKey(1) == ord('q'):
         stop_event.set()
         cv2.destroyAllWindows()
