@@ -5,7 +5,6 @@ This repository contains much of the documentation and orchestrating configurati
 The components of the vision pipeline can be found in the following repositories:
 | Component        | Repository / URI                                                   |
 | ---------------- | ------------------------------------------------------------------ | 
-| Helm Chart (sae) | https://github.com/starwit/helm-charts/tree/main/charts/sae        | 
 | Video Source     | https://github.com/starwit/video-source-py                         |
 | Object Detector  | https://github.com/starwit/object-detector                         |
 | Object Tracker   | https://github.com/starwit/object-tracker                          |
