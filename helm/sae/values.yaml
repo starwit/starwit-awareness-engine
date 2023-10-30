@@ -12,10 +12,11 @@ videoSource:
   image: 
     repository: docker.internal.starwit-infra.de/sae/video-source-py
     tag: 0.8.0
-  # configs: []
   configs: 
   - id: video1
     uri: 'uri'
+    maxFps: 0
+    jpegEncode: "True"
     logLevel: DEBUG
 
 objectDetector:

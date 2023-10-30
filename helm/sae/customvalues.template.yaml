@@ -1,43 +1,43 @@
-# Credentials for docker.internal.starwit-infra.de
+# Credentials for docker.internal.starwit-infra.de (see Bitwarden)
 pullSecret:
   user: user
   password: password
 
 videoSource:
   configs: 
-  - id: video1
-    uri: 'uri'
-    maxFps: 5
-    logLevel: DEBUG
+  - id: video1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
+    uri: 'uri'        # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
+    maxFps: 5         # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
+    logLevel: DEBUG   # Options: ERROR, WARNING, INFO, DEBUG
 
 objectDetector:
   config:
     model:
-      size: "n"
-      device: cpu
-    inferenceSize: [ 640, 640 ]
-    classes: [ 2 ]
-    logLevel: DEBUG
+      size: "n"                   # Which Ultralytics model to use. Options: n (nano), s (small), m (medium), l (large), x (xlarge)
+      device: cpu                 # Options: cpu, cuda (uses gpu; needs proper setup; see README)
+    inferenceSize: [ 640, 640 ]   # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
+    classes: [ 2 ]                # Which object classes to detect (refer to coco object classes)
+    logLevel: DEBUG               # Options: ERROR, WARNING, INFO, DEBUG
     redis:
       streamIds:
-        - video1
+        - video1                  # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
   configs:
-    - streamId: video1
-      trackingParams:
-        detThresh: 0.25
+    - streamId: video1                        # On which video stream to track objects on
+      trackingParams:   
+        detThresh: 0.25                       # Filter out objects below this confidence threshold
         modelWeights: osnet_x0_25_msmt17.pt
-      device: cpu
-      logLevel: DEBUG
+      device: cpu                             # Options: cpu, cuda (uses gpu; needs proper setup; see README)
+      logLevel: DEBUG                         # Options: ERROR, WARNING, INFO, DEBUG
 
 databaseWriter:
   config:
     redisStreamIds:
-      - video1
+      - video1                                # Which video streams to read (and extract detection and tracking data from)
     db:
-      jdbcUrl: jdbc:postgresql://host:port/
+      jdbcUrl: jdbc:postgresql://host:port/   # JDBC URL. Must be a Postgres database. Does not have to be a Timescale (although the latter makes most sense)
       schema: schema
       username: username
       password: password
-      hypertable: tablename
+      hypertable: tablename                   # Table name. Does not have to be a Hypertable.
