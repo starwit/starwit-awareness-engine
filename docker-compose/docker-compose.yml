@@ -48,7 +48,7 @@ services:
     image: ${IMAGE_REGISTRY}/sae/anomaly-detector:1.0-SNAPSHOT
     volumes:
       - ./anomaly-detector/anomaly-detector.settings.yaml:/code/settings.yaml
-      - /home/hanna/Schreibtisch/Starwit/anomaly_detection/outputDocker:/app/generated
+      - /home/hanna/Schreibtisch/Starwit/anomaly_detection/generated:/app/generated
       - /home/hanna/Schreibtisch/Starwit/anomaly_detection/.env:/app/.env
     environment:
       REDIS_HOST: redis
