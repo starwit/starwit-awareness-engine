@@ -3,16 +3,16 @@ The database-writer expects the following table structure when inserting trackin
 ```sql
 CREATE TABLE IF NOT EXISTS public.detection
 (
-    "DETECTION_ID" integer,
-    "CAPTURE_TS" timestamp with time zone NOT NULL,
-    "CAMERA_ID" character varying COLLATE pg_catalog."default",
-    "OBJECT_ID" character varying COLLATE pg_catalog."default",
-    "CLASS_ID" integer,
-    "CONFIDENCE" double precision,
-    "MIN_X" integer,
-    "MIN_Y" integer,
-    "MAX_X" integer,
-    "MAX_Y" integer
+    "detection_id" integer,
+    "capture_ts" timestamp with time zone NOT NULL,
+    "camera_id" character varying COLLATE pg_catalog."default",
+    "object_id" character varying COLLATE pg_catalog."default",
+    "class_id" integer,
+    "confidence" double precision,
+    "min_x" integer,
+    "min_y" integer,
+    "max_x" integer,
+    "max_y" integer
 )
 ```
 
@@ -21,15 +21,15 @@ For performance it is important to create this table as a hypertable
 Also, the indices below might help to speed up common queries.
 
 ```sql 
-SELECT create_hypertable('detection', 'CAPTURE_TS');
+SELECT create_hypertable('detection', 'capture_ts');
 
 CREATE INDEX IF NOT EXISTS detection_camera_id
     ON public.detection USING btree
-    ("CAMERA_ID" COLLATE pg_catalog."default" ASC NULLS LAST)
+    ("camera_id" COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
     
 CREATE INDEX IF NOT EXISTS detection_object_id
     ON public.detection USING btree
-    ("OBJECT_ID" COLLATE pg_catalog."default" ASC NULLS LAST)
+    ("object_id" COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
 ```

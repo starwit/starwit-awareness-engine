@@ -4,15 +4,15 @@ set -e
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
 	CREATE TABLE IF NOT EXISTS public.data
 	(
-		"DETECTION_ID" integer,
-		"CAPTURE_TS" timestamp with time zone NOT NULL,
-		"CAMERA_ID" character varying COLLATE pg_catalog."default",
-		"OBJECT_ID" character varying COLLATE pg_catalog."default",
-		"CLASS_ID" integer,
-		"CONFIDENCE" double precision,
-		"MIN_X" integer,
-		"MIN_Y" integer,
-		"MAX_X" integer,
-		"MAX_Y" integer
+		"detection_id" integer,
+		"capture_ts" timestamp with time zone NOT NULL,
+		"camera_id" character varying COLLATE pg_catalog."default",
+		"object_id" character varying COLLATE pg_catalog."default",
+		"class_id" integer,
+		"confidence" double precision,
+		"min_x" integer,
+		"min_y" integer,
+		"max_x" integer,
+		"max_y" integer
 	)
 EOSQL
