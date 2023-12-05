@@ -104,13 +104,13 @@ if __name__ == '__main__':
     arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
-    STREAM_ID = args.stream
+    STREAM_KEY = args.stream
     REDIS_HOST = args.redis_host
     REDIS_PORT = args.redis_port
 
-    if STREAM_ID is None:
+    if STREAM_KEY is None:
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
-        STREAM_ID = choose_stream(redis_client)
+        STREAM_KEY = choose_stream(redis_client)
     
     stop_event = threading.Event()
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
 
-    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_ID], block=200)
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 
     with consume:
         for stream_key, proto_data in consume():

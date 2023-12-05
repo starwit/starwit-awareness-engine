@@ -6,26 +6,10 @@ from typing import TextIO
 
 import pybase64
 import redis
-from pydantic import BaseModel
 from simple_term_menu import TerminalMenu
-from visionapi.messages_pb2 import (Detection, DetectionOutput,
-                                    TrackedDetection, TrackingOutput,
-                                    VideoFrame)
 from visionlib.pipeline.consumer import RedisConsumer
 
-MESSAGE_SEPARATOR = ';'
-
-
-class EventMeta(BaseModel):
-    record_time: float
-    source_stream: str
-    
-class Event(BaseModel):
-    meta: EventMeta
-    data_b64: str
-
-class DumpMeta(BaseModel):
-    start_time: float
+from common import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 
 
 def choose_streams(redis_client):
@@ -45,8 +29,11 @@ def choose_streams(redis_client):
         exit(0)
     return [available_streams[idx] for idx in selected_idx_list]
 
-def write_meta(file: TextIO, start_time: float):
-    meta = DumpMeta(start_time=start_time)
+def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
+    meta = DumpMeta(
+        start_time=start_time,
+        recorded_streams=stream_keys
+    )
     file.write(meta.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
@@ -58,26 +45,13 @@ def write_event(file: TextIO, stream_key: str, proto_data):
             record_time=time.time(),
             source_stream=stream_key
         ),
-        data_b64=get_proto_b64(stream_type, proto_data)
+        data_b64=pybase64.standard_b64encode(proto_data)
     )
 
     file.write(event.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
     
-def get_proto_b64(stream_type: str, proto_data):
-    if stream_type == 'videosource':
-        proto = VideoFrame()
-        proto.ParseFromString(proto_data)
-    elif stream_type == 'objectdetector':
-        proto = DetectionOutput()
-        proto.ParseFromString(proto_data)
-    elif stream_type == 'objecttracker':
-        proto = TrackingOutput()
-        proto.ParseFromString(proto_data)
-    return pybase64.standard_b64encode(proto_data)
-
-
 if __name__ == '__main__':
 
     arg_parser = argparse.ArgumentParser()
@@ -88,15 +62,15 @@ if __name__ == '__main__':
     arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
-    STREAM_IDS = args.streams
+    STREAM_KEYS = args.streams
     REDIS_HOST = args.redis_host
     REDIS_PORT = args.redis_port
 
-    if STREAM_IDS is None:
+    if STREAM_KEYS is None:
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
-        STREAM_IDS = choose_streams(redis_client)
+        STREAM_KEYS = choose_streams(redis_client)
 
-    print(f'Recording streams {STREAM_IDS} into {args.output_file}')
+    print(f'Recording streams {STREAM_KEYS} into {args.output_file}')
 
     stop_event = threading.Event()
 
@@ -108,13 +82,13 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
 
-    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_IDS, block=200)
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
 
     start_time = time.time()
 
     with consume, open(args.output_file, 'x') as output_file:
         
-        write_meta(output_file, start_time)
+        write_meta(output_file, start_time, STREAM_KEYS)
 
         for stream_key, proto_data in consume():
             if stop_event.is_set():
