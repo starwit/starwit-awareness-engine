@@ -26,6 +26,7 @@ def choose_stream(redis_client):
     menu = TerminalMenu(available_streams, title='Choose Redis stream to watch:', show_search_hint=True)
     selected_idx = menu.show()
     if selected_idx is None:
+        print('No stream chosen. Exiting.')
         exit(0)
     return available_streams[selected_idx]
 
@@ -111,10 +112,7 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_ID = choose_stream(redis_client)
     
-    STREAM_TYPE = STREAM_ID.split(':')[0]
-
     stop_event = threading.Event()
-    last_retrieved_id = None
 
     def sig_handler(signum, _):
         signame = signal.Signals(signum).name
@@ -127,14 +125,15 @@ if __name__ == '__main__':
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_ID], block=200)
 
     with consume:
-        for stream_id, proto_data in consume():
+        for stream_key, proto_data in consume():
             if stop_event.is_set():
                 break
 
-            if stream_id is None:
+            if stream_key is None:
                 continue
-
-            STREAM_TYPE_HANDLER[STREAM_TYPE](proto_data, stream_id)
+            
+            stream_type, stream_id = stream_key.split(':')
+            STREAM_TYPE_HANDLER[stream_type](proto_data, stream_id)
 
         
 
