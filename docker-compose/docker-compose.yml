@@ -12,19 +12,6 @@ services:
       test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
       interval: 1s
       start_period: 5s
-  
-  postgres:
-    image: postgres:15
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_PASSWORD: postgres
-    volumes:
-      - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
-    healthcheck:
-      test: "pg_isready -U postgres"
-      interval: 2s
-      start_period: 10s
 
   video-source-stream1:
     image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
@@ -48,30 +35,6 @@ services:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
     depends_on:
       redis:
-        condition: service_healthy
-
-  database-writer:
-    image: ${IMAGE_REGISTRY}/sae/vision-api-jms-client:${DATABASE_WRITER_VERSION}
-    volumes:
-      - ./database-writer/.env:/app/.env
-    depends_on:
-      redis:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-       - ./pgadmin/servers-config.json:/pgadmin4/servers.json
-    ports:
-      - "5050:80"
-    depends_on:
-      postgres:
         condition: service_healthy
 
   streaming-server:
