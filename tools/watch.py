@@ -23,7 +23,7 @@ def isWindowVisible(window_name):
 
 def choose_stream(redis_client):
     available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
-    menu = TerminalMenu(available_streams)
+    menu = TerminalMenu(available_streams, title='Choose Redis stream to watch:', show_search_hint=True)
     selected_idx = menu.show()
     if selected_idx is None:
         exit(0)
