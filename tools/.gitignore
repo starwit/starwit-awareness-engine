@@ -1,2 +1,4 @@
 .venv
 .venv_temp
+__pycache__
+*.saedump
