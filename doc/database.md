@@ -33,3 +33,6 @@ CREATE INDEX IF NOT EXISTS detection_object_id
     ("object_id" COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
 ```
+
+# Export database as CSV
+`psql -U sae -h <host> -p <port> -c "\copy (select * from detection order by capture_ts desc limit 10) TO STDOUT CSV HEADER"`
