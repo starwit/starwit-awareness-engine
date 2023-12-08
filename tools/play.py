@@ -5,9 +5,11 @@ import time
 from typing import TextIO
 
 import pybase64
-from visionlib.pipeline.publisher import RedisPublisher
-
 from common import MESSAGE_SEPARATOR, DumpMeta, Event
+from visionapi.messages_pb2 import (Detection, DetectionOutput,
+                                    TrackedDetection, TrackingOutput,
+                                    VideoFrame)
+from visionlib.pipeline.publisher import RedisPublisher
 
 
 def read_messages(file: TextIO):
@@ -29,13 +31,31 @@ def wait_until(playback_start_time: float, record_start_time: float, record_targ
     target_delta = record_target_time - record_start_time
     if playback_delta <= target_delta:
         time.sleep(target_delta - playback_delta)
-        
+
+def set_frame_timestamp_to_now(proto_bytes: str, stream_name: str):
+    if stream_name.startswith('videosource'):
+        frame = VideoFrame()
+        frame.ParseFromString(proto_bytes)
+    elif stream_name.startswith('objectdetector'):
+        proto = DetectionOutput()
+        proto.ParseFromString(proto_bytes)
+        frame = proto.frame
+    elif stream_name.startswith('objecttracker'):
+        proto = TrackingOutput()
+        proto.ParseFromString(proto_bytes)
+        frame = proto.frame
+
+    frame.timestamp_utc_ms = time.time_ns() // 1000000
+    
+    return proto.SerializeToString()
+
 
 if __name__ == '__main__':
 
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('-o', '--input-file', type=str, required=True)
-    arg_parser.add_argument('-l', '--loop', action='store_true')
+    arg_parser.add_argument('-l', '--loop', action='store_true', help='Loop indefinitely (exit with Ctrl-C)')
+    arg_parser.add_argument('-t', '--adjust-timestamps', action='store_true', help='Adjust message timestamps to the time in the moment of playback')
     arg_parser.add_argument('--redis-host', type=str, default='localhost')
     arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
@@ -66,10 +86,14 @@ if __name__ == '__main__':
 
             for message in message_reader:
                 event = Event.model_validate_json(message)
+                proto_bytes = pybase64.standard_b64decode(event.data_b64)
+
+                if args.adjust_timestamps:
+                    proto_bytes = set_frame_timestamp_to_now(proto_bytes, event.meta.source_stream)
 
                 wait_until(playback_start, dump_meta.start_time, event.meta.record_time)
 
-                publish(event.meta.source_stream, pybase64.standard_b64decode(event.data_b64))
+                publish(event.meta.source_stream, proto_bytes)
 
                 if stop_event.is_set():
                     break
