@@ -2,3 +2,4 @@
 *.values.yaml
 
 charts
+*.tgz

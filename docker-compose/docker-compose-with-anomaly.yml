@@ -1,0 +1,15 @@
+version: "3.8"
+
+include:
+  - docker-compose.yml
+
+services:
+
+  anomaly-detector:
+    image: ${IMAGE_REGISTRY}/sae/anomaly-detector:2.1.0
+    volumes:
+      - ./anomaly-detector/anomaly-detector.settings.yaml:/code/settings.yaml
+      - /home/hanna/workspaces/anomaly_detection/generated:/app/generated
+      - /home/hanna/workspaces/anomaly_detection/.env:/app/.env
+    environment:
+      REDIS_HOST: redis
