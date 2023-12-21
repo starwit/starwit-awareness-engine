@@ -1,8 +1,3 @@
-# Credentials for docker.internal.starwit-infra.de (see Bitwarden)
-pullSecret:
-  user: user
-  password: password
-
 videoSource:
   configs: 
   - id: video1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.

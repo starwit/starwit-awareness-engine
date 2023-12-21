@@ -1,16 +1,12 @@
 nameOverride: ""
 fullnameOverride: ""
 
-pullSecret:
-  user: user
-  password: password
-
 # extraImagePullSecrets:
 #   - name: extra-pull-secret
 
 videoSource:
   image: 
-    repository: docker.internal.starwit-infra.de/sae/video-source-py
+    repository: starwitorg/sae-video-source-py
     tag: 0.8.0
   configs: 
   - id: video1
@@ -21,7 +17,7 @@ videoSource:
 
 objectDetector:
   image:
-    repository: docker.internal.starwit-infra.de/sae/object-detector
+    repository: starwitorg/sae-object-detector
     tag: 0.7.0
   config:
     model:
@@ -36,7 +32,7 @@ objectDetector:
 
 objectTracker:
   image:
-    repository: docker.internal.starwit-infra.de/sae/object-tracker
+    repository: starwitorg/sae-object-tracker
     tag: 0.7.0
   configs:
     - streamId: video1
@@ -48,17 +44,17 @@ objectTracker:
 
 databaseWriter:
   image:
-    repository: docker.internal.starwit-infra.de/sae/vision-api-jms-client
+    repository: starwitorg/sae-database-writer
     tag: 0.5.0
   config:
     redisStreamIds:
       - video1
     db:
-      jdbcUrl: jdbc:postgresql://100.70.113.34:30001/
-      schema: sae
-      username: sae
-      password: sae
-      hypertable: detection2
+      jdbcUrl: jdbc:postgresql://host:port/
+      schema: schema
+      username: username
+      password: password
+      hypertable: tablename
 
 redis:
   architecture: standalone
