@@ -5,10 +5,9 @@ This repository aims at replicating the Helm/Kubernetes-based vision pipeline fo
 A longer explanation of the architecture and the technical setup can be found in `../doc/README.md`.
 
 ## Quickstart
-1. Make sure you can pull images from `docker.internal.starwit-infra.de` (run `docker login docker.internal.starwit-infra.de` if not)
-2. Change `VIDEO_PATH` in `.env` to a video on your machine
-3. Run `docker compose up`
-4. Have a look at the `watch.py` et al. in `../tools` (also see its readme)
+1. Change `VIDEO_PATH` in `.env` to a video on your machine
+2. Run `docker compose up`
+3. Have a look at the `watch.py` et al. in `../tools` (also see its readme)
 
 ### Database output
 If you want to have database output, i.e. store the tracker output in a Postgres DB (which is what prod deployments do), you can replace step 3 from above to `docker compose -f docker-compose-with-db.yaml up`. You'll find a pgadmin web UI to browse the database at http://localhost:5050.
