@@ -11,7 +11,7 @@
     ```
 - Install K3s (disable all components we do not need, and add tailscale name to api cert)
     ```sh
-    curl -ksL get.k3s.io | INSTALL_K3S_EXEC="--disable traefik --disable servicelb --tls-san carmel-srv-vw-gpu" sh -
+    curl -ksL get.k3s.io | INSTALL_K3S_EXEC="--disable traefik --disable servicelb" sh -
     ```
 - Create runtimeClass "nvidia"
     ```sh

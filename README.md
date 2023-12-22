@@ -29,18 +29,13 @@ The components of the vision pipeline can be found in the following repositories
 2. Install Timescale DB (if do not have one on another machine and you want to store the pipeline output data)
     - Create a database for pipeline data and a table / hypertable. See [`./doc/database.md`](doc/database.md) for instructions.
 3. Install SAE
-    - Set up internal Starwit Helm repo (see Bitwarden for credentials)
-        ```sh
-        helm repo add starwit-internal https://helm.internal.starwit-infra.de --username chartmuseum --password-stdin < <(read -s -p "Password: "; echo $REPLY)
-        helm repo update
-        ```
     - Copy the values template file and adapt it to your needs (see the file for information)
         ```sh
         cp ./helm/sae/customvalues.template my.values.yaml
         ``` 
     - Install helm chart
         ```sh
-        helm install <release-name> starwit-internal/sae -f my.values.yaml
+        helm install <release-name> oci://registry-1.docker.io/starwitorg/sae -f my.values.yaml
         ```
 4. Set up and use the watch tool in [`tools/`](tools/watch.py) to inspect the pipeline visually
 5. Check out the internal pipeline metrics
