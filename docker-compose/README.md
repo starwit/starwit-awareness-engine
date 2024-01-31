@@ -29,3 +29,20 @@ If you have a Nvidia GPU in your system, you can try changing the `device` on ob
 
 ## Visual Pipeline Introspection
 The `../tools/watch.py` script can be used to visually look into the data flows within the pipeline. See more detailed description it its readme.
+
+## How-To Use Nvidia GPU
+- Install `nvidia-container-toolkit` (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
+  - Test if the Nvidia runtime works (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/sample-workload.html#running-a-sample-workload-with-docker)
+- Enable GPU support for compose services, where you want it (e.g. `object-detector`)
+  Add the following section to each service that needs GPU support:
+  ```yaml
+  deploy:
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+  ```
+- Configure application to use Nvidia CUDA
+  - In the case of `object-detector` change `model.device` in its settings file (by default at `./object-detector/object-detector.settings.yaml`) from `cpu` to `cuda`
