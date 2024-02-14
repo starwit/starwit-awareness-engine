@@ -18,13 +18,21 @@ objectDetector:
         - video1                  # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
-  configs:
-    - streamId: video1                        # On which video stream to track objects on
-      trackingParams:   
-        detThresh: 0.25                       # Filter out objects below this confidence threshold
-        modelWeights: osnet_x0_25_msmt17.pt
-      device: cpu                             # Options: cpu, cuda (uses gpu; needs proper setup; see README)
-      logLevel: DEBUG                         # Options: ERROR, WARNING, INFO, DEBUG
+  logLevel: DEBUG                             # Options: ERROR, WARNING, INFO, DEBUG
+  needsGpu: False                             # Whether the algorithm needs gpu support (needs proper setup; see README)
+  streamIds:                                  # On which video streams to track objects (the same as object-detector stream ids above)
+    - video1
+  config:                                     # Tracker specific config (see object-tracker repo / Boxmot for details)
+    tracker_algorithm: OCSORT
+    tracker_config:
+      det_thresh: 0.2
+      max_age: 30
+      min_hits: 3
+      asso_threshold: 0.3
+      delta_t: 3
+      asso_func: 'iou'
+      inertia: 0.2
+      use_byte: False
 
 databaseWriter:
   config:

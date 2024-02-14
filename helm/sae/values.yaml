@@ -33,14 +33,22 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 0.7.0
-  configs:
-    - streamId: video1
-      trackingParams:
-        detThresh: 0.25
-        modelWeights: osnet_x0_25_msmt17.pt
-      device: cpu
-      logLevel: DEBUG
+    tag: 1.0.0
+  logLevel: DEBUG
+  needsGpu: False
+  streamIds:
+    - video1
+  config:
+    tracker_algorithm: OCSORT
+    tracker_config:
+      det_thresh: 0.2
+      max_age: 30
+      min_hits: 3
+      asso_threshold: 0.3
+      delta_t: 3
+      asso_func: 'iou'
+      inertia: 0.2
+      use_byte: False
 
 databaseWriter:
   image:

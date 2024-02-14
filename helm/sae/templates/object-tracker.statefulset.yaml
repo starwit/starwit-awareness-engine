@@ -1,9 +1,10 @@
 {{- with .Values.objectTracker }}
 {{- $imageRepo := required "image repository for object-tracker is required" .image.repository }}
 {{- $imageTag := required "image tag for object-tracker is required" .image.tag }}
-{{- range .configs }}
-{{- $isUsingGpu := hasPrefix "cuda" .device }}
-{{- $instanceName := printf "object-tracker-%s" (lower .streamId) }}
+{{- $config := . }}
+{{- range .streamIds }}
+{{- $streamId := . -}}
+{{- $instanceName := printf "object-tracker-%s" (lower .) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -27,7 +28,7 @@ spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $isUsingGpu }}
+      {{- if $config.needsGpu }}
       runtimeClassName: nvidia
       {{- end }}
       initContainers:
@@ -40,29 +41,31 @@ spec:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $isUsingGpu }}
+          {{- if $config.needsGpu }}
           resources:
             limits:
               nvidia.com/gpu: 1
           {{- end }}
           env:
-            - name: TRACKING_PARAMS__DET_THRESH
-              value: {{ .trackingParams.detThresh | quote }}
-            - name: TRACKING_PARAMS__MODEL_WEIGHTS
-              value: {{ .trackingParams.modelWeights | quote }}
-            - name: DEVICE
-              value: {{ .device | quote }}
             - name: LOG_LEVEL
-              value: {{ .logLevel | quote }}
+              value: {{ $config.logLevel | quote }}
             - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
             - name: REDIS__PORT
               value: {{ include "sae.redisServicePort" $ }}
             - name: REDIS__STREAM_ID
-              value: {{ .streamId | quote }}
+              value: {{ $streamId | quote }}
           ports:
             - name: prometheus
               containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: object-tracker-config
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
