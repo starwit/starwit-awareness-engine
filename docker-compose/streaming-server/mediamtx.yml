@@ -1,7 +1,4 @@
 paths:
-  ondemand-1080:
-    runOnDemand: ffmpeg -re -stream_loop -1 -i /video_1080 -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
-    runOnDemandRestart: yes
-  ondemand-4k:
-    runOnDemand: ffmpeg -re -stream_loop -1 -i /video_4k -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
+  video-stream:
+    runOnDemand: ffmpeg -re -stream_loop -1 -i /video -c copy -f rtsp rtsp://localhost:$RTSP_PORT/$MTX_PATH
     runOnDemandRestart: yes

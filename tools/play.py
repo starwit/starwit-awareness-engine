@@ -53,7 +53,7 @@ def set_frame_timestamp_to_now(proto_bytes: str, stream_name: str):
 if __name__ == '__main__':
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-o', '--input-file', type=str, required=True)
+    arg_parser.add_argument('-i', '--input-file', type=str, required=True)
     arg_parser.add_argument('-l', '--loop', action='store_true', help='Loop indefinitely (exit with Ctrl-C)')
     arg_parser.add_argument('-t', '--adjust-timestamps', action='store_true', help='Adjust message timestamps to the time in the moment of playback')
     arg_parser.add_argument('--redis-host', type=str, default='localhost')
