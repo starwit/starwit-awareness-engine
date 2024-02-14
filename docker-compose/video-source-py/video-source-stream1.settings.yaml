@@ -1,7 +1,7 @@
 id: stream1
 uri: rtsp://streaming-server:8554/video-stream
 reconnect_backoff_time: 1
-max_fps: 5
+max_fps: 10
 jpeg_encode: True
 log_level: DEBUG
 redis:

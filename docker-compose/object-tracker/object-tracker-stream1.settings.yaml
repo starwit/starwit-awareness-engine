@@ -1,7 +1,34 @@
-tracking_params:
-  det_thresh: 0.25
-  model_weights: osnet_x0_25_msmt17.pt
-device: "cpu"
+tracker_algorithm: OCSORT
+tracker_config:
+  det_thresh: 0.2
+  max_age: 30
+  min_hits: 3
+  asso_threshold: 0.3
+  delta_t: 3
+  asso_func: 'iou'
+  inertia: 0.2
+  use_byte: False
+
+# tracker_algorithm: DEEPOCSORT
+# tracker_config:
+#   model_weights: 'osnet_x0_25_msmt17.pt'
+#   device: 'cpu'
+#   fp16: False
+#   det_thresh: 0.3
+#   max_age: 30
+#   min_hits: 3
+#   iou_threshold: 0.3
+#   delta_t: 3
+#   asso_func: 'iou'
+#   inertia: 0.2
+#   w_association_emb: 0.5
+#   alpha_fixed_emb: 0.95
+#   aw_param: 0.5
+#   embedding_off: False
+#   cmc_off: False
+#   aw_off: False
+#   new_kf_off: False
+
 log_level: DEBUG
 redis:
   host: redis
