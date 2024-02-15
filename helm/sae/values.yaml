@@ -18,7 +18,7 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 0.7.0
+    tag: 0.7.1
   config:
     model:
       size: "n"
