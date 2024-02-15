@@ -53,7 +53,7 @@ objectTracker:
 databaseWriter:
   image:
     repository: starwitorg/sae-database-writer
-    tag: 0.5.0
+    tag: 0.5.1
   config:
     redisStreamIds:
       - video1
