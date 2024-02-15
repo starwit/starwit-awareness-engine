@@ -549,7 +549,7 @@
           "expr": "rate(object_tracker_proto_serialization_duration_sum{pod=~\".*-object-tracker-$streamId-0\"}[30s])/rate(object_tracker_proto_serialization_duration_count{pod=~\".*-object-tracker-$streamId-0\"}[30s])",
           "hide": false,
           "instant": false,
-          "legendFormat": "proto_deserialize()",
+          "legendFormat": "proto_serialize()",
           "range": true,
           "refId": "C"
         },
