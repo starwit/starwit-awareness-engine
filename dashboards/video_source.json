@@ -144,7 +144,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(video_source_frame_counter_total[30s])",
+          "expr": "rate(video_source_frame_counter_total{pod=~\".*-video-source-$streamId-0\"}[30s])",
           "instant": false,
           "legendFormat": "fps ingested into pipeline",
           "range": true,
@@ -156,7 +156,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(frame_grabber_frame_counter_total[30s])",
+          "expr": "rate(frame_grabber_frame_counter_total{pod=~\".*-video-source-$streamId-0\"}[30s])",
           "hide": false,
           "instant": false,
           "legendFormat": "fps retrieved from stream",
@@ -238,7 +238,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(video_source_redis_publish_duration_bucket[30s])) by (le)",
+          "expr": "sum(rate(video_source_redis_publish_duration_bucket{pod=~\".*-video-source-$streamId-0\"}[30s])) by (le)",
           "format": "heatmap",
           "instant": false,
           "interval": "",
@@ -336,7 +336,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(video_source_redis_publish_duration_sum[30s])/rate(video_source_redis_publish_duration_count[30s])",
+          "expr": "rate(video_source_redis_publish_duration_sum{pod=~\".*-video-source-$streamId-0\"}[30s])/rate(video_source_redis_publish_duration_count{pod=~\".*-video-source-$streamId-0\"}[30s])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -355,18 +355,23 @@
     "list": [
       {
         "current": {},
-        "definition": "label_values(video_source_frame_counter_total,pod)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(pod)",
         "hide": 0,
         "includeAll": false,
+        "label": "Stream-ID",
         "multi": false,
-        "name": "Pod",
+        "name": "streamId",
         "options": [],
         "query": {
-          "query": "label_values(video_source_frame_counter_total,pod)",
+          "query": "label_values(pod)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
-        "refresh": 1,
-        "regex": "",
+        "refresh": 2,
+        "regex": ".*-video-source-(?<text>\\w+)-0",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
@@ -374,13 +379,13 @@
     ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Video_Source",
   "uid": "cd9b5148-e31d-4379-b23d-1c7f5c122632",
-  "version": 11,
+  "version": 12,
   "weekStart": ""
 }
