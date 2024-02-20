@@ -31,10 +31,10 @@ def choose_stream(redis_client):
     return available_streams[selected_idx]
 
 def annotate(image, detection: Detection, object_id: bytes = None):
-    bbox_x1 = detection.bounding_box.min_x
-    bbox_y1 = detection.bounding_box.min_y
-    bbox_x2 = detection.bounding_box.max_x
-    bbox_y2 = detection.bounding_box.max_y
+    bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
+    bbox_y1 = int(detection.bounding_box.min_y * image.shape[0])
+    bbox_x2 = int(detection.bounding_box.max_x * image.shape[1])
+    bbox_y2 = int(detection.bounding_box.max_y * image.shape[0])
 
     class_id = detection.class_id
     conf = detection.confidence
