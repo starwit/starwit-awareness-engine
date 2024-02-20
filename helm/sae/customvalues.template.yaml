@@ -1,9 +1,10 @@
 videoSource:
+  logLevel: DEBUG   # Options: ERROR, WARNING, INFO, DEBUG
   configs: 
   - id: video1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
     uri: 'uri'        # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
     maxFps: 5         # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
-    logLevel: DEBUG   # Options: ERROR, WARNING, INFO, DEBUG
+    scale_width: 0    # If > 0, scale the image to the given width (preserving aspect ratio)
 
 objectDetector:
   config:
