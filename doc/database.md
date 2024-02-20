@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS public.detection
     "object_id" character varying COLLATE pg_catalog."default",
     "class_id" integer,
     "confidence" double precision,
-    "min_x" integer,
-    "min_y" integer,
-    "max_x" integer,
-    "max_y" integer
+    "min_x" real,
+    "min_y" real,
+    "max_x" real,
+    "max_y" real
 )
 ```
 
@@ -36,3 +36,14 @@ CREATE INDEX IF NOT EXISTS detection_object_id
 
 # Export database as CSV
 `psql -U sae -h <host> -p <port> -c "\copy (select * from detection order by capture_ts desc limit 10) TO STDOUT CSV HEADER"`
+
+# Backup and Restore
+## Backup
+`pg_dump -h <db_host> -p <db_port> -U <db_user> -F custom -f <dumpfile> -d <db_name>`
+If you need to only export a certain schema (default: all schemas in specified database), you can add `-n <pattern>`
+
+## Restore
+- Before restoring run `SELECT timescaledb_pre_restore();`
+- Do the restore\
+    `pg_restore -U <db_user> -h <db_host> -p <db_port> -d <target_db_name> --no-tablespaces --no-owner --no-privileges <dumpfile>`
+- After process has finished run `SELECT timescaledb_post_restore();`
