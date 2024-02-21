@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.detection
     "min_y" real,
     "max_x" real,
     "max_y" real
-)
+);
 ```
 
 For performance it is important to create this table as a hypertable

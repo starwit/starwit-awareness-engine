@@ -7,7 +7,7 @@ fullnameOverride: ""
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 0.9.0
+    tag: 0.9.1
   configs: 
   - id: video1
     uri: 'uri'
