@@ -34,6 +34,36 @@ CREATE INDEX IF NOT EXISTS detection_object_id
     TABLESPACE pg_default;
 ```
 
+# Database migration <1.0.0 => 1.0.0
+With 1.0.0 the data type of the bounding box coordinates changed from `integer` to `real` as the coordinates are now normalized (i.e. a fraction of image height / width). If needed, the existing data can be migrated, if the resolution of the camera the data originated from is known. In practice, it is probably advisable to just drop all data and change the table format, as migrating big amounts of data can take a while and short downtime is mostly preferable to keeping historic data.
+
+## Schema migration
+```sql
+ALTER TABLE detection RENAME COLUMN min_x TO min_x_abs;
+ALTER TABLE detection RENAME COLUMN min_y TO min_y_abs;
+ALTER TABLE detection RENAME COLUMN max_x TO max_x_abs;
+ALTER TABLE detection RENAME COLUMN max_y TO max_y_abs;
+
+ALTER TABLE detection
+    ADD COLUMN min_x REAL,
+    ADD COLUMN min_y REAL,
+    ADD COLUMN max_x REAL,
+    ADD COLUMN max_y REAL;
+
+UPDATE detection SET
+    min_x = min_x_abs::REAL / <x_resolution>,
+    min_y = min_y_abs::REAL / <y_resolution>,
+    max_x = max_x_abs::REAL / <x_resolution>,
+    max_y = max_y_abs::REAL / <y_resolution>;
+
+ALTER TABLE detection (
+    DROP COLUMN min_x_abs,
+    DROP COLUMN min_y_abs,
+    DROP COLUMN max_x_abs,
+    DROP COLUMN max_y_abs
+);
+```
+
 # Export database as CSV
 `psql -U sae -h <host> -p <port> -c "\copy (select * from detection order by capture_ts desc limit 10) TO STDOUT CSV HEADER"`
 
