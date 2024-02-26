@@ -38,8 +38,6 @@ def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     file.write(MESSAGE_SEPARATOR)
 
 def write_event(file: TextIO, stream_key: str, proto_data):
-    stream_type = stream_key.split(':')[0]
-
     event = Event(
         meta=EventMeta(
             record_time=time.time(),
@@ -70,7 +68,7 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
 
-    print(f'Recording streams {STREAM_KEYS} into {args.output_file}')
+    print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {args.output_file}')
 
     stop_event = threading.Event()
 

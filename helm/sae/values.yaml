@@ -7,7 +7,7 @@ fullnameOverride: ""
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 0.9.1
+    tag: 1.0.0
   configs: 
   - id: video1
     uri: 'uri'
@@ -18,7 +18,7 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 1.0.0
+    tag: 2.0.0
   config:
     model:
       size: "n"
@@ -33,7 +33,7 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 2.0.0
+    tag: 3.0.0
   logLevel: DEBUG
   needsGpu: False
   streamIds:
@@ -53,7 +53,7 @@ objectTracker:
 databaseWriter:
   image:
     repository: starwitorg/sae-database-writer
-    tag: 1.0.0
+    tag: 2.0.0
   config:
     redisStreamIds:
       - video1

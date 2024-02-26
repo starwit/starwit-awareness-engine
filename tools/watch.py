@@ -5,9 +5,7 @@ import threading
 import cv2
 import redis
 from simple_term_menu import TerminalMenu
-from visionapi.messages_pb2 import (Detection, DetectionOutput,
-                                    TrackedDetection, TrackingOutput,
-                                    VideoFrame)
+from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 
@@ -30,7 +28,7 @@ def choose_stream(redis_client):
         exit(0)
     return available_streams[selected_idx]
 
-def annotate(image, detection: Detection, object_id: bytes = None):
+def annotate(image, detection: Detection):
     bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
     bbox_y1 = int(detection.bounding_box.min_y * image.shape[0])
     bbox_x2 = int(detection.bounding_box.max_x * image.shape[1])
@@ -41,8 +39,8 @@ def annotate(image, detection: Detection, object_id: bytes = None):
 
     label = f'{class_id} - {round(conf,2)}'
 
-    if object_id is not None:
-        object_id = object_id.hex()[:4]
+    if detection.object_id is not None:
+        object_id = detection.object_id.hex()[:4]
         label = f'ID {object_id} - {class_id} - {round(conf,2)}'
 
     line_width = max(round(sum(image.shape) / 2 * 0.002), 2)
@@ -60,40 +58,19 @@ def showImage(stream_id, image):
         stop_event.set()
         cv2.destroyAllWindows()
 
-def source_output_handler(frame_message, stream_id):
-    frame_proto = VideoFrame()
-    frame_proto.ParseFromString(frame_message)
-    image = get_raw_frame_data(frame_proto)
+def handle_sae_message(sae_message_bytes, stream_key):
+    sae_msg = SaeMessage()
+    sae_msg.ParseFromString(sae_message_bytes)
 
-    showImage(stream_id, image)
+    if sae_msg.HasField('metrics'):
+        print(f'Inference times - detection: {sae_msg.metrics.detection_inference_time_us} us, tracking: {sae_msg.metrics.tracking_inference_time_us} us')
 
-def detection_output_handler(detection_message, stream_id):
-    detection_proto = DetectionOutput()
-    detection_proto.ParseFromString(detection_message)
-    print(f'Inference times - detection: {detection_proto.metrics.detection_inference_time_us} us')
-    image = get_raw_frame_data(detection_proto.frame)
+    image = get_raw_frame_data(sae_msg.frame)
 
-    for detection in detection_proto.detections:
+    for detection in sae_msg.detections:
         annotate(image, detection)
-
-    showImage(stream_id, image)
-
-def tracking_output_handler(tracking_message, stream_id):
-    track_proto = TrackingOutput()
-    track_proto.ParseFromString(tracking_message)
-    print(f'Inference times - detection: {track_proto.metrics.detection_inference_time_us} us, tracking: {track_proto.metrics.tracking_inference_time_us} us')
-    image = get_raw_frame_data(track_proto.frame)
-
-    for tracked_det in track_proto.tracked_detections:
-        annotate(image, tracked_det.detection, tracked_det.object_id)
-
-    showImage(stream_id, image)
-
-STREAM_TYPE_HANDLER = {
-    'videosource': source_output_handler,
-    'objectdetector': detection_output_handler,
-    'objecttracker': tracking_output_handler,
-}
+    
+    showImage(stream_key, image)
 
 
 if __name__ == '__main__':
@@ -132,10 +109,4 @@ if __name__ == '__main__':
             if stream_key is None:
                 continue
             
-            stream_type, stream_id = stream_key.split(':')
-            STREAM_TYPE_HANDLER[stream_type](proto_data, stream_id)
-
-        
-
-        
-    
+            handle_sae_message(proto_data, stream_key)

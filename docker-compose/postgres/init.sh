@@ -13,6 +13,8 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 		"min_x" real,
 		"min_y" real,
 		"max_x" real,
-		"max_y" real
+		"max_y" real,
+		"latitude" double precision,
+		"longitude" double precision
 	)
 EOSQL

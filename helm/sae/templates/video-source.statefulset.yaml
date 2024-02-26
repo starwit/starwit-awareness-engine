@@ -20,6 +20,7 @@ spec:
     metadata:
       annotations:
         sae.starwit.de/stage: video-source
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/video-source.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
         app.kubernetes.io/component: {{ $instanceName }}

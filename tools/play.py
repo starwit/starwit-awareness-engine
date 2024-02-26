@@ -6,9 +6,7 @@ from typing import TextIO
 
 import pybase64
 from common import MESSAGE_SEPARATOR, DumpMeta, Event
-from visionapi.messages_pb2 import (Detection, DetectionOutput,
-                                    TrackedDetection, TrackingOutput,
-                                    VideoFrame)
+from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
 from visionlib.pipeline.publisher import RedisPublisher
 
 
@@ -32,20 +30,11 @@ def wait_until(playback_start_time: float, record_start_time: float, record_targ
     if playback_delta <= target_delta:
         time.sleep(target_delta - playback_delta)
 
-def set_frame_timestamp_to_now(proto_bytes: str, stream_name: str):
-    if stream_name.startswith('videosource'):
-        frame = VideoFrame()
-        frame.ParseFromString(proto_bytes)
-    elif stream_name.startswith('objectdetector'):
-        proto = DetectionOutput()
-        proto.ParseFromString(proto_bytes)
-        frame = proto.frame
-    elif stream_name.startswith('objecttracker'):
-        proto = TrackingOutput()
-        proto.ParseFromString(proto_bytes)
-        frame = proto.frame
+def set_frame_timestamp_to_now(proto_bytes: str):
+    proto = SaeMessage()
+    proto.ParseFromString(proto_bytes)
 
-    frame.timestamp_utc_ms = time.time_ns() // 1000000
+    proto.frame.timestamp_utc_ms = time.time_ns() // 1000000
     
     return proto.SerializeToString()
 
@@ -53,7 +42,7 @@ def set_frame_timestamp_to_now(proto_bytes: str, stream_name: str):
 if __name__ == '__main__':
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-i', '--input-file', type=str, required=True)
+    arg_parser.add_argument('dumpfile')
     arg_parser.add_argument('-l', '--loop', action='store_true', help='Loop indefinitely (exit with Ctrl-C)')
     arg_parser.add_argument('-t', '--adjust-timestamps', action='store_true', help='Adjust message timestamps to the time in the moment of playback')
     arg_parser.add_argument('--redis-host', type=str, default='localhost')
@@ -75,21 +64,21 @@ if __name__ == '__main__':
 
     publish = RedisPublisher(REDIS_HOST, REDIS_PORT)
 
-    with publish, open(args.input_file, 'r') as input_file:
+    with publish, open(args.dumpfile, 'r') as input_file:
         while True:
             message_reader = read_messages(input_file)
 
             playback_start = time.time()
             start_message = next(message_reader)
             dump_meta = DumpMeta.model_validate_json(start_message)
-            print(f'Starting playback from file {args.input_file} containing streams {dump_meta.recorded_streams}')
+            print(f'Starting playback from file {args.dumpfile} containing streams {dump_meta.recorded_streams}')
 
             for message in message_reader:
                 event = Event.model_validate_json(message)
                 proto_bytes = pybase64.standard_b64decode(event.data_b64)
 
                 if args.adjust_timestamps:
-                    proto_bytes = set_frame_timestamp_to_now(proto_bytes, event.meta.source_stream)
+                    proto_bytes = set_frame_timestamp_to_now(proto_bytes)
 
                 wait_until(playback_start, dump_meta.start_time, event.meta.record_time)
 

@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS public.detection
     "min_x" real,
     "min_y" real,
     "max_x" real,
-    "max_y" real
+    "max_y" real,
+    "latitude" double precision,
+    "longitude" double precision
 );
 ```
 
