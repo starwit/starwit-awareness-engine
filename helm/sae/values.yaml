@@ -53,7 +53,7 @@ objectTracker:
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
-    tag: 0.1.0
+    tag: 0.1.1
   enabled: false
   config:
     cameras:
