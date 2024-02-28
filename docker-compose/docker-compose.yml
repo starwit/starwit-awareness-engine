@@ -46,3 +46,11 @@ services:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
+
+  geo-mapper:
+    image: ${IMAGE_REGISTRY}/sae-geo-mapper:${GEO_MAPPER_VERSION}
+    volumes:
+      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy

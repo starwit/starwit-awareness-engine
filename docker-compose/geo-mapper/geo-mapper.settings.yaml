@@ -1,0 +1,17 @@
+cameras:
+  - stream_id: stream1
+    focallength_mm: 3.2
+    sensor_height_mm: 8
+    sensor_width_mm: 4.5
+    image_width_px: 3840
+    image_height_px: 2160
+    elevation_m: 8
+    tilt_deg: 64
+    pos_lat: 39.95871094145749
+    pos_lon: -86.12691605973491
+    heading_deg: 155
+
+log_level: INFO
+redis:
+  host: redis
+  port: 6379
