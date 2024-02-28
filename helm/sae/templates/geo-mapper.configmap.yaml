@@ -1,0 +1,13 @@
+{{- with .Values.geoMapper }}
+{{- if .enabled }}
+{{- with .config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geo-mapper-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

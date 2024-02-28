@@ -21,6 +21,7 @@ spec:
     metadata:
       annotations:
         sae.starwit.de/stage: object-tracker
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/object-tracker.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
         app.kubernetes.io/component: {{ $instanceName }}

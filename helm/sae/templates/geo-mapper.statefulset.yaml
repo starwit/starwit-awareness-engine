@@ -1,27 +1,28 @@
-{{- with .Values.databaseWriter }}
+{{- with .Values.geoMapper }}
 {{- if .enabled }}
-{{- $imageRepo := required "image repository for database-writer is required" .image.repository }}
-{{- $imageTag := required "image tag for database-writer is required" .image.tag }}
-{{- with .config -}}
+{{- $imageRepo := required "image repository for geo-mapper is required" .image.repository }}
+{{- $imageTag := required "image tag for geo-mapper is required" .image.tag }}
+{{- $instanceName := "geo-mapper" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "sae.fullname" $ }}-database-writer
+  name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
   labels:
     {{- include "sae.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: database-writer
+    app.kubernetes.io/component: geo-mapper
 spec:
   selector:
     matchLabels:
       {{- include "sae.selectorLabels" $ | nindent 6 }}
-      app.kubernetes.io/component: database-writer
+      app.kubernetes.io/component: {{ $instanceName }}
   template:
     metadata:
       annotations:
-        sae.starwit.de/stage: database-writer
+        sae.starwit.de/stage: geo-mapper
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/geo-mapper.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
-        app.kubernetes.io/component: database-writer
+        app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
@@ -31,7 +32,7 @@ spec:
           image: redis:7.2-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
       containers:
-        - name: database-writer
+        - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
@@ -39,30 +40,23 @@ spec:
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
           env:
-            - name: DB_OUTPUT_ENABLED
-              value: "true"
-            - name: DB_JDBC_URL
-              value: {{ .db.jdbcUrl | quote }}
-            - name: DB_SCHEMA
-              value: {{ .db.schema | quote }}
-            - name: DB_USERNAME
-              value: {{ .db.username | quote }}
-            - name: DB_PASSWORD
-              value: {{ .db.password | quote }}
-            - name: DB_HYPERTABLE
-              value: {{ .db.hypertable | quote }}
-            - name: REDIS_INPUT_ENABLED
-              value: "true"
-            - name: REDIS_HOST
+            - name: LOG_LEVEL
+              value: {{ default "INFO" .logLevel | quote }}
+            - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
-            - name: REDIS_PORT
+            - name: REDIS__PORT
               value: {{ include "sae.redisServicePort" $ }}
-            - name: REDIS_STREAM_IDS
-              value: {{ join "," .redisStreamIds | quote }}
-            - name: REDIS_INPUT_STREAM_PREFIX
-              value: {{ ternary "geomapper" "objecttracker" $.Values.geoMapper.enabled }}
-            - name: JAVA_TOOL_OPTIONS
-              value: "-Xmx512m"
+          ports:
+            - name: prometheus
+              containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $instanceName }}-config
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -76,6 +70,5 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
-{{- end }}
 {{- end }}
 {{- end }}

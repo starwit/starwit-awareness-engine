@@ -50,10 +50,30 @@ objectTracker:
       inertia: 0.2
       use_byte: False
 
+geoMapper:
+  image:
+    repository: starwitorg/sae-geo-mapper
+    tag: 0.1.0
+  enabled: false
+  config:
+    cameras:
+      - stream_id: video1
+        focallength_mm: 20
+        sensor_height_mm: 16
+        sensor_width_mm: 9
+        image_width_px: 1920
+        image_height_px: 1080
+        elevation_m: 10
+        tilt_deg: 45
+        pos_lat: 52
+        pos_lon: 10
+        heading_deg: 90
+
 databaseWriter:
   image:
     repository: starwitorg/sae-database-writer
     tag: 2.0.0
+  enabled: true
   config:
     redisStreamIds:
       - video1
@@ -100,7 +120,7 @@ prometheus:
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
             action: keep
-            regex: (video-source|object-detector|object-tracker)
+            regex: (video-source|object-detector|object-tracker|geo-mapper)
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod
