@@ -41,9 +41,11 @@ geoMapper:
   config:
     cameras:                       # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
       - stream_id: video1          # This must match one of the existing camera streams
-        focallength_mm: 20
-        sensor_height_mm: 16
-        sensor_width_mm: 9
+        focallength_mm: 20         # view_*_deg and image dimensions are equivalent. Sensor size is harder to obtain and therefore only second choice.
+        sensor_height_mm: 16       # See above
+        sensor_width_mm: 9         # See above
+        view_x_deg: 90
+        view_y_deg: 55
         image_width_px: 1920
         image_height_px: 1080
         elevation_m: 10
@@ -51,6 +53,9 @@ geoMapper:
         pos_lat: 52
         pos_lon: 10
         heading_deg: 90
+        abc_distortion_a: 0
+        abc_distortion_b: 0
+        abc_distortion_c: 0
 
 databaseWriter:
   enabled: true                               # If the database-writer should be deployed

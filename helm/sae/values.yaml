@@ -53,14 +53,13 @@ objectTracker:
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
-    tag: 0.1.1
+    tag: 0.2.0
   enabled: false
   config:
     cameras:
       - stream_id: video1
-        focallength_mm: 20
-        sensor_height_mm: 16
-        sensor_width_mm: 9
+        view_x_deg: 90
+        view_y_deg: 54
         image_width_px: 1920
         image_height_px: 1080
         elevation_m: 10
@@ -68,6 +67,9 @@ geoMapper:
         pos_lat: 52
         pos_lon: 10
         heading_deg: 90
+        abc_distortion_a: 0
+        abc_distortion_b: 0
+        abc_distortion_c: 0
 
 databaseWriter:
   image:
