@@ -12,6 +12,8 @@ from visionlib.pipeline.tools import get_raw_frame_data
 ANNOTATION_COLOR = (0, 0, 255)
 DEFAULT_WINDOW_SIZE = (1280, 720)
 
+previous_frame_timestamp = 0
+
 def isWindowVisible(window_name):
     try:
         windowVisibleProp = int(cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE))
@@ -59,11 +61,16 @@ def showImage(stream_id, image):
         cv2.destroyAllWindows()
 
 def handle_sae_message(sae_message_bytes, stream_key):
+    global previous_frame_timestamp
+
     sae_msg = SaeMessage()
     sae_msg.ParseFromString(sae_message_bytes)
 
+    frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
+    previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
+
     if sae_msg.HasField('metrics'):
-        print(f'Inference times - detection: {sae_msg.metrics.detection_inference_time_us} us, tracking: {sae_msg.metrics.tracking_inference_time_us} us')
+        print(f'Frametime: {frametime} ms, Detection: {sae_msg.metrics.detection_inference_time_us} us, Tracking: {sae_msg.metrics.tracking_inference_time_us} us')
 
     image = get_raw_frame_data(sae_msg.frame)
 
