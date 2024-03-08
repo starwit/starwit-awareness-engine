@@ -1,5 +1,6 @@
-# Vision Pipeline (SAE core) for Kubernetes / Docker Compose
-This repository contains much of the documentation and orchestrating configuration for the container-based vision pipeline (which is the only supported version now).
+# Starwit Awareness Engine (formerly Vision Pipeline)
+This is an umbrella repository containing much of the documentation and orchestration code for the Starwit Awareness Engine.
+It links to all relevant components and is meant to be the place to start exploring the SAE project.
 
 ## Repositories
 The components of the vision pipeline can be found in the following repositories:
