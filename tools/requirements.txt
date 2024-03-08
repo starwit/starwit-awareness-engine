@@ -1,5 +1,5 @@
 git+https://github.com/starwit/vision-api.git@2.0.0#subdirectory=python/visionapi
-git+https://github.com/starwit/vision-lib.git@0.7.0#subdirectory=pythonannotated-types==0.6.0
+git+https://github.com/starwit/vision-lib.git@0.7.0#subdirectory=python
 anyio==4.3.0
 argon2-cffi==23.1.0
 argon2-cffi-bindings==21.2.0
