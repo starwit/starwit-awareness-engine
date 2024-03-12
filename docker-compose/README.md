@@ -37,7 +37,8 @@ The `../tools/watch.py` script can be used to visually look into the data flows 
 
 ## How-To Use Nvidia GPU
 - Install `nvidia-container-toolkit` (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
-  - Test if the Nvidia runtime works (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/sample-workload.html#running-a-sample-workload-with-docker)
+- Configure NVIDIA container toolkit (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker)
+- Test if the Nvidia runtime works (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/sample-workload.html#running-a-sample-workload-with-docker)
 - Enable GPU support for compose services, where you want it (e.g. `object-detector`)
   Add the following section to each service that needs GPU support:
   ```yaml
