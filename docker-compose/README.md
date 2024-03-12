@@ -43,12 +43,12 @@ The `../tools/watch.py` script can be used to visually look into the data flows 
   Add the following section to each service that needs GPU support:
   ```yaml
   deploy:
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          count: all
-          capabilities: [gpu]
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
   ```
 - Configure application to use Nvidia CUDA
   - In the case of `object-detector` change `model.device` in its settings file (by default at `./object-detector/object-detector.settings.yaml`) from `cpu` to `cuda`
