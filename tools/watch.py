@@ -69,8 +69,10 @@ def handle_sae_message(sae_message_bytes, stream_key):
     frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
     previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
 
+    log_line = f'Frametime: {frametime} ms'
     if sae_msg.HasField('metrics'):
-        print(f'Frametime: {frametime} ms, Detection: {sae_msg.metrics.detection_inference_time_us} us, Tracking: {sae_msg.metrics.tracking_inference_time_us} us')
+        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us} us, Tracking: {sae_msg.metrics.tracking_inference_time_us} us'
+    print(log_line)
 
     image = get_raw_frame_data(sae_msg.frame)
 
