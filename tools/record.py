@@ -6,28 +6,11 @@ from typing import TextIO
 
 import pybase64
 import redis
-from simple_term_menu import TerminalMenu
+
 from visionlib.pipeline.consumer import RedisConsumer
 
-from common import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
+from common import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta, choose_streams
 
-
-def choose_streams(redis_client):
-    available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
-    menu = TerminalMenu(
-        available_streams, 
-        title='Choose Redis streams to record:', 
-        show_search_hint=True,
-        multi_select=True,
-        multi_select_empty_ok=True,
-        multi_select_select_on_accept=False,
-        show_multi_select_hint=True,
-    )
-    selected_idx_list = menu.show()
-    if selected_idx_list is None:
-        print('No stream chosen. Exiting.')
-        exit(0)
-    return [available_streams[idx] for idx in selected_idx_list]
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     meta = DumpMeta(

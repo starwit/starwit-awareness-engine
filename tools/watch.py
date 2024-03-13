@@ -4,6 +4,7 @@ import threading
 
 import cv2
 import redis
+from common import choose_stream
 from simple_term_menu import TerminalMenu
 from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
 from visionlib.pipeline.consumer import RedisConsumer
@@ -20,15 +21,6 @@ def isWindowVisible(window_name):
         return windowVisibleProp == 1
     except:
         return False
-
-def choose_stream(redis_client):
-    available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
-    menu = TerminalMenu(available_streams, title='Choose Redis stream to watch:', show_search_hint=True)
-    selected_idx = menu.show()
-    if selected_idx is None:
-        print('No stream chosen. Exiting.')
-        exit(0)
-    return available_streams[selected_idx]
 
 def annotate(image, detection: Detection):
     bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
