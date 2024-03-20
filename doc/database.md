@@ -58,12 +58,16 @@ UPDATE detection SET
     max_x = max_x_abs::REAL / <x_resolution>,
     max_y = max_y_abs::REAL / <y_resolution>;
 
-ALTER TABLE detection (
-    DROP COLUMN min_x_abs,
-    DROP COLUMN min_y_abs,
-    DROP COLUMN max_x_abs,
-    DROP COLUMN max_y_abs
-);
+ALTER TABLE detection DROP COLUMN min_x_abs;
+ALTER TABLE detection DROP COLUMN min_y_abs;
+ALTER TABLE detection DROP COLUMN max_x_abs;
+ALTER TABLE detection DROP COLUMN max_y_abs;
+```
+
+# Database migration <2.1.0 => 2.1.0 (geo-mapper)
+```sql
+ALTER TABLE detection ADD COLUMN "latitude" DOUBLE PRECISION;
+ALTER TABLE detection ADD COLUMN "longitude" DOUBLE PRECISION;
 ```
 
 # Export database as CSV
