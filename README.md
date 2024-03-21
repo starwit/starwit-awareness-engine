@@ -9,6 +9,7 @@ The components of the vision pipeline can be found in the following repositories
 | Video Source     | https://github.com/starwit/video-source-py                         |
 | Object Detector  | https://github.com/starwit/object-detector                         |
 | Object Tracker   | https://github.com/starwit/object-tracker                          |
+| Geo-Mapper       | https://github.com/starwit/geo-mapper                              |
 | Database Writer  | https://github.com/starwit/vision-api-jms-client                   |
 | vision-api       | https://github.com/starwit/vision-api                              |
 | vision-lib       | https://github.com/starwit/vision-lib                              |
@@ -20,6 +21,12 @@ The components of the vision pipeline can be found in the following repositories
 - [`/tools`](tools/README.md) - Contains the [`watch`](tools/watch.py) script which makes visually introspecting the pipeline easy (can render image output for every stage)
 - [`/nvidia`](nvidia/notes.md) - Some rough documentation about setting up K3s with Nvidia properly (needs to be extended / automated)
 - [`/dashboards`](dashboards/) - A place to save created dashboards for viewing the pipeline metrics (not part of the demo setup yet)
+
+## SemVer conventions
+As this is highly debatable, here is what we are currently trying to maintain:
+- Patch version: This is increased if neither the public API of the artifact in question is changed nor any new features are implemented. Upgrade should be possible without any changes to config or setup. Dependency bumps are also included, if the preceding points are 
+- Minor version: This is increased if the component changes its public API in a downwards compatible way (that usually means the new feature extends the existing functionality and has some sane defaults). Upgrade should be possible without any changes to the configuration.
+- Major version: This is increased if the component changes its public API in a non-downwards-compatible way and changes to configuration / infrastructure / etc. have to be made to upgrade.
 
 ## How-To Prod Install
 
@@ -51,3 +58,6 @@ As long as the Redis port of the pipeline instance is available on the local mac
 For port forwarding either k9s or `kubectl port-forward` can be used (or any other K8s tool).
 The compose-based version of the pipeline can be used for maximum (or rather most convenient) 
 control over individual components (see [`/docker-compose`](docker-compose/README.md)).
+
+## How-To create a new component / pipeline stage
+See https://github.com/starwit/sae-stage-template on how to get started with a new component.
