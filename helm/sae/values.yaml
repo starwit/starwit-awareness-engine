@@ -18,7 +18,7 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 2.2.0
+    tag: 2.2.1
   config:
     model:
       size: "n"
@@ -33,7 +33,7 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 3.0.0
+    tag: 3.0.1
   logLevel: DEBUG
   needsGpu: False
   streamIds:
@@ -53,7 +53,7 @@ objectTracker:
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
-    tag: 0.2.0
+    tag: 0.3.0
   enabled: false
   config:
     cameras:

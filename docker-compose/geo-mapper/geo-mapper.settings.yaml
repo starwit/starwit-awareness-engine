@@ -1,5 +1,6 @@
 cameras:
   - stream_id: stream1
+    passthrough: false
     view_x_deg: 90
     view_y_deg: 54
     image_width_px: 3840

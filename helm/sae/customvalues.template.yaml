@@ -41,6 +41,7 @@ geoMapper:
   config:
     cameras:                       # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
       - stream_id: video1          # This must match one of the existing camera streams
+        passthrough: false         # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
         focallength_mm: 20         # view_*_deg and image dimensions are equivalent. Sensor size is harder to obtain and therefore only second choice.
         sensor_height_mm: 16       # See above
         sensor_width_mm: 9         # See above
