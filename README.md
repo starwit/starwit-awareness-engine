@@ -24,14 +24,18 @@ The components of the vision pipeline can be found in the following repositories
 
 ## SemVer conventions
 As this is highly debatable, here is what we are currently trying to maintain:
-- Patch version: This is increased if neither the public API of the artifact in question is changed nor any new features are implemented. Upgrade should be possible without any changes to config or setup. Dependency bumps are also included, if the preceding points are 
+- Patch version: This is increased if neither the public API of the artifact in question is changed nor any new features are implemented. Upgrade should be possible without any changes to config or setup. Dependency bumps are also included, if the preceding constraints are fulfilled.
 - Minor version: This is increased if the component changes its public API in a downwards compatible way (that usually means the new feature extends the existing functionality and has some sane defaults). Upgrade should be possible without any changes to the configuration.
 - Major version: This is increased if the component changes its public API in a non-downwards-compatible way and changes to configuration / infrastructure / etc. have to be made to upgrade.
 
 ## How-To Prod Install
 
 ### Installation Steps
-1. Set up K3s cluster
+1. Set up K3s cluster \
+    `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san <tailscale_host_name> --write-kubeconfig-mode 644 --disable traefik --disable servicelb" sh -`
+    - `--tls-san` only has to be set if the hostname the cluster is suppose to be managed through is not equal to the actual hostname (e.g. it is on Tailscale)
+    - As we currently do not open any ports and do not host publicly host any services `traefik` and `servicelb` can be disabled
+    - `--write-kubeconfig-mode 644` enables managing the cluster through any user on the machine
     - If the machine you install K3s on has a NVIDIA GPU available and want to use it for running the pipeline, 
     you have to follow the instructions in [`./nvidia/notes.md`](nvidia/notes.md)
 2. Install Timescale DB (if do not have one on another machine and you want to store the pipeline output data)
