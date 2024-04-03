@@ -33,7 +33,7 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 3.0.2
+    tag: 3.0.3
   logLevel: DEBUG
   needsGpu: False
   streamIds:
