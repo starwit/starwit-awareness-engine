@@ -5,7 +5,7 @@ include:
 
 services:
   database-writer:
-    image: ${IMAGE_REGISTRY}/sae/vision-api-jms-client:${DATABASE_WRITER_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-database-writer:${DATABASE_WRITER_VERSION}
     volumes:
       - ./database-writer/.env:/app/.env
     depends_on:
@@ -17,7 +17,7 @@ services:
   postgres:
     image: postgres:15
     ports:
-      - 5432:5432
+      - 5435:5432
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:

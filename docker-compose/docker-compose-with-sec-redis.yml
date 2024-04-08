@@ -1,0 +1,25 @@
+version: "3.8"
+
+include:
+  - docker-compose.yml
+
+services:
+  redis-writer:
+    image: ${IMAGE_REGISTRY}/sae-redis-writer:${REDIS_WRITER_VERSION}
+    volumes:
+      - ./redis-writer/redis-writer.settings.yaml:/code/settings.yaml
+      - ./redis-writer/certs/:/code/certs/
+    depends_on:
+      redis:
+        condition: service_healthy
+  
+  secondary-redis:
+    image: redis:7.0
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - 16379:6379
+      - 16380:6380
+    volumes:
+      - ./secondary-redis/secondary-redis.conf:/usr/local/etc/redis/redis.conf
+      - ./secondary-redis/certs/:/certs/
+  

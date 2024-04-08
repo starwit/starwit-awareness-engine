@@ -1,17 +1,18 @@
 nameOverride: ""
 fullnameOverride: ""
 
-pullSecret:
-  user: user
-  password: password
-
 # extraImagePullSecrets:
 #   - name: extra-pull-secret
 
 videoSource:
   image: 
+<<<<<<< HEAD
     repository: docker.internal.starwit-infra.de/sae/video-source-py
     tag: 0.8.0
+=======
+    repository: starwitorg/sae-video-source-py
+    tag: 1.0.0
+>>>>>>> main
   configs: 
   - id: video1
     uri: 'uri'
@@ -21,8 +22,8 @@ videoSource:
 
 objectDetector:
   image:
-    repository: docker.internal.starwit-infra.de/sae/object-detector
-    tag: 0.7.0
+    repository: starwitorg/sae-object-detector
+    tag: 2.2.1
   config:
     model:
       size: "n"
@@ -36,29 +37,64 @@ objectDetector:
 
 objectTracker:
   image:
-    repository: docker.internal.starwit-infra.de/sae/object-tracker
-    tag: 0.7.0
-  configs:
-    - streamId: video1
-      trackingParams:
-        detThresh: 0.25
-        modelWeights: osnet_x0_25_msmt17.pt
-      device: cpu
-      logLevel: DEBUG
+    repository: starwitorg/sae-object-tracker
+    tag: 3.0.3
+  logLevel: DEBUG
+  needsGpu: False
+  streamIds:
+    - video1
+  config:
+    tracker_algorithm: OCSORT
+    tracker_config:
+      det_thresh: 0.2
+      max_age: 30
+      min_hits: 3
+      asso_threshold: 0.3
+      delta_t: 3
+      asso_func: 'iou'
+      inertia: 0.2
+      use_byte: False
+
+geoMapper:
+  image:
+    repository: starwitorg/sae-geo-mapper
+    tag: 0.3.0
+  enabled: false
+  config:
+    cameras:
+      - stream_id: video1
+        view_x_deg: 90
+        view_y_deg: 54
+        image_width_px: 1920
+        image_height_px: 1080
+        elevation_m: 10
+        tilt_deg: 45
+        pos_lat: 52
+        pos_lon: 10
+        heading_deg: 90
+        abc_distortion_a: 0
+        abc_distortion_b: 0
+        abc_distortion_c: 0
 
 databaseWriter:
   image:
+<<<<<<< HEAD
     repository: docker.internal.starwit-infra.de/sae/vision-api-jms-client
     tag: 0.5.0
+=======
+    repository: starwitorg/sae-database-writer
+    tag: 2.0.0
+  enabled: true
+>>>>>>> main
   config:
     redisStreamIds:
       - video1
     db:
-      jdbcUrl: jdbc:postgresql://100.70.113.34:30001/
-      schema: sae
-      username: sae
-      password: sae
-      hypertable: detection2
+      jdbcUrl: jdbc:postgresql://host:port/
+      schema: schema
+      username: username
+      password: password
+      hypertable: tablename
 
 redis:
   architecture: standalone
@@ -96,7 +132,7 @@ prometheus:
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
             action: keep
-            regex: (video-source|object-detector|object-tracker)
+            regex: (video-source|object-detector|object-tracker|geo-mapper)
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod

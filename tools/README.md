@@ -26,3 +26,14 @@ You can exit the program by pressing `q`.
 ### Caveats
 - The annotations are not exactly pretty anymore, because I wanted to remove the dependency on the ultralytics library (which has great plotting features) -> you are more than welcome to improve that :)
 - Data transfer from Redis and rendering will increase your system load by another few percent
+
+## Pipeline Recording (`record.py`)
+The `record.py` script provides a simple way to record messages from some or all Redis streams into a file, i.e. create a log of all pipeline activities / state.
+See `python record.py -h` for how to use it.
+
+## Pipeline Playback (`play.py`)
+The `play.py` script plays back a pipeline log into a running pipeline (i.e. at least a running Redis instance). It'll read the log file it is given and play back all messages into the corresponding streams they were recorded from. The messages will be spaced exactly as they were recorded (i.e. a 5fps recording will be played back at the same speed).
+See `python play.py -h` for how to use it.
+
+## JSON Output (`echo.py`)
+The `echo.py` script echoes all SAE messages it receives into stdout as a JSON string (output of protobufs `MessageToJSON()`). Frame data is removed by default as to not clutter the output. `echo.py` can be very useful when combined with other tools like jq. For example, to print the source id, frame timestamp and number of detections for each received message: `python echo.py | jq -r '[.frame.sourceId, .frame.timestampUtcMs, (.detections | length)] | @tsv'`

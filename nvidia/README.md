@@ -1,5 +1,5 @@
 # Installation steps
-- Install Nvidia driver (headless version)
+- Install Nvidia driver (headless/server version)
 - Install nvidia-container-toolkit
     ```sh
     curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
@@ -9,19 +9,18 @@
     && \
         sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
     ```
-- Install K3s (disable all components we do not need, and add tailscale name to api cert)
-    ```sh
-    curl -ksL get.k3s.io | INSTALL_K3S_EXEC="--disable traefik --disable servicelb --tls-san carmel-srv-vw-gpu" sh -
-    ```
+- Reboot (or at least load the Nvidia driver and restart K3s)
 - Create runtimeClass "nvidia"
     ```sh
     kubectl apply -f nvidia.runtime-class.yaml
     ```
 - Install nvidia-device-plugin (and enable CUDA time slicing)
     ```sh
+    helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+    helm repo update
     helm install nvdp nvdp/nvidia-device-plugin \
         --namespace nvidia-device-plugin --create-namespace \
-        --version 0.14.1 -f nvidia-device-plugin.values.yaml
+        --version 0.14.5 -f nvidia-device-plugin.values.yaml
     ```
 
 # Sources

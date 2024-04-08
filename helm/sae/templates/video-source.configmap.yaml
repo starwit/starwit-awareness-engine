@@ -1,0 +1,13 @@
+{{- with .Values.videoSource }}
+{{- range .configs -}}
+{{- $instanceName := printf "video-source-%s" (lower .id) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instanceName }}-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+---
+{{- end }}
+{{- end }}

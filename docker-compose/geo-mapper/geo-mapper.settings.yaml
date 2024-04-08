@@ -1,0 +1,20 @@
+cameras:
+  - stream_id: stream1
+    passthrough: false
+    view_x_deg: 90
+    view_y_deg: 54
+    image_width_px: 3840
+    image_height_px: 2160
+    tilt_deg: 64.2
+    elevation_m: 7.73
+    pos_lat: 39.958691023987
+    pos_lon: -86.126901333369
+    heading_deg: 155
+    abc_distortion_a: -0.074
+    abc_distortion_b: 0.345
+    abc_distortion_c: -0.705
+
+log_level: INFO
+redis:
+  host: redis
+  port: 6379

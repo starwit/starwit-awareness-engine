@@ -261,11 +261,37 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(object_detector_get_duration_sum[30s])/rate(object_detector_get_duration_count[30s])",
+          "expr": "rate(object_detector_proto_deserialization_duration_sum[30s])/rate(object_detector_proto_deserialization_duration_count[30s])",
+          "hide": false,
           "instant": false,
-          "legendFormat": "get()",
+          "legendFormat": "proto_deserialize()",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(object_detector_model_duration_sum[30s])/rate(object_detector_model_duration_count[30s])+rate(object_detector_nms_duration_sum[30s])/rate(object_detector_nms_duration_count[30s])",
+          "instant": false,
+          "legendFormat": "model()",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(object_detector_proto_serialization_duration_sum[30s])/rate(object_detector_proto_serialization_duration_count[30s])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "proto_serialize()",
+          "range": true,
+          "refId": "D"
         },
         {
           "datasource": {
@@ -373,9 +399,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(video_source_get_duration_sum[30s])/rate(video_source_get_duration_count[30s])",
+          "expr": "rate(video_source_proto_serialization_duration_sum{pod=~\".*-video-source-$streamId-0\"}[30s])/rate(video_source_proto_serialization_duration_count{pod=~\".*-video-source-$streamId-0\"}[30s])",
           "instant": false,
-          "legendFormat": "get()",
+          "legendFormat": "proto_serialize()",
           "range": true,
           "refId": "A"
         },
@@ -385,12 +411,25 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(video_source_redis_publish_duration_sum[30s])/rate(video_source_redis_publish_duration_count[30s])",
+          "expr": "rate(video_source_redis_publish_duration_sum{pod=~\".*-video-source-$streamId-0\"}[30s])/rate(video_source_redis_publish_duration_count{pod=~\".*-video-source-$streamId-0\"}[30s])",
           "hide": false,
           "instant": false,
           "legendFormat": "publish()",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(video_source_wait_next_frame_duration_sum{pod=~\".*-video-source-$streamId-0\"}[30s])/rate(video_source_wait_next_frame_duration_count{pod=~\".*-video-source-$streamId-0\"}[30s])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "wait_next_frame()",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "video-source loop times (stacked)",
@@ -482,9 +521,9 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(object_tracker_get_duration_sum[30s])/rate(object_tracker_get_duration_count[30s])",
+          "expr": "rate(object_tracker_proto_deserialization_duration_sum{pod=~\".*-object-tracker-$streamId-0\"}[30s])/rate(object_tracker_proto_deserialization_duration_count{pod=~\".*-object-tracker-$streamId-0\"}[30s])",
           "instant": false,
-          "legendFormat": "get()",
+          "legendFormat": "proto_deserialize()",
           "range": true,
           "refId": "A"
         },
@@ -494,7 +533,33 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "rate(object_tracker_redis_publish_duration_sum[30s])/rate(object_tracker_redis_publish_duration_count[30s])",
+          "expr": "rate(object_tracker_tracker_update_duration_sum{pod=~\".*-object-tracker-$streamId-0\"}[30s])/rate(object_tracker_tracker_update_duration_count{pod=~\".*-object-tracker-$streamId-0\"}[30s])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "tracker_update()",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(object_tracker_proto_serialization_duration_sum{pod=~\".*-object-tracker-$streamId-0\"}[30s])/rate(object_tracker_proto_serialization_duration_count{pod=~\".*-object-tracker-$streamId-0\"}[30s])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "proto_serialize()",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "rate(object_tracker_redis_publish_duration_sum{pod=~\".*-object-tracker-$streamId-0\"}[30s])/rate(object_tracker_redis_publish_duration_count{pod=~\".*-object-tracker-$streamId-0\"}[30s])",
           "hide": false,
           "instant": false,
           "legendFormat": "publish()",
@@ -511,7 +576,31 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(pod)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Stream-ID",
+        "multi": false,
+        "name": "streamId",
+        "options": [],
+        "query": {
+          "query": "label_values(pod)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 2,
+        "regex": ".*-video-source-(?<text>\\w+)-0",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-30m",
@@ -521,6 +610,6 @@
   "timezone": "",
   "title": "SAE Overview",
   "uid": "e4bca8a7-8f68-4772-b8d2-7bc328110d53",
-  "version": 4,
+  "version": 7,
   "weekStart": ""
 }

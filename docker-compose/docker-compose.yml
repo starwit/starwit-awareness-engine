@@ -14,7 +14,7 @@ services:
       start_period: 5s
 
   video-source-stream1:
-    image: ${IMAGE_REGISTRY}/sae/video-source-py:${VIDEO_SOURCE_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
     depends_on:
@@ -22,7 +22,7 @@ services:
         condition: service_healthy
 
   object-detector:
-    image: ${IMAGE_REGISTRY}/sae/object-detector:${OBJECT_DETECTOR_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
     depends_on:
@@ -30,7 +30,7 @@ services:
         condition: service_healthy
 
   object-tracker-stream1:
-    image: ${IMAGE_REGISTRY}/sae/object-tracker:${OBJECT_TRACKER_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
     depends_on:
@@ -41,9 +41,16 @@ services:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
-      - /home/hanna/workspaces/anomaly_detection/test.mp4:/video_1080
-      - /home/florian/workspaces/carmel/videos/RangelineSMedicalDr.mp4:/video_4k
+      - ${VIDEO_PATH}:/video
     environment:
       MTX_PROTOCOLS: tcp
     ports:
       - 8554:8554
+
+#  geo-mapper:
+#    image: ${IMAGE_REGISTRY}/sae-geo-mapper:${GEO_MAPPER_VERSION}
+#    volumes:
+#      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+#    depends_on:
+#      redis:
+#        condition: service_healthy

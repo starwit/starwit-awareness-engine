@@ -1,0 +1,13 @@
+log_level: DEBUG
+redis:
+  host: redis
+  port: 6379
+  input_stream_prefix: geomapper
+target_redis:
+  host: secondary-redis
+  port: 6379
+  output_stream_prefix: output
+  buffer_length: 100
+  target_stream_maxlen: 100
+stream_ids: 
+  - stream1
