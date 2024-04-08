@@ -6,7 +6,7 @@ include:
 services:
 
   anomaly-detector:
-    image: ${IMAGE_REGISTRY}/sae/anomaly-detector:2.1.0
+    image: ${IMAGE_REGISTRY}/sae/anomaly-detector:3.0.0
     volumes:
       - ./anomaly-detector/anomaly-detector.settings.yaml:/code/settings.yaml
       - /home/hanna/workspaces/anomaly_detection/generated:/app/generated
