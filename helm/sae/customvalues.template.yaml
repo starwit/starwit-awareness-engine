@@ -50,7 +50,7 @@ geoMapper:
         image_width_px: 1920
         image_height_px: 1080
         elevation_m: 10
-        tilt_deg: 45
+        tilt_deg: 45               # 0° = camera facing straight down (image plane parallel to the ground), 90° camera pointed at horizon (image plane 90° to the ground)
         pos_lat: 52
         pos_lon: 10
         heading_deg: 90
