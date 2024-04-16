@@ -6,10 +6,10 @@ from typing import TextIO
 
 import pybase64
 import redis
-
+from common import (MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta,
+                    choose_streams)
+from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
-
-from common import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta, choose_streams
 
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
@@ -20,13 +20,22 @@ def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     file.write(meta.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
-def write_event(file: TextIO, stream_key: str, proto_data):
+def write_event(file: TextIO, stream_key: str, proto_data, remove_frame=False):
+    bytes_to_write = proto_data
+    
+    if remove_frame:
+        msg = SaeMessage()
+        msg.ParseFromString(proto_data)
+        msg.frame.ClearField('frame_data')
+        msg.frame.ClearField('frame_data_jpeg')
+        bytes_to_write = msg.SerializeToString()
+    
     event = Event(
         meta=EventMeta(
             record_time=time.time(),
             source_stream=stream_key
         ),
-        data_b64=pybase64.standard_b64encode(proto_data)
+        data_b64=pybase64.standard_b64encode(bytes_to_write)
     )
 
     file.write(event.model_dump_json())
@@ -39,6 +48,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
     arg_parser.add_argument('-o', '--output-file', type=str, default=f'./{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
     arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=60)
+    arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
     arg_parser.add_argument('--redis-host', type=str, default='localhost')
     arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
@@ -82,4 +92,4 @@ if __name__ == '__main__':
                 print(f'Reached configured time limit of {args.time_limit}s')
                 break
 
-            write_event(output_file, stream_key, proto_data)
+            write_event(output_file, stream_key, proto_data, args.remove_frame)
