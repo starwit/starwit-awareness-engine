@@ -63,5 +63,8 @@ For port forwarding either k9s or `kubectl port-forward` can be used (or any oth
 The compose-based version of the pipeline can be used for maximum (or rather most convenient) 
 control over individual components (see [`/docker-compose`](docker-compose/README.md)).
 
+For anyone wanting to get in touch with the dev team, please join Slack channel at: https://starwit-ae.slack.com 
+If you are a student and think about working with SAE for a thesis please let us know. We value education and love to support your ideas!
+
 ## How-To create a new component / pipeline stage
 See https://github.com/starwit/sae-stage-template on how to get started with a new component.
