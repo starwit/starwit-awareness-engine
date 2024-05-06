@@ -16,12 +16,11 @@ def read_messages(file: TextIO):
         chunk = file.read(4096)
         if len(chunk) == 0:
             break
-        sep_idx = chunk.find(MESSAGE_SEPARATOR)
+        buffer += chunk
+        sep_idx = buffer.find(MESSAGE_SEPARATOR)
         if sep_idx != -1:
-            yield buffer + chunk[:sep_idx]
-            buffer = chunk[sep_idx+1:]
-        else:
-            buffer += chunk
+            yield buffer[:sep_idx]
+            buffer = buffer[sep_idx+1:]
 
 def wait_until(playback_start_time: float, record_start_time: float, record_target_time: float):
     current_time = time.time()
