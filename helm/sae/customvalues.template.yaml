@@ -1,7 +1,7 @@
 videoSource:
   logLevel: DEBUG   # Options: ERROR, WARNING, INFO, DEBUG
   configs: 
-  - id: video1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
+  - id: stream1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
     uri: 'uri'        # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
     max_fps: 5        # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
     scale_width: 0    # If > 0, scale the image to the given width (preserving aspect ratio)
@@ -17,13 +17,13 @@ objectDetector:
     logLevel: DEBUG               # Options: ERROR, WARNING, INFO, DEBUG
     redis:
       streamIds:
-        - video1                  # On which video streams to detect objects on. Mostly all video source stream ids.
+        - stream1                  # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
   logLevel: DEBUG                             # Options: ERROR, WARNING, INFO, DEBUG
   needsGpu: False                             # Whether the algorithm needs gpu support (needs proper setup; see README)
   streamIds:                                  # On which video streams to track objects (the same as object-detector stream ids above)
-    - video1
+    - stream1
   config:                                     # Tracker specific config (see object-tracker repo / Boxmot for details)
     tracker_algorithm: OCSORT
     tracker_config:
@@ -40,7 +40,7 @@ geoMapper:
   enabled: false                   # If the geomapper should be deployed (by default it reads from "objecttracker:*"" and outputs into "geomapper:*")
   config:
     cameras:                       # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
-      - stream_id: video1          # This must match one of the existing camera streams
+      - stream_id: stream1          # This must match one of the existing camera streams
         passthrough: false         # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
         focallength_mm: 20         # view_*_deg and image dimensions are equivalent. Sensor size is harder to obtain and therefore only second choice.
         sensor_height_mm: 16       # See above
@@ -74,13 +74,13 @@ redisWriter:
       target_stream_maxlen: 100             # How many messages to keep in the output stream (translates to XADD maxlen option)
       tls: false
     stream_ids:                             # Which video stream to attach to
-      - video1
+      - stream1
 
 databaseWriter:
   enabled: true                               # If the database-writer should be deployed
   config:
     redisStreamIds:
-      - video1                                # Which video streams to read (and extract detection and tracking data from)
+      - stream1                                # Which video streams to read (and extract detection and tracking data from)
     db:
       jdbcUrl: jdbc:postgresql://host:port/   # JDBC URL. Must be a Postgres database. Does not have to be a Timescale (although the latter makes most sense)
       schema: schema

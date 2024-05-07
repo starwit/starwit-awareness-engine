@@ -9,7 +9,7 @@ videoSource:
     repository: starwitorg/sae-video-source-py
     tag: 1.0.0
   configs: 
-  - id: video1
+  - id: stream1
     uri: 'uri'
     maxFps: 0
     jpegEncode: "True"
@@ -28,7 +28,7 @@ objectDetector:
     logLevel: DEBUG
     redis:
       streamIds:
-        - video1
+        - stream1
 
 objectTracker:
   image:
@@ -37,7 +37,7 @@ objectTracker:
   logLevel: DEBUG
   needsGpu: False
   streamIds:
-    - video1
+    - stream1
   config:
     tracker_algorithm: OCSORT
     tracker_config:
@@ -57,7 +57,7 @@ geoMapper:
   enabled: false
   config:
     cameras:
-      - stream_id: video1
+      - stream_id: stream1
         view_x_deg: 90
         view_y_deg: 54
         image_width_px: 1920
@@ -85,7 +85,7 @@ redisWriter:
       target_stream_maxlen: 100
       tls: false
     stream_ids:
-      - video1
+      - stream1
 
 databaseWriter:
   image:
@@ -94,7 +94,7 @@ databaseWriter:
   enabled: true
   config:
     redisStreamIds:
-      - video1
+      - stream1
     db:
       jdbcUrl: jdbc:postgresql://host:port/
       schema: schema
