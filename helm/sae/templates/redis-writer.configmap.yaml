@@ -1,0 +1,13 @@
+{{- with .Values.redisWriter }}
+{{- if .enabled }}
+{{- with .config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-writer-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}
