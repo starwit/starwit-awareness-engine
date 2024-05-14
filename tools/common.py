@@ -20,7 +20,7 @@ class DumpMeta(BaseModel):
 
 
 def choose_stream(redis_client):
-    available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
+    available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
     menu = TerminalMenu(available_streams, title='Choose Redis stream to attach to:', show_search_hint=True)
     selected_idx = menu.show()
     if selected_idx is None:
@@ -29,7 +29,7 @@ def choose_stream(redis_client):
     return available_streams[selected_idx]
 
 def choose_streams(redis_client):
-    available_streams = list(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
+    available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM')[1]))
     menu = TerminalMenu(
         available_streams, 
         title='Choose Redis streams to attach to:', 
