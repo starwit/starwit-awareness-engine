@@ -49,6 +49,8 @@ spec:
               value: {{ .model.size | quote }}
             - name: MODEL__DEVICE
               value: {{ .model.device | quote }}
+            - name: MODEL__NMS_AGNOSTIC
+              value: {{ .model.nmsAgnostic | quote }}
             - name: INFERENCE_SIZE
               value: {{ toJson .inferenceSize | quote }}
             - name: CLASSES

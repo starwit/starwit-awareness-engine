@@ -12,6 +12,7 @@ objectDetector:
     model:
       size: "n"                   # Which Ultralytics model to use. Options: n (nano), s (small), m (medium), l (large), x (xlarge)
       device: cpu                 # Options: cpu, cuda (uses gpu; needs proper setup; see README)
+      nmsAgnostic: false          # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
     inferenceSize: [ 640, 640 ]   # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
     classes: [ 2 ]                # Which object classes to detect (refer to coco object classes)
     logLevel: DEBUG               # Options: ERROR, WARNING, INFO, DEBUG

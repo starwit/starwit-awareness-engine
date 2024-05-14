@@ -23,6 +23,7 @@ objectDetector:
     model:
       size: "n"
       device: cpu
+      nmsAgnostic: false
     inferenceSize: [ 640, 640 ]
     classes: [ 2 ]
     logLevel: DEBUG
