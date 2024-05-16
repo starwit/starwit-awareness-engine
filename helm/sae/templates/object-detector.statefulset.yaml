@@ -51,6 +51,8 @@ spec:
               value: {{ .model.device | quote }}
             - name: MODEL__NMS_AGNOSTIC
               value: {{ .model.nmsAgnostic | quote }}
+            - name: MODEL__USE_TENSORRT
+              value: {{ .model.useTensorrt | quote }}
             - name: INFERENCE_SIZE
               value: {{ toJson .inferenceSize | quote }}
             - name: CLASSES

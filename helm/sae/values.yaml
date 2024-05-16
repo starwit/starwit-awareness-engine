@@ -18,12 +18,13 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 2.2.1
+    tag: 2.3.0
   config:
     model:
       size: "n"
       device: cpu
       nmsAgnostic: false
+      useTensorrt: false
     inferenceSize: [ 640, 640 ]
     classes: [ 2 ]
     logLevel: DEBUG
