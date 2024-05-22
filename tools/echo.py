@@ -3,7 +3,7 @@ import signal
 import threading
 
 import redis
-from common import choose_streams
+from common import choose_streams, default_arg_parser
 from google.protobuf.json_format import MessageToJson
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
@@ -25,11 +25,9 @@ def handle_sae_message(sae_message_bytes, preserve_frame=False, output_file=None
 
 if __name__ == '__main__':
 
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
     arg_parser.add_argument('-f', '--preserve-frame', action='store_true', help='Do not remove frame data (WARNING: large output!)')
-    arg_parser.add_argument('--redis-host', type=str, default='localhost')
-    arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
     STREAM_KEYS = args.streams

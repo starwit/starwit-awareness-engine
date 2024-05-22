@@ -5,7 +5,7 @@ import time
 from typing import TextIO
 
 import pybase64
-from common import MESSAGE_SEPARATOR, DumpMeta, Event
+from common import MESSAGE_SEPARATOR, DumpMeta, Event, default_arg_parser
 from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
 from visionlib.pipeline.publisher import RedisPublisher
 
@@ -40,12 +40,10 @@ def set_frame_timestamp_to_now(proto_bytes: str):
 
 if __name__ == '__main__':
 
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = default_arg_parser()
     arg_parser.add_argument('dumpfile')
     arg_parser.add_argument('-l', '--loop', action='store_true', help='Loop indefinitely (exit with Ctrl-C)')
     arg_parser.add_argument('-t', '--adjust-timestamps', action='store_true', help='Adjust message timestamps to the time in the moment of playback')
-    arg_parser.add_argument('--redis-host', type=str, default='localhost')
-    arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
     REDIS_HOST = args.redis_host

@@ -1,10 +1,12 @@
 import argparse
 import signal
 import threading
+import time
 
 import cv2
+import numpy as np
 import redis
-from common import choose_stream
+from common import choose_stream, default_arg_parser
 from simple_term_menu import TerminalMenu
 from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
 from visionlib.pipeline.consumer import RedisConsumer
@@ -14,6 +16,7 @@ ANNOTATION_COLOR = (0, 0, 255)
 DEFAULT_WINDOW_SIZE = (1280, 720)
 
 previous_frame_timestamp = 0
+args = None
 
 def isWindowVisible(window_name):
     try:
@@ -21,6 +24,21 @@ def isWindowVisible(window_name):
         return windowVisibleProp == 1
     except:
         return False
+    
+def get_image(sae_msg: SaeMessage):
+    if args.image_file is not None:
+        image = cv2.imread(args.image_file)
+        if image is None:
+            raise ValueError(f'Could not read image from file {args.image_file}')
+        return image
+    else:
+        frame = get_raw_frame_data(sae_msg.frame)
+        if frame is not None:
+            return frame
+        else:
+            # If no frame is available, return a grey image as a last resort
+            return np.ones((sae_msg.frame.shape.height, sae_msg.frame.shape.width, 3), dtype=np.uint8) * 127
+
 
 def annotate(image, detection: Detection):
     bbox_x1 = int(detection.bounding_box.min_x * image.shape[1])
@@ -61,12 +79,12 @@ def handle_sae_message(sae_message_bytes, stream_key):
     frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
     previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
 
-    log_line = f'Frametime: {frametime} ms'
+    log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms)} ms, Display Frametime: {frametime} ms'
     if sae_msg.HasField('metrics'):
         log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us} us, Tracking: {sae_msg.metrics.tracking_inference_time_us} us'
     print(log_line)
 
-    image = get_raw_frame_data(sae_msg.frame)
+    image = get_image(sae_msg)
 
     for detection in sae_msg.detections:
         annotate(image, detection)
@@ -76,10 +94,9 @@ def handle_sae_message(sae_message_bytes, stream_key):
 
 if __name__ == '__main__':
 
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--stream', type=str)
-    arg_parser.add_argument('--redis-host', type=str, default='localhost')
-    arg_parser.add_argument('--redis-port', type=int, default=6379)
+    arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     args = arg_parser.parse_args()
 
     STREAM_KEY = args.stream

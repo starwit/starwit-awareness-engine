@@ -7,7 +7,7 @@ from typing import TextIO
 import pybase64
 import redis
 from common import (MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta,
-                    choose_streams)
+                    choose_streams, default_arg_parser)
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
@@ -44,13 +44,11 @@ def write_event(file: TextIO, stream_key: str, proto_data, remove_frame=False):
     
 if __name__ == '__main__':
 
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
     arg_parser.add_argument('-o', '--output-file', type=str, default=f'./{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
     arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=60)
     arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
-    arg_parser.add_argument('--redis-host', type=str, default='localhost')
-    arg_parser.add_argument('--redis-port', type=int, default=6379)
     args = arg_parser.parse_args()
 
     STREAM_KEYS = args.streams

@@ -1,3 +1,4 @@
+import argparse
 from typing import List
 
 from pydantic import BaseModel
@@ -44,3 +45,10 @@ def choose_streams(redis_client):
         print('No stream chosen. Exiting.')
         exit(0)
     return [available_streams[idx] for idx in selected_idx_list]
+
+def default_arg_parser():
+    arg_parser = argparse.ArgumentParser(add_help=False)
+    arg_parser.add_argument('--help', action='help', help='Show help message and exit')
+    arg_parser.add_argument('-h', '--redis-host', type=str, default='localhost')
+    arg_parser.add_argument('-p', '--redis-port', type=int, default=6379)
+    return arg_parser
