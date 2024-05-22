@@ -595,7 +595,7 @@
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
-        "regex": ".*-video-source-(?<text>\\w+)-0",
+        "regex": ".*-video-source-(?<text>\\S+)-0",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
