@@ -76,7 +76,7 @@ geoMapper:
 redisWriter:
   image:
     repository: starwitorg/sae-redis-writer
-    tag: 1.0.0
+    tag: 1.1.0
   enabled: false
   config:
     redis:
