@@ -1,13 +1,10 @@
-import argparse
-import signal
-import threading
 import time
 from typing import TextIO
 
 import pybase64
 import redis
 from common import (MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta,
-                    choose_streams, default_arg_parser)
+                    choose_streams, default_arg_parser, register_stop_handler)
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
@@ -61,15 +58,7 @@ if __name__ == '__main__':
 
     print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {args.output_file}')
 
-    stop_event = threading.Event()
-
-    def sig_handler(signum, _):
-        signame = signal.Signals(signum).name
-        print(f'Caught signal {signame} ({signum}). Exiting...')
-        stop_event.set()
-
-    signal.signal(signal.SIGTERM, sig_handler)
-    signal.signal(signal.SIGINT, sig_handler)
+    stop_event = register_stop_handler()
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
 

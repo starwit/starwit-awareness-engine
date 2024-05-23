@@ -1,14 +1,10 @@
-import argparse
-import signal
-import threading
 import time
 
 import cv2
 import numpy as np
 import redis
-from common import choose_stream, default_arg_parser
-from simple_term_menu import TerminalMenu
-from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
+from common import choose_stream, default_arg_parser, register_stop_handler
+from visionapi.messages_pb2 import Detection, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 
@@ -79,9 +75,9 @@ def handle_sae_message(sae_message_bytes, stream_key):
     frametime = sae_msg.frame.timestamp_utc_ms - previous_frame_timestamp
     previous_frame_timestamp = sae_msg.frame.timestamp_utc_ms
 
-    log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms)} ms, Display Frametime: {frametime} ms'
+    log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
     if sae_msg.HasField('metrics'):
-        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us} us, Tracking: {sae_msg.metrics.tracking_inference_time_us} us'
+        log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
     print(log_line)
 
     image = get_image(sae_msg)
@@ -107,15 +103,7 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEY = choose_stream(redis_client)
     
-    stop_event = threading.Event()
-
-    def sig_handler(signum, _):
-        signame = signal.Signals(signum).name
-        print(f'Caught signal {signame} ({signum}). Exiting...')
-        stop_event.set()
-
-    signal.signal(signal.SIGTERM, sig_handler)
-    signal.signal(signal.SIGINT, sig_handler)
+    stop_event = register_stop_handler()
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
 

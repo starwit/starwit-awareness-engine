@@ -1,4 +1,6 @@
 import argparse
+import signal
+import threading
 from typing import List
 
 from pydantic import BaseModel
@@ -52,3 +54,16 @@ def default_arg_parser():
     arg_parser.add_argument('-h', '--redis-host', type=str, default='localhost')
     arg_parser.add_argument('-p', '--redis-port', type=int, default=6379)
     return arg_parser
+
+def register_stop_handler():
+    stop_event = threading.Event()
+
+    def sig_handler(signum, _):
+        signame = signal.Signals(signum).name
+        print(f'Caught signal {signame} ({signum}). Exiting...')
+        stop_event.set()
+
+    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGINT, sig_handler)
+
+    return stop_event

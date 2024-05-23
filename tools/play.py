@@ -1,12 +1,10 @@
-import argparse
-import signal
-import threading
 import time
 from typing import TextIO
 
 import pybase64
-from common import MESSAGE_SEPARATOR, DumpMeta, Event, default_arg_parser
-from visionapi.messages_pb2 import Detection, SaeMessage, VideoFrame
+from common import (MESSAGE_SEPARATOR, DumpMeta, Event, default_arg_parser,
+                    register_stop_handler)
+from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.publisher import RedisPublisher
 
 
@@ -49,15 +47,7 @@ if __name__ == '__main__':
     REDIS_HOST = args.redis_host
     REDIS_PORT = args.redis_port
 
-    stop_event = threading.Event()
-
-    def sig_handler(signum, _):
-        signame = signal.Signals(signum).name
-        print(f'Caught signal {signame} ({signum}). Exiting...')
-        stop_event.set()
-
-    signal.signal(signal.SIGTERM, sig_handler)
-    signal.signal(signal.SIGINT, sig_handler)
+    stop_event = register_stop_handler()
 
     publish = RedisPublisher(REDIS_HOST, REDIS_PORT)
 

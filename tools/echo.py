@@ -1,9 +1,5 @@
-import argparse
-import signal
-import threading
-
 import redis
-from common import choose_streams, default_arg_parser
+from common import choose_streams, default_arg_parser, register_stop_handler
 from google.protobuf.json_format import MessageToJson
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
@@ -38,15 +34,7 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
     
-    stop_event = threading.Event()
-
-    def sig_handler(signum, _):
-        signame = signal.Signals(signum).name
-        print(f'Caught signal {signame} ({signum}). Exiting...')
-        stop_event.set()
-
-    signal.signal(signal.SIGTERM, sig_handler)
-    signal.signal(signal.SIGINT, sig_handler)
+    stop_event = register_stop_handler()
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
 
