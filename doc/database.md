@@ -71,7 +71,10 @@ ALTER TABLE detection ADD COLUMN "longitude" DOUBLE PRECISION;
 ```
 
 # Export database as CSV
-`psql -U sae -h <host> -p <port> -c "\copy (select * from detection order by capture_ts desc limit 10) TO STDOUT CSV HEADER"`
+## With remote access
+`psql -U sae -h <host> -p <port> -c "\copy (select * from detection order by capture_ts asc limit 10) TO STDOUT CSV HEADER"`
+## Gzipped through kubectl
+`kubectl exec -n timescale timescale-0 -- bash -c "psql sae -c \"COPY (select * from detection limit 10) TO STDOUT DELIMITER ',' CSV HEADER;\" | gzip" > out.csv.gz`
 
 # Backup and Restore
 ## Backup
