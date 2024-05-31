@@ -1,26 +1,27 @@
-# Starwit Awareness Engine (formerly Vision Pipeline)
+# Starwit Awareness Engine
 This is an umbrella repository containing much of the documentation and orchestration code for the Starwit Awareness Engine.
 It links to all relevant components and is meant to be the place to start exploring the SAE project.
 
 ## Repositories
 The components of the vision pipeline can be found in the following repositories:
-| Component        | Repository / URI                                                   |
-| ---------------- | ------------------------------------------------------------------ | 
-| Video Source     | https://github.com/starwit/video-source-py                         |
-| Object Detector  | https://github.com/starwit/object-detector                         |
-| Object Tracker   | https://github.com/starwit/object-tracker                          |
-| Geo-Mapper       | https://github.com/starwit/geo-mapper                              |
-| Database Writer  | https://github.com/starwit/vision-api-jms-client                   |
-| vision-api       | https://github.com/starwit/vision-api                              |
-| vision-lib       | https://github.com/starwit/vision-lib                              |
+| Component        | Repository / URI                                           |
+| ---------------- | ---------------------------------------------------------- |  
+| Video Source     | https://github.com/starwit/video-source-py                 |
+| Object Detector  | https://github.com/starwit/object-detector                 |
+| Object Tracker   | https://github.com/starwit/object-tracker                  |
+| Geo-Mapper       | https://github.com/starwit/geo-mapper                      |
+| Redis Writer     | https://github.com/starwit/sae-redis-writer                |
+| Database Writer  | https://github.com/starwit/vision-api-jms-client           |
+| vision-api       | https://github.com/starwit/vision-api                      |
+| vision-lib       | https://github.com/starwit/vision-lib                      |
 
 ## Contents
 - [`/doc`](doc/README.md) - Documentation of the architecture and some details of the technical setup
-- [`/helm/sae`](helm/sae) - The main Helm chart
-- [`/docker-compose`](docker-compose/README.md) - A docker compose version of the pipeline (should be more or less up-to-date with the Helm chart)
-- [`/tools`](tools/README.md) - Contains the [`watch`](tools/watch.py) script which makes visually introspecting the pipeline easy (can render image output for every stage)
-- [`/nvidia`](nvidia/notes.md) - Some rough documentation about setting up K3s with Nvidia properly (needs to be extended / automated)
-- [`/dashboards`](dashboards/) - A place to save created dashboards for viewing the pipeline metrics (not part of the demo setup yet)
+- [`/helm/sae`](helm/sae) - The SAE Helm chart
+- [`/docker-compose`](docker-compose/README.md) - A docker compose version of the pipeline (usually up-to-date with the Helm version)
+- [`/tools`](tools/README.md) - Contains scripts which help introspecting the pipeline state and developing new components. E.g. visualizing frames with annotations, drawing objects onto a map or recording and playing pipeline state to/from a file.
+- [`/nvidia`](nvidia/notes.md) - Some rough documentation about setting up K3s with Nvidia properly.
+- [`/dashboards`](dashboards/) - A place to save created dashboards for viewing the pipeline metrics (not part of the compose setup yet)
 
 ## SemVer conventions
 As this is highly debatable, here is what we are currently trying to maintain:
