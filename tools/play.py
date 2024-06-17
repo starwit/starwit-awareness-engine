@@ -1,24 +1,11 @@
 import time
-from typing import TextIO
 
 import pybase64
-from common import (MESSAGE_SEPARATOR, DumpMeta, Event, default_arg_parser,
-                    register_stop_handler)
+from common import default_arg_parser, register_stop_handler
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.publisher import RedisPublisher
+from visionlib.saedump import DumpMeta, Event, message_splitter
 
-
-def read_messages(file: TextIO):
-    buffer = ''
-    while True:
-        chunk = file.read(4096)
-        if len(chunk) == 0:
-            break
-        buffer += chunk
-        sep_idx = buffer.find(MESSAGE_SEPARATOR)
-        if sep_idx != -1:
-            yield buffer[:sep_idx]
-            buffer = buffer[sep_idx+1:]
 
 def wait_until(playback_start_time: float, record_start_time: float, record_target_time: float):
     current_time = time.time()
@@ -53,14 +40,14 @@ if __name__ == '__main__':
 
     with publish, open(args.dumpfile, 'r') as input_file:
         while True:
-            message_reader = read_messages(input_file)
+            messages = message_splitter(input_file)
 
             playback_start = time.time()
-            start_message = next(message_reader)
+            start_message = next(messages)
             dump_meta = DumpMeta.model_validate_json(start_message)
             print(f'Starting playback from file {args.dumpfile} containing streams {dump_meta.recorded_streams}')
 
-            for message in message_reader:
+            for message in messages:
                 event = Event.model_validate_json(message)
                 proto_bytes = pybase64.standard_b64decode(event.data_b64)
 

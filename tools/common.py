@@ -1,25 +1,8 @@
 import argparse
 import signal
 import threading
-from typing import List
 
-from pydantic import BaseModel
 from simple_term_menu import TerminalMenu
-
-MESSAGE_SEPARATOR = ';'
-
-
-class EventMeta(BaseModel):
-    record_time: float
-    source_stream: str
-    
-class Event(BaseModel):
-    meta: EventMeta
-    data_b64: str
-
-class DumpMeta(BaseModel):
-    start_time: float
-    recorded_streams: List[str]
 
 
 def choose_stream(redis_client):

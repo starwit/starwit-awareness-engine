@@ -3,10 +3,10 @@ from typing import TextIO
 
 import pybase64
 import redis
-from common import (MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta,
-                    choose_streams, default_arg_parser, register_stop_handler)
+from common import choose_streams, default_arg_parser, register_stop_handler
 from visionapi.messages_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
+from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 
 
 def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
