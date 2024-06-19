@@ -1,0 +1,13 @@
+{{- with .Values.geoMerger }}
+{{- if .enabled }}
+{{- with .config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: geo-merger-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

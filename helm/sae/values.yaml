@@ -7,7 +7,7 @@ fullnameOverride: ""
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 1.0.0
+    tag: 1.0.1
   configs: 
   - id: stream1
     uri: 'uri'
@@ -72,6 +72,21 @@ geoMapper:
         abc_distortion_a: 0
         abc_distortion_b: 0
         abc_distortion_c: 0
+
+geoMerger:
+  image:
+    repository: starwitorg/sae-geo-merger
+    tag: 0.1.0
+  enabled: false
+  config:
+    merging_config:
+      max_distance_m: 2
+      merging_window_ms: 1000
+      target_mps: 10
+      input_stream_ids: 
+        - stream1
+        - stream2
+      output_stream_id: merged
 
 redisWriter:
   image:
@@ -140,7 +155,7 @@ prometheus:
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
             action: keep
-            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer)
+            regex: (video-source|object-detector|object-tracker|geo-mapper|geo-merger|redis-writer)
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod

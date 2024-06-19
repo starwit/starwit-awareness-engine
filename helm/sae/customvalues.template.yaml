@@ -60,6 +60,18 @@ geoMapper:
         abc_distortion_b: 0
         abc_distortion_c: 0
 
+geoMerger:
+  enabled: false
+  config:
+    merging_config:
+      max_distance_m: 2
+      merging_window_ms: 1000
+      target_mps: 10
+      input_stream_ids: 
+        - stream1
+        - stream2
+      output_stream_id: merged
+
 redisWriter:
   image:
     repository: starwitorg/sae-redis-writer

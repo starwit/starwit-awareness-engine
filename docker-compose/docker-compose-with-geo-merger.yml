@@ -1,0 +1,90 @@
+services:
+
+  redis:
+    extends:
+      service: redis
+      file: docker-compose.yml
+
+  video-source-monon-nb:
+    extends:
+      service: video-source-stream1
+      file: docker-compose.yml
+    environment:
+      ID: Monon1stStreetNB
+      URI: rtsp://streaming-server:8554/video-stream2
+
+  video-source-monon-sb:
+    extends:
+      service: video-source-stream1
+      file: docker-compose.yml
+    environment:
+      ID: Monon1stStreetSB
+      URI: rtsp://streaming-server:8554/video-stream3
+  
+  object-detector:
+    extends:
+      service: object-detector
+      file: docker-compose.yml
+    environment:
+      REDIS__STREAM_IDS: "[ \"Monon1stStreetNB\", \"Monon1stStreetSB\" ]"
+
+  object-tracker-monon-nb:
+    extends:
+      service: object-tracker-stream1
+      file: docker-compose.yml
+    environment:
+      REDIS__STREAM_ID: Monon1stStreetNB
+        
+  object-tracker-monon-sb:
+    extends:
+      service: object-tracker-stream1
+      file: docker-compose.yml
+    environment:
+      REDIS__STREAM_ID: Monon1stStreetSB
+
+  geo-mapper:
+    extends:
+      service: geo-mapper
+      file: docker-compose.yml
+    environment:
+      CAMERAS: >
+        [{
+          "passthrough": false,
+          "stream_id": "Monon1stStreetSB",
+          "elevation_m": 7,
+          "heading_deg": 182.8,
+          "image_height_px": 1080,
+          "image_width_px": 1920,
+          "pos_lat": 39.9775629043685,
+          "pos_lon": -86.1297911387507,
+          "tilt_deg": 60,
+          "view_x_deg": 94,
+          "view_y_deg": 53
+        },{
+          "passthrough": false,
+          "stream_id": "Monon1stStreetNB",
+          "elevation_m": 7,
+          "heading_deg": 21.8,
+          "image_height_px": 1080,
+          "image_width_px": 1920,
+          "pos_lat": 39.97736021964957,
+          "pos_lon": -86.12994848313588,
+          "tilt_deg": 50,
+          "view_x_deg": 94,
+          "view_y_deg": 53
+        }]
+
+  geo-merger:
+    image: ${IMAGE_REGISTRY}/sae-geo-merger:${GEO_MERGER_VERSION}
+    volumes:
+      - ./geo-merger/geo-merger.settings.yaml:/code/settings.yaml
+    environment:
+      MERGING_CONFIG__INPUT_STREAM_IDS: "[ \"Monon1stStreetNB\", \"Monon1stStreetSB\" ]"
+
+  streaming-server:
+    extends:
+      service: streaming-server
+      file: docker-compose.yml
+    volumes:
+      - /home/florian/workspaces/sae/starwit-awareness-engine/tools/temp/Monon1stStreetNB.mp4:/video2
+      - /home/florian/workspaces/sae/starwit-awareness-engine/tools/temp/Monon1stStreetSB.mp4:/video3

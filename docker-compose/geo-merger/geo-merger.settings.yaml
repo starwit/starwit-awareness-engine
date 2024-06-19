@@ -1,0 +1,15 @@
+log_level: DEBUG
+prometheus_port: 8000
+redis:
+  host: redis
+  port: 6379
+  input_stream_prefix: geomapper
+  output_stream_prefix: geomerger
+merging_config:
+  max_distance_m: 2
+  merging_window_ms: 1000
+  target_mps: 10
+  input_stream_ids: 
+    - stream1
+    - stream2
+  output_stream_id: merged
