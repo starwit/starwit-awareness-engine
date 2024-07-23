@@ -1,3 +1,5 @@
+import sys
+import os
 import time
 
 import cv2
@@ -67,7 +69,7 @@ def showImage(stream_id, image):
         cv2.destroyAllWindows()
 
 def handle_sae_message(sae_message_bytes, stream_key):
-    global previous_frame_timestamp
+    global previous_frame_timestamp, args
 
     sae_msg = SaeMessage()
     sae_msg.ParseFromString(sae_message_bytes)
@@ -78,12 +80,15 @@ def handle_sae_message(sae_message_bytes, stream_key):
     log_line = f'E2E-Delay: {round(time.time() * 1000 - sae_msg.frame.timestamp_utc_ms): >8} ms, Display Frametime: {frametime: >5} ms'
     if sae_msg.HasField('metrics'):
         log_line += f', Detection: {sae_msg.metrics.detection_inference_time_us: >7} us, Tracking: {sae_msg.metrics.tracking_inference_time_us: >7} us'
-    print(log_line)
+    print(log_line, file=sys.stderr)
 
     image = get_image(sae_msg)
 
     for detection in sae_msg.detections:
         annotate(image, detection)
+    
+    if args.stdout:
+        sys.stdout.buffer.write(image)
     
     showImage(stream_key, image)
 
@@ -93,7 +98,12 @@ if __name__ == '__main__':
     arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
+    arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
     args = arg_parser.parse_args()
+
+    if args.stdout and sys.stdout.isatty():
+        print('Stdout is the terminal. Ignoring "stdout" option. Please redirect (e.g. into ffmpeg)', file=sys.stderr)
+        args.stdout = False
 
     STREAM_KEY = args.stream
     REDIS_HOST = args.redis_host

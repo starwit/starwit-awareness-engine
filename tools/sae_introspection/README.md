@@ -17,6 +17,11 @@ On a technical level, it attaches to a Redis stream of your choice and then trie
 It will then render (and annotate, if possible) every output object / proto it receives from Redis.
 You can exit the program by pressing `q` in the video window or hitting Ctrl-C on the CLI.
 
+### Create video from output
+Find out the frame size and framerate, then run (replacing `-r 10` (fps) and `-s 3840x2160` (size in px) with the appropriate values):\
+`python watch.py | ffmpeg -y -pix_fmt bgr24 -f rawvideo -r 10 -s 3840x2160 -i - -c:v libx264 -crf 25 out.mp4`\
+You can increase the quality (and file size) by lowering the `crf` value (-6 approx. doubles the file size)
+
 ### Examples
 - `python watch.py` displays a menu with all available streams for ease of use (and after selection renders content of that stream)
 - `python watch.py --help` shows all available options

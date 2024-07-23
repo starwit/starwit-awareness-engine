@@ -1,5 +1,6 @@
 import argparse
 import signal
+import sys
 import threading
 
 from simple_term_menu import TerminalMenu
@@ -10,7 +11,7 @@ def choose_stream(redis_client):
     menu = TerminalMenu(available_streams, title='Choose Redis stream to attach to:', show_search_hint=True)
     selected_idx = menu.show()
     if selected_idx is None:
-        print('No stream chosen. Exiting.')
+        print('No stream chosen. Exiting.', file=sys.stderr)
         exit(0)
     return available_streams[selected_idx]
 
@@ -27,7 +28,7 @@ def choose_streams(redis_client):
     )
     selected_idx_list = menu.show()
     if selected_idx_list is None:
-        print('No stream chosen. Exiting.')
+        print('No stream chosen. Exiting.', file=sys.stderr)
         exit(0)
     return [available_streams[idx] for idx in selected_idx_list]
 
@@ -43,7 +44,7 @@ def register_stop_handler():
 
     def sig_handler(signum, _):
         signame = signal.Signals(signum).name
-        print(f'Caught signal {signame} ({signum}). Exiting...')
+        print(f'Caught signal {signame} ({signum}). Exiting...', file=sys.stderr)
         stop_event.set()
 
     signal.signal(signal.SIGTERM, sig_handler)
