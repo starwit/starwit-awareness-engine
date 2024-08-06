@@ -6,13 +6,9 @@ output_files=("output1.mp4" "output2.mp4")  # Replace these with desired output 
 
 start_time=$(date --iso-8601=sec)
 
-(
-    # Start recording each video source
-    for i in "${!sources[@]}"; do
-        ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -c copy "file:${start_time}-${output_files[$i]}" &
-    done
+# Start recording each video source
+for i in "${!sources[@]}"; do
+    ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -c copy "file:${start_time}-${output_files[$i]}" &
+done
 
-    trap '' INT TERM
-
-    wait
-)
+wait
