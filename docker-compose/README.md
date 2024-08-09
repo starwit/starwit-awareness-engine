@@ -8,9 +8,10 @@ A longer explanation of the architecture and the technical setup can be found in
 1. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
 2. Run `docker compose up` (the first time may take a while, some images are quite big)
 3. Change into `../tools`
-  1. Create and activate a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`)
-  2. Install dependencies (`pip install -r requirements.txt`)
-  3. Run `python watch.py` and choose a stream to watch
+  1. Install python3 venv (e.g. sudo apt install python3.11-venv)
+  2. Create and activate a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`)
+  3. Install dependencies (`pip install -r requirements.txt`)
+  4. Run `python watch.py` and choose a stream to watch
 
 If you do not get a consistent framerate or your machine gets slow, try lowering the `max_fps` value on the video-source (i.e. 5 fps) in `./video-source-py/video-source-stream1.settings.yaml`. Also, you might want to try setting up your Nvidia GPU, if you have one (see below).
 
