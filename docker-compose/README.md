@@ -5,9 +5,9 @@ This repository aims at replicating the Helm/Kubernetes-based vision pipeline fo
 A longer explanation of the architecture and the technical setup can be found in `../doc/README.md`.
 
 ## Quickstart
-1. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
+1. Copy .env.template and change the name of the copy to .env. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
 2. Run `docker compose up` (the first time may take a while, some images are quite big)
-3. Change into `../tools`
+3. Change into `../tools/sae_introspection`
   1. Install python3 venv (e.g. sudo apt install python3.11-venv)
   2. Create and activate a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`)
   3. Install dependencies (`pip install -r requirements.txt`)
