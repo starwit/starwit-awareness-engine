@@ -30,7 +30,7 @@ spec:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: wait-for-redis
-          image: redis:7.2-alpine
+          image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
       containers:
         - name: {{ $instanceName }}
