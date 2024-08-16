@@ -1,3 +1,5 @@
+name: sae
+
 services:
   redis:
     image: redis:7.0
