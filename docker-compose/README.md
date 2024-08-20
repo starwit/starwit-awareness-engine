@@ -13,6 +13,8 @@ A longer explanation of the architecture and the technical setup can be found in
   3. Install dependencies (`pip install -r requirements.txt`)
   4. Run `python watch.py` and choose a stream to watch
 
+Hint: You need Python 3.11 for sae components. If you just want to test with scripts in `tools\sae_introspection`, you can use Python 3.12.
+
 If you do not get a consistent framerate or your machine gets slow, try lowering the `max_fps` value on the video-source (i.e. 5 fps) in `./video-source-py/video-source-stream1.settings.yaml`. Also, you might want to try setting up your Nvidia GPU, if you have one (see below).
 
 ### Database output

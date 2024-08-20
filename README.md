@@ -4,10 +4,10 @@ It links to all relevant components and is meant to be the place to start explor
 
 ## Prerequisites
 
-* you need python 3.11, you can switch between python versions with pyenv:
+* for sae components, you need python 3.11, you can switch between python versions with pyenv:
     * see https://github.com/pyenv/pyenv/wiki#suggested-build-environment
     * `curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
-    * choose environment with `pyenv local 3.11.9`
+    * choose python version with `pyenv local 3.11.9`
 * install python3 venv (e.g. sudo apt install python3.11-venv)
 
 ## Repositories
