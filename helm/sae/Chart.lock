@@ -1,7 +1,7 @@
 dependencies:
-- name: redis
+- name: valkey
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 17.16.0
+  version: 0.3.14
 - name: prometheus
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 0.2.2
@@ -11,5 +11,5 @@ dependencies:
 - name: node-exporter
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.8.0
-digest: sha256:deabf2c7869cff4e0b986755dfd6369ee0e97472fe163fe946dd0e9df49a62fd
-generated: "2023-09-19T17:27:54.913431971+02:00"
+digest: sha256:215ce723747d9bd0af91a74c496727c684ec97c63f8a714e22c0c4c57c7c4ef6
+generated: "2024-08-16T14:06:08.518095673+02:00"
