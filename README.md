@@ -2,6 +2,14 @@
 This is an umbrella repository containing much of the documentation and orchestration code for the Starwit Awareness Engine.
 It links to all relevant components and is meant to be the place to start exploring the SAE project.
 
+## Prerequisites
+
+* for sae components, you need python 3.11, you can switch between python versions with pyenv:
+    * see https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+    * `curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash`
+    * choose python version with `pyenv local 3.11.9`
+* install python3 venv (e.g. sudo apt install python3.11-venv)
+
 ## Repositories
 The components of the vision pipeline can be found in the following repositories:
 | Component        | Repository / URI                                           |

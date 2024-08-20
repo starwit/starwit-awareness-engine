@@ -5,13 +5,15 @@ This repository aims at replicating the Helm/Kubernetes-based vision pipeline fo
 A longer explanation of the architecture and the technical setup can be found in `../doc/README.md`.
 
 ## Quickstart
-1. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
+1. Copy .env.template and change the name of the copy to .env. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
 2. Run `docker compose up` (the first time may take a while, some images are quite big)
-3. Change into `../tools`
+3. Change into `../tools/sae_introspection`
   1. Install python3 venv (e.g. sudo apt install python3.11-venv)
   2. Create and activate a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`)
   3. Install dependencies (`pip install -r requirements.txt`)
   4. Run `python watch.py` and choose a stream to watch
+
+Hint: You need Python 3.11 for sae components. If you just want to test with scripts in `tools\sae_introspection`, you can use Python 3.12.
 
 If you do not get a consistent framerate or your machine gets slow, try lowering the `max_fps` value on the video-source (i.e. 5 fps) in `./video-source-py/video-source-stream1.settings.yaml`. Also, you might want to try setting up your Nvidia GPU, if you have one (see below).
 
