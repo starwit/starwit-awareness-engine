@@ -1,0 +1,5 @@
+temp
+.venv
+*.jpg
+*.mp4
+.python-version

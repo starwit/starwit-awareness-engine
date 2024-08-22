@@ -1,0 +1,4 @@
+git+https://github.com/rgerum/cameratransform@ed36491b3003bf8429515f3df1c3e319e56eae49
+numpy
+jupyter
+opencv-python
