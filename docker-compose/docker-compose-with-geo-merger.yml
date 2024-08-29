@@ -5,42 +5,46 @@ services:
       service: redis
       file: docker-compose.yml
 
-  video-source-monon-nb:
+  video-source-1:
     extends:
       service: video-source-stream1
       file: docker-compose.yml
     environment:
-      ID: Monon1stStreetNB
+      ID: WOB-238
       URI: rtsp://streaming-server:8554/video-stream2
+      MAX_FPS: 0
 
-  video-source-monon-sb:
+  video-source-2:
     extends:
       service: video-source-stream1
       file: docker-compose.yml
     environment:
-      ID: Monon1stStreetSB
+      ID: WOB-244
       URI: rtsp://streaming-server:8554/video-stream3
+      MAX_FPS: 0
   
   object-detector:
     extends:
       service: object-detector
       file: docker-compose.yml
     environment:
-      REDIS__STREAM_IDS: "[ \"Monon1stStreetNB\", \"Monon1stStreetSB\" ]"
+      REDIS__STREAM_IDS: "[ \"WOB-238\", \"WOB-244\" ]"
+      DROP_EDGE_DETECTIONS: true
+      CLASSES: "[ 2, 7 ]"
 
-  object-tracker-monon-nb:
+  object-tracker-1:
     extends:
       service: object-tracker-stream1
       file: docker-compose.yml
     environment:
-      REDIS__STREAM_ID: Monon1stStreetNB
-        
-  object-tracker-monon-sb:
+      REDIS__STREAM_ID: WOB-238
+
+  object-tracker-2:
     extends:
       service: object-tracker-stream1
       file: docker-compose.yml
     environment:
-      REDIS__STREAM_ID: Monon1stStreetSB
+      REDIS__STREAM_ID: WOB-244
 
   geo-mapper:
     extends:
@@ -50,41 +54,46 @@ services:
       CAMERAS: >
         [{
           "passthrough": false,
-          "stream_id": "Monon1stStreetSB",
-          "elevation_m": 7,
-          "heading_deg": 182.8,
-          "image_height_px": 1080,
-          "image_width_px": 1920,
-          "pos_lat": 39.9775629043685,
-          "pos_lon": -86.1297911387507,
-          "tilt_deg": 60,
-          "view_x_deg": 94,
-          "view_y_deg": 53
+          "stream_id": "WOB-244",
+          "elevation_m": 10,
+          "heading_deg": 37,
+          "image_height_px": 960,
+          "image_width_px": 1280,
+          "pos_lat": 52.42415872,
+          "pos_lon": 10.78691456,
+          "tilt_deg": 46.3,
+          "roll_deg": -1.5,
+          "view_x_deg": 80.4,
+          "brown_distortion_k1": -0.225,
+          "brown_distortion_k2": 0.035
         },{
           "passthrough": false,
-          "stream_id": "Monon1stStreetNB",
-          "elevation_m": 7,
-          "heading_deg": 21.8,
-          "image_height_px": 1080,
-          "image_width_px": 1920,
-          "pos_lat": 39.97736021964957,
-          "pos_lon": -86.12994848313588,
-          "tilt_deg": 50,
-          "view_x_deg": 94,
-          "view_y_deg": 53
+          "stream_id": "WOB-238",
+          "elevation_m": 10,
+          "heading_deg": 322,
+          "image_height_px": 960,
+          "image_width_px": 1280,
+          "pos_lat": 52.42415872,
+          "pos_lon": 10.78691456,
+          "tilt_deg": 46.9,
+          "roll_deg": 3.8,
+          "view_x_deg": 84.5,
+          "brown_distortion_k1": -0.225,
+          "brown_distortion_k2": 0.035
         }]
+      OBJECT_CENTER_ELEVATION_M: 1
 
-  geo-merger:
-    image: ${IMAGE_REGISTRY}/sae-geo-merger:${GEO_MERGER_VERSION}
-    volumes:
-      - ./geo-merger/geo-merger.settings.yaml:/code/settings.yaml
-    environment:
-      MERGING_CONFIG__INPUT_STREAM_IDS: "[ \"Monon1stStreetNB\", \"Monon1stStreetSB\" ]"
+  # geo-merger:
+  #   image: ${IMAGE_REGISTRY}/sae-geo-merger:${GEO_MERGER_VERSION}
+  #   volumes:
+  #     - ./geo-merger/geo-merger.settings.yaml:/code/settings.yaml
+  #   environment:
+  #     MERGING_CONFIG__INPUT_STREAM_IDS: "[ \"WOB-238\", \"WOB-244\" ]"
 
   streaming-server:
     extends:
       service: streaming-server
       file: docker-compose.yml
     volumes:
-      - /home/florian/workspaces/sae/starwit-awareness-engine/tools/temp/Monon1stStreetNB.mp4:/video2
-      - /home/florian/workspaces/sae/starwit-awareness-engine/tools/temp/Monon1stStreetSB.mp4:/video3
+      - /home/florian/data/recordings/Wolfsburg/238_2024-07-19T12-45-52+02-00.mp4:/video2
+      - /home/florian/data/recordings/Wolfsburg/244_2024-07-19T12-45-52+02-00.mp4:/video3
