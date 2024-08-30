@@ -1,0 +1,11 @@
+{{- with .Values.objectDetector }}
+{{- with .config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: object-detector-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}

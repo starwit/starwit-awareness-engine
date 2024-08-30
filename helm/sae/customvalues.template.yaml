@@ -1,32 +1,32 @@
 videoSource:
-  logLevel: DEBUG   # Options: ERROR, WARNING, INFO, DEBUG
+  logLevel: DEBUG                           # Options: ERROR, WARNING, INFO, DEBUG
   configs: 
-  - id: stream1        # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
-    uri: 'uri'        # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
-    max_fps: 5        # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
-    scale_width: 0    # If > 0, scale the image to the given width (preserving aspect ratio)
-    jpeg_quality: 80  # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points (for image height): 2160 = 80, 1080 = 90, <720 = 95
+  - id: stream1                             # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
+    uri: 'uri'                              # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
+    max_fps: 5                              # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
+    scale_width: 0                          # If > 0, scale the image to the given width (preserving aspect ratio)
+    jpeg_quality: 80                        # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points (for image height): 2160 = 80, 1080 = 90, <720 = 95
 
 objectDetector:
+  logLevel: DEBUG                           # Options: ERROR, WARNING, INFO, DEBUG
   config:
     model:
-      size: "n"                   # Which Ultralytics model to use. Options: n (nano), s (small), m (medium), l (large), x (xlarge)
-      device: cpu                 # Options: cpu, cuda (uses gpu; needs proper setup; see README)
-      nmsAgnostic: false          # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
-      useTensorrt: false          # Whether to use TensorRT (for Nvidia GPUs; has some implications on hardware and driver configuration; not all sizes included)
-    inferenceSize: [ 640, 640 ]   # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
-    classes: [ 2 ]                # Which object classes to detect (refer to coco object classes)
-    logLevel: DEBUG               # Options: ERROR, WARNING, INFO, DEBUG
+      size: "n"                             # Which Ultralytics model to use. Options: n (nano), s (small), m (medium), l (large), x (xlarge)
+      device: cpu                           # Options: cpu, cuda (uses gpu; needs proper setup; see README)
+      nms_agnostic: false                   # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
+      use_tensorrt: false                   # Whether to use TensorRT (for Nvidia GPUs; has some implications on hardware and driver configuration; not all sizes included)
+    inference_size: [ 640, 640 ]            # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
+    classes: [ 2 ]                          # Which object classes to detect (refer to coco object classes)
     redis:
-      streamIds:
-        - stream1                  # On which video streams to detect objects on. Mostly all video source stream ids.
+      stream_ids:
+        - stream1                           # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
-  logLevel: DEBUG                             # Options: ERROR, WARNING, INFO, DEBUG
-  needsGpu: False                             # Whether the algorithm needs gpu support (needs proper setup; see README)
-  streamIds:                                  # On which video streams to track objects (the same as object-detector stream ids above)
+  logLevel: INFO                            # Options: ERROR, WARNING, INFO, DEBUG
+  needsGpu: False                           # Whether the algorithm needs gpu support (needs proper setup; see README)
+  streamIds:                                # On which video streams to track objects (the same as object-detector stream ids above)
     - stream1
-  config:                                     # Tracker specific config (see object-tracker repo / Boxmot for details)
+  config:                                   # Tracker specific config (see object-tracker repo / Boxmot for details)
     tracker_algorithm: OCSORT
     tracker_config:
       det_thresh: 0.2
@@ -41,26 +41,22 @@ objectTracker:
       Q_s_scaling: 0.0001
 
 geoMapper:
-  enabled: false                   # If the geomapper should be deployed (by default it reads from "objecttracker:*"" and outputs into "geomapper:*")
+  enabled: false                            # If the geomapper should be deployed (by default it reads from "objecttracker:*"" and outputs into "geomapper:*")
   config:
-    cameras:                       # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
-      - stream_id: stream1          # This must match one of the existing camera streams
-        passthrough: false         # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
-        focallength_mm: 20         # view_*_deg and image dimensions are equivalent. Sensor size is harder to obtain and therefore only second choice.
-        sensor_height_mm: 16       # See above
-        sensor_width_mm: 9         # See above
-        view_x_deg: 90
-        view_y_deg: 55
+    cameras:                                # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
+      - stream_id: stream1                  # This must match one of the existing camera streams
+        passthrough: false                  # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
+        view_x_deg: 90                      # The horizontal angle of view 
         image_width_px: 1920
         image_height_px: 1080
-        elevation_m: 10
-        tilt_deg: 45               # 0° = camera facing straight down (image plane parallel to the ground), 90° camera pointed at horizon (image plane 90° to the ground)
-        pos_lat: 52
-        pos_lon: 10
-        heading_deg: 90
-        abc_distortion_a: 0
-        abc_distortion_b: 0
-        abc_distortion_c: 0
+        elevation_m: 10                     # Height of the camera above ground
+        tilt_deg: 45                        # 0° = camera facing straight down (image plane parallel to the ground), 90° camera pointed at horizon (image plane 90° to the ground)
+        pos_lat: 52                         # Camera location latitude 
+        pos_lon: 10                         # Camera location longitude
+        heading_deg: 90                     # Heading the camera is pointed at
+        brown_distortion_k1: 0              # Distortion correction (abc-model is also available)
+        brown_distortion_k2: 0
+        brown_distortion_k3: 0
 
 geoMerger:
   enabled: false
@@ -93,13 +89,13 @@ redisWriter:
       - stream1
 
 databaseWriter:
-  enabled: true                               # If the database-writer should be deployed
+  enabled: true                             # If the database-writer should be deployed
   config:
     redisStreamIds:
-      - stream1                                # Which video streams to read (and extract detection and tracking data from)
+      - stream1                             # Which video streams to read (and extract detection and tracking data from)
     db:
-      jdbcUrl: jdbc:postgresql://host:port/   # JDBC URL. Must be a Postgres database. Does not have to be a Timescale (although the latter makes most sense)
+      jdbcUrl: jdbc:postgresql://host:port/ # JDBC URL. Must be a Postgres database. Does not have to be a Timescale (although the latter makes most sense)
       schema: schema
       username: username
       password: password
-      hypertable: tablename                   # Table name. Does not have to be a Hypertable.
+      hypertable: tablename                 # Table name. Does not have to be a Hypertable.

@@ -11,32 +11,29 @@ videoSource:
   configs: 
   - id: stream1
     uri: 'uri'
-    maxFps: 0
-    jpegEncode: "True"
-    logLevel: DEBUG
 
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
     tag: 2.4.0
+  logLevel: INFO
   config:
     model:
       size: "n"
       device: cpu
-      nmsAgnostic: false
-      useTensorrt: false
-    inferenceSize: [ 640, 640 ]
+      nms_agnostic: false
+      use_tensorrt: false
+    inference_size: [ 640, 640 ]
     classes: [ 2 ]
-    logLevel: DEBUG
     redis:
-      streamIds:
+      stream_ids:
         - stream1
 
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
     tag: 3.1.0
-  logLevel: DEBUG
+  logLevel: INFO
   needsGpu: False
   streamIds:
     - stream1
@@ -51,6 +48,8 @@ objectTracker:
       asso_func: 'iou'
       inertia: 0.2
       use_byte: False
+      Q_xy_scaling: 0.01
+      Q_s_scaling: 0.0001
 
 geoMapper:
   image:
@@ -58,20 +57,20 @@ geoMapper:
     tag: 0.4.0
   enabled: false
   config:
-    cameras:
-      - stream_id: stream1
-        view_x_deg: 90
-        view_y_deg: 54
+    cameras:                  
+      - stream_id: stream1    
+        passthrough: false    
+        view_x_deg: 90        
         image_width_px: 1920
         image_height_px: 1080
-        elevation_m: 10
-        tilt_deg: 45
-        pos_lat: 52
-        pos_lon: 10
-        heading_deg: 90
-        abc_distortion_a: 0
-        abc_distortion_b: 0
-        abc_distortion_c: 0
+        elevation_m: 10       
+        tilt_deg: 45          
+        pos_lat: 52           
+        pos_lon: 10           
+        heading_deg: 90       
+        brown_distortion_k1: 0
+        brown_distortion_k2: 0
+        brown_distortion_k3: 0
 
 geoMerger:
   image:
