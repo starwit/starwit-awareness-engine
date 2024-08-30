@@ -35,6 +35,17 @@ CREATE INDEX IF NOT EXISTS detection_object_id
     ("object_id" COLLATE pg_catalog."default" ASC NULLS LAST)
     TABLESPACE pg_default;
 ```
+## Retention policy
+In order to run the setup sustainably, we need to set a retention policy (i.e. drop data after x days):
+```sql
+SELECT add_retention_policy('detection', INTERVAL '60 days');
+```
+
+# Chunk size optimization
+TimescaleDB documentation recommends a chunk size that fits into 25% of the available memory. Adjust accordingly:
+```sql
+SELECT set_chunk_time_interval('detection', INTERVAL '24 hours');
+```
 
 # Database migration <1.0.0 => 1.0.0
 With 1.0.0 the data type of the bounding box coordinates changed from `integer` to `real` as the coordinates are now normalized (i.e. a fraction of image height / width). If needed, the existing data can be migrated, if the resolution of the camera the data originated from is known. In practice, it is probably advisable to just drop all data and change the table format, as migrating big amounts of data can take a while and short downtime is mostly preferable to keeping historic data.
