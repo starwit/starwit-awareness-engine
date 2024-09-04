@@ -46,8 +46,7 @@ def fetch_data(start_time: datetime, end_time: datetime, camera_id: str) -> List
         with psycopg.connect(**conn_params) as conn:
             with conn.cursor() as cur:
                 query = "SELECT * FROM detection WHERE capture_ts >= %s AND capture_ts <= %s AND camera_id = %s ORDER BY capture_ts ASC;"
-                print(f'Running query (camera: {camera_id}, start: {start_time.isoformat(timespec='seconds')}, end: {end_time.isoformat(timespec='seconds')})')
-                cur.execute(query, (start_time.isoformat(), end_time, camera_id))
+                cur.execute(query, (start_time.isoformat(), end_time.isoformat(), camera_id))
                 rows = []
                 print('Loading result')
                 with tqdm(unit=' rows') as pbar:
@@ -102,10 +101,9 @@ if __name__ == "__main__":
 
     annotated_image = image.copy()
 
-    output_file = Path('.') / f'{args.camera_id}_{args.start_time}_{args.length.seconds}s.jpg'
+    output_file = Path('.') / f'{args.camera_id}_{start_time}_{args.length.seconds}s.jpg'
 
-    print('Loading data')
-
+    print(f'Running query (camera: {args.camera_id}, start: {start_time.isoformat(timespec='seconds')}, length: {args.length})')
     rows = fetch_data(start_time, end_time, args.camera_id)
 
     print(f'Retrieved {len(rows)} data points from DB')
