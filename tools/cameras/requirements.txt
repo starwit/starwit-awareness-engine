@@ -1,0 +1,6 @@
+numpy==2.1.1
+opencv-python==4.10.0.84
+palettable==3.3.3
+psycopg==3.2.1
+tqdm==4.66.5
+typing_extensions==4.12.2
