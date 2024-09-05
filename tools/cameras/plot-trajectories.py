@@ -37,12 +37,11 @@ def fetch_data(start_time: datetime, end_time: datetime, camera_id: str) -> List
         'user': 'saebackend',
         'password': 'saebackend',
         'host': 'carmel-k3s',
-        'port': '30002',
+        'port': '10022',
         'row_factory': class_row(DetectionRow)
     }
 
     try:
-        print('Connecting to database')
         with psycopg.connect(**conn_params) as conn:
             with conn.cursor() as cur:
                 query = "SELECT * FROM detection WHERE capture_ts >= %s AND capture_ts <= %s AND camera_id = %s ORDER BY capture_ts ASC;"
@@ -69,7 +68,7 @@ def get_center(row: DetectionRow):
 
 def draw_trajectories(img, detections: List[DetectionRow]):
     preceding_points = {}
-    for det in detections:
+    for det in tqdm(detections):
         new_point = get_center(det)
         if det.object_id in preceding_points:
             draw_line(img, pt1=preceding_points[det.object_id], pt2=new_point, class_id=det.class_id)
@@ -108,6 +107,7 @@ if __name__ == "__main__":
 
     print(f'Retrieved {len(rows)} data points from DB')
 
+    print('Drawing trajectories')
     draw_trajectories(annotated_image, rows)
 
     if args.image_file is None:
