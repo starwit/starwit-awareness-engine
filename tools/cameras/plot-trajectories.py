@@ -37,7 +37,7 @@ def fetch_data(start_time: datetime, end_time: datetime, camera_id: str) -> List
         'user': 'saebackend',
         'password': 'saebackend',
         'host': 'carmel-k3s',
-        'port': '10022',
+        'port': '30003',
         'row_factory': class_row(DetectionRow)
     }
 
