@@ -1,0 +1,5 @@
+log_level: INFO
+redis:
+  host: redis
+  port: 6379
+  stream_id: stream1
