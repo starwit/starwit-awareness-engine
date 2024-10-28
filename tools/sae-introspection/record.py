@@ -22,10 +22,10 @@ def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     file.write(meta.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
-def write_event(file: TextIO, stream_key: str, proto_data, remove_frame=False, scale_width=0, scale_quality=85):
+def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False, scale_width=0, scale_quality=85):
     bytes_to_write = proto_data
     
-    if remove_frame:
+    if is_remove_frame:
         bytes_to_write = remove_frame(proto_data)
 
     if scale_width > 0:
