@@ -15,6 +15,7 @@ objectDetector:
       device: cpu                           # Options: cpu, cuda (uses gpu; needs proper setup; see README)
       nms_agnostic: false                   # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
       use_tensorrt: false                   # Whether to use TensorRT (for Nvidia GPUs; has some implications on hardware and driver configuration; not all sizes included)
+    drop_edge_detections: false             # Drop detections touching the frame borders
     inference_size: [ 640, 640 ]            # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
     classes: [ 2 ]                          # Which object classes to detect (refer to coco object classes)
     redis:
@@ -71,9 +72,6 @@ geoMerger:
       output_stream_id: merged
 
 redisWriter:
-  image:
-    repository: starwitorg/sae-redis-writer
-    tag: 1.0.0
   enabled: false                            # If the redis-writer should be deployed (off by default)
   config:
     redis:                                  # The SAE internal Redis instance
