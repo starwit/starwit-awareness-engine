@@ -6,6 +6,9 @@
 #!/bin/bash
 
 SNAPSHOT_INTERVAL_S=600
+SNAPSHOT_DIRECTORY=./snapshots
+
+mkdir -p ${SNAPSHOT_DIRECTORY}
 
 # Define video sources
 sources=(
@@ -21,7 +24,7 @@ cam_ids=(
 
 # Start recording each video source
 for i in "${!sources[@]}"; do
-    ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -vf fps=1/${SNAPSHOT_INTERVAL_S} -q:v 1 "file:snapshots/${cam_ids[$i]}_${RANDOM}_%05d.jpg" &
+    ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -vf fps=1/${SNAPSHOT_INTERVAL_S} -q:v 1 "file:${SNAPSHOT_DIRECTORY}/${cam_ids[$i]}_${RANDOM}_%05d.jpg" &
 done
 
 wait
