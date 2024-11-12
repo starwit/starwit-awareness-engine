@@ -24,7 +24,7 @@ cam_ids=(
 # Start recording each video source
 for i in "${!sources[@]}"; do
     if [ -f "${cam_ids[$i]}_mask.png" ]; do
-        ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -i "${cam_ids[$i]}_mask.png" -filter_complex "[1:v]colorkey=white[ckout];[0:v][ckout]overlay[out]" -map "[out]" -vf fps=1/${SNAPSHOT_INTERVAL_S} -q:v 1 "file:${SNAPSHOT_DIRECTORY}/${cam_ids[$i]}_${RANDOM}_%05d.jpg" &
+        ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -i "${cam_ids[$i]}_mask.png" -filter_complex "[1:v]colorkey=white[ckout];[0:v][ckout]overlay[ov];[ov]fps=1/${SNAPSHOT_INTERVAL_S}[out]" -map "[out]" -q:v 1 "file:${SNAPSHOT_DIRECTORY}/${cam_ids[$i]}_${RANDOM}_%05d.jpg" &
     else
         ffmpeg -nostdin -rtsp_transport tcp -i "${sources[$i]}" -vf fps=1/${SNAPSHOT_INTERVAL_S} -q:v 1 "file:${SNAPSHOT_DIRECTORY}/${cam_ids[$i]}_${RANDOM}_%05d.jpg" &
     fi
