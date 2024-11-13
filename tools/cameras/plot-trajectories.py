@@ -75,7 +75,7 @@ def draw_trajectories(img, detections: List[DetectionRow]):
         preceding_points[det.object_id] = new_point
 
 def draw_line(img, pt1: Tuple[float], pt2: Tuple[float], class_id: int):
-    cv2.line(img, (int(pt1[0] * img.shape[1]), int(pt1[1] * img.shape[0])), (int(pt2[0] * img.shape[1]), int(pt2[1] * img.shape[0])), color=get_color(class_id), thickness=2, lineType=cv2.LINE_AA)
+    cv2.line(img, (int(pt1[0] * img.shape[1]), int(pt1[1] * img.shape[0])), (int(pt2[0] * img.shape[1]), int(pt2[1] * img.shape[0])), color=get_color(class_id), thickness=1, lineType=cv2.LINE_AA)
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
