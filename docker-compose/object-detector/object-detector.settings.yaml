@@ -1,5 +1,5 @@
 model:
-  size: n
+  weights_path: yolov8n.pt
   device: "cpu"
 inference_size: [ 640, 640 ]
 classes: [ 2 ]
