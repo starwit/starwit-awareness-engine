@@ -9,12 +9,14 @@ videoSource:
 
 objectDetector:
   logLevel: DEBUG                           # Options: ERROR, WARNING, INFO, DEBUG
+  customWeights: 
+    enabled: false                          # Whether to inject custom weights from init container (into custom_weights/*)
+    imageTag: weights-image-tag             # Which tag of the starwitorg/sae-object-detector-weights image to use
   config:
     model:
-      size: "n"                             # Which Ultralytics model to use. Options: n (nano), s (small), m (medium), l (large), x (xlarge)
+      weights_path: custom_weights/xyz      # Which weights to load. yolov8[nsmlx].pt are shipped with the object-detector. For custom weights see above.
       device: cpu                           # Options: cpu, cuda (uses gpu; needs proper setup; see README)
       nms_agnostic: false                   # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
-      use_tensorrt: false                   # Whether to use TensorRT (for Nvidia GPUs; has some implications on hardware and driver configuration; not all sizes included)
     drop_edge_detections: false             # Drop detections touching the frame borders
     inference_size: [ 640, 640 ]            # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
     classes: [ 2 ]                          # Which object classes to detect (refer to coco object classes)

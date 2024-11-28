@@ -33,6 +33,13 @@ spec:
         - name: wait-for-redis
           image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
+        {{- if .customWeights.enabled }}
+        - name: install-model-weights
+          image: starwitorg/sae-object-detector-weights:{{ .customWeights.imageTag }}
+          volumeMounts:
+            - name: custom-weights
+              mountPath: /weights_target
+        {{- end }}
       containers:
         - name: object-detector
           securityContext:
@@ -58,10 +65,14 @@ spec:
             - name: config
               mountPath: /code/settings.yaml
               subPath: settings.yaml
+            - name: custom-weights
+              mountPath: /code/custom_weights
       volumes:
         - name: config
           configMap:
             name: object-detector-config
+        - name: custom-weights
+          emptyDir: {}
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

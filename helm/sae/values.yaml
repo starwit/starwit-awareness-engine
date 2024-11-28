@@ -15,14 +15,16 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 2.4.0
+    tag: 3.0.0
+  customWeights: 
+    enabled: false
+    imageTag: weights-image-tag
   logLevel: INFO
   config:
     model:
-      size: "n"
+      weights_path: yolov8n.pt
       device: cpu
       nms_agnostic: false
-      use_tensorrt: false
     inference_size: [ 640, 640 ]
     classes: [ 2 ]
     redis:
