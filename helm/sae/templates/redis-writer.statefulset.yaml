@@ -2,7 +2,9 @@
 {{- if .enabled }}
 {{- $imageRepo := required "image repository for redis-writer is required" .image.repository }}
 {{- $imageTag := required "image tag for redis-writer is required" .image.tag }}
-{{- $instanceName := "redis-writer" }}
+{{- $rootConfig := . }}
+{{- range .configs -}}
+{{- $instanceName := printf "redis-writer-%s" (lower .name) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -70,5 +72,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

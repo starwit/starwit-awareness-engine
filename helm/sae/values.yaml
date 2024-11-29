@@ -94,16 +94,19 @@ redisWriter:
     repository: starwitorg/sae-redis-writer
     tag: 1.2.1
   enabled: false
-  config:
-    redis:
-      input_stream_prefix: objecttracker
-    target_redis:
-      output_stream_prefix: saeoutput
-      buffer_length: 10
-      target_stream_maxlen: 100
-      tls: false
-    stream_ids:
-      - stream1
+  configs:
+    - name: output1
+      redis:
+        input_stream_prefix: objecttracker
+      target_redis:
+        output_stream_prefix: saeoutput
+        host: host
+        port: 6379
+        buffer_length: 10
+        target_stream_maxlen: 100
+        tls: false
+      stream_ids:
+        - stream1
 
 databaseWriter:
   image:
