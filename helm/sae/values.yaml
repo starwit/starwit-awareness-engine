@@ -133,6 +133,11 @@ redis:
   master:
     persistence:
       enabled: false
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        memory: 256Mi
   metrics:
     enabled: true
 
