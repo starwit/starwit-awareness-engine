@@ -26,7 +26,7 @@ objectDetector:
       device: cpu
       nms_agnostic: false
     inference_size: [ 640, 640 ]
-    classes: [ 2 ]
+    classes: null
     redis:
       stream_ids:
         - stream1
