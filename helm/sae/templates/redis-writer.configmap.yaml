@@ -1,13 +1,15 @@
 {{- with .Values.redisWriter }}
 {{- if .enabled }}
-{{- with .config }}
+{{- range .configs }}
+{{- $instanceName := printf "redis-writer-%s" (lower .name) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: redis-writer-config
+  name: {{ $instanceName }}-config
 data:
   settings.yaml: |
     {{- toYaml . | nindent 4 }}
+---
 {{- end }}
 {{- end }}
 {{- end }}

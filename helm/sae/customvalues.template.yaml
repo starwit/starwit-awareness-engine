@@ -75,18 +75,19 @@ geoMerger:
 
 redisWriter:
   enabled: false                            # If the redis-writer should be deployed (off by default)
-  config:
-    redis:                                  # The SAE internal Redis instance
-      input_stream_prefix: objecttracker    # The prefix of the input stream (e.g. objecttracker or geomapper)
-    target_redis:                           # The Redis instance to write to
-      host: redis-host
-      port: 6379
-      output_stream_prefix: saeoutput       # The prefix of the output stream (e.g. data will be published to saeoutput:<stream_id>)
-      buffer_length: 10                     # How many messages to buffer before discarding
-      target_stream_maxlen: 100             # How many messages to keep in the output stream (translates to XADD maxlen option)
-      tls: false
-    stream_ids:                             # Which video stream to attach to
-      - stream1
+  configs:                                  # One config per target
+    - name: writer1                         # A unique name to identify the instance
+      redis:                                # The SAE internal Redis instance
+        input_stream_prefix: objecttracker  # The prefix of the input stream (e.g. objecttracker or geomapper)
+      target_redis:                         # The Redis instance to write to
+        host: redis-host
+        port: 6379
+        output_stream_prefix: saeoutput     # The prefix of the output stream (e.g. data will be published to saeoutput:<stream_id>)
+        buffer_length: 10                   # How many messages to buffer before discarding
+        target_stream_maxlen: 100           # How many messages to keep in the output stream (translates to XADD maxlen option)
+        tls: false
+      stream_ids:                           # Which video stream to attach to
+        - stream1
 
 databaseWriter:
   enabled: true                             # If the database-writer should be deployed
