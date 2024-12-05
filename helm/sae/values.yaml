@@ -50,8 +50,8 @@ objectTracker:
       asso_func: 'iou'
       inertia: 0.2
       use_byte: False
-      Q_xy_scaling: 0.01
-      Q_s_scaling: 0.0001
+      Q_xy_scaling: 1
+      Q_s_scaling: 1
 
 geoMapper:
   image:
