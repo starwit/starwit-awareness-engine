@@ -1,0 +1,58 @@
+# README BEFORE USING THE SCRIPT:
+# This auto-camera-fitting script assists in fitting camera parameters when limited information is available. 
+# The script estimates parameters based on GPS and pixel locations.
+
+# ASSUMPTIONS:
+# - The labeled points in autocameratransform.py have an elevation of 0. If not, please specify the elevation.
+# - At a minimum, provide one of the following: `focallength_mm`, `view_x_deg`, or `view_y_deg`, as well as a sample image frame and the GPS location of the camera.
+
+# STEPS TO USE THE SCRIPT:
+# 1. Fill in the parameters in this .yaml file. For unknown parameters, set them to `null`.
+# 2. Label points in autocameratransform.py with pixel coordinates (e.g., [1920, 1080]) and corresponding GPS coordinates (e.g., [39.97109148165551, -86.07059324551214]).
+# 3. Run the script with `python autocameratransform.py`.
+
+
+# Path to the image file to be used for camera fitting
+IMG_DIR: 'path/to/file'
+
+Cam_pre_setting_parameters:
+  # RECTILINEAR PROJECTION PARAMETERS
+  # Set one of the following: `focallength_mm`, `view_x_deg`, or `view_y_deg`.
+  RectilinearProjection_parameters:
+    focallength_mm: null           # Focal length in millimeters. Set to `null` if unknown.
+    view_x_deg: 80                 # Horizontal field of view in degrees. Mandatory if `focallength_mm` is `null`.
+    view_y_deg: null               # Vertical field of view in degrees. Optional; set if known.
+    sensor_width_mm: null          # Sensor width in millimeters.
+    sensor_height_mm: null         # Sensor height in millimeters.
+
+  # SPATIAL ORIENTATION PARAMETERS
+  SpatialOrientation_parameters:
+    heading_deg: 325               # Camera heading in degrees, north is the reference. Set to `null` if unknown.
+    tilt_deg: null                 # Camera tilt angle in degrees. Set to `null` if unknown.
+    roll_deg: null                 # Camera roll angle in degrees. Set to `null` if unknown.
+    pos_x_m: 0                     # X position of the camera in meters; set to 0 for origin.
+    pos_y_m: 0                     # Y position of the camera in meters; set to 0 for origin.
+    elevation_m: null              # Camera elevation in meters. Set to `null` if unknown.
+
+  # BROWN LENS DISTORTION PARAMETERS
+  BrownLensDistortion_parameters:
+    k1: null                       # Distortion coefficient k1. Set to `null` if unknown.
+    k2: null                       # Distortion coefficient k2. Set to `null` if unknown.
+    k3: 0                     # Distortion coefficient k3. Optional; set only if needed.
+
+  # GPS LOCATION OF THE CAMERA
+  GPS: [39.97095, -86.070464]      # Mandatory GPS coordinates of the camera (latitude, longitude).
+
+# ITERATION SETTINGS FOR METROPOLIS OPTIMIZATION
+Iteration_num: 10000               # Number of iterations for the Metropolis optimization.
+
+# TOP VIEW SETTINGS
+TOPVIEW:
+  do_plot: TRUE                    # Set to `true` to generate a top-view image; `false` to disable.
+  extent: [-80, 20, -20, 80]       # Extent of the top view in meters: [x_min, x_max, y_min, y_max].
+                                   # Leave as `null` to auto-calculate an appropriate extent.
+  scaling: 0.05                    # Scaling factor for top view; represents meters per pixel. 
+                                   # Leave as `null` for auto-scaling.
+
+# OPTION TO SAVE FITTED CAMERA PARAMETERS
+SAVE_CAM: true                     # Set to `true` to save the fitted camera parameters; `false` to disable.
