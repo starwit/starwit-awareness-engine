@@ -3,3 +3,5 @@ temp
 *.jpg
 *.mp4
 .python-version
+autofit.*.yaml
+__pycache__
