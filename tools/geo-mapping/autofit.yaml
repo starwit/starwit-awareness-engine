@@ -26,20 +26,20 @@ camera_parameters:
     sensor_width_mm: null          # Sensor width in millimeters.
     sensor_height_mm: null         # Sensor height in millimeters.
 
-  # SPATIAL ORIENTATION PARAMETERS
+  # SPATIAL ORIENTATION PARAMETERS (you may also set an object like {min: 0, max: 10, init: 5} to set fit constraints)
   spatial_orientation:
-    heading_deg: null              # Camera heading in degrees, north is the reference. Set to `null` if unknown.
-    tilt_deg: null                 # Camera tilt angle in degrees. Set to `null` if unknown.
-    roll_deg: null                 # Camera roll angle in degrees. Set to `null` if unknown.
-    pos_x_m: 0                     # X position of the camera in meters; set to 0 for origin.
-    pos_y_m: 0                     # Y position of the camera in meters; set to 0 for origin.
-    elevation_m: null              # Camera elevation in meters. Set to `null` if unknown.
+    # heading_deg: null              # Camera heading in degrees, north is the reference. Do not set if unknown.
+    # tilt_deg: null                 # Camera tilt angle in degrees. Do not set if unknown.
+    # roll_deg: null                 # Camera roll angle in degrees. Do not set if unknown.
+    # elevation_m: null              # Camera elevation in meters. Do not set if unknown.
+    pos_x_m: 0                       # X position of the camera in meters; set to 0 for origin.
+    pos_y_m: 0                       # Y position of the camera in meters; set to 0 for origin.
 
-  # BROWN LENS DISTORTION PARAMETERS
+  # BROWN LENS DISTORTION PARAMETERS (you may also set an object like {min: 0, max: 10, init: 5} to set fit constraints)
   brown_lens_distortion:
-    k1: null                       # Distortion coefficient k1. Set to `null` if unknown.
-    k2: null                       # Distortion coefficient k2. Set to `null` if unknown.
-    k3: 0                          # Distortion coefficient k3. Optional; set only if needed.
+    # k1: null                       # Distortion coefficient k1. Do not set if unknown.
+    # k2: null                       # Distortion coefficient k2. Do not set if unknown.
+    k3: 0                            # Distortion coefficient k3. Do not set if unknown.
 
   # GPS LOCATION OF THE CAMERA (mandatory)
   gps_location:

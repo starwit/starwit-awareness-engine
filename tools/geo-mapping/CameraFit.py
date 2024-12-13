@@ -1,5 +1,5 @@
 from math import cos, radians, sqrt
-from typing import Any, Dict, Optional, List, NamedTuple
+from typing import Any, Dict, Optional, List, NamedTuple, Union
 
 import cameratransform as ct
 import matplotlib.pyplot as plt
@@ -12,6 +12,11 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 from typing import Optional
 
+class FitConstraint(BaseModel):
+    min: float
+    max: float
+    init: float
+
 class RectilinearProjection(BaseModel):
     focallength_mm: Optional[float] = None
     view_x_deg: Optional[float] = None
@@ -20,17 +25,17 @@ class RectilinearProjection(BaseModel):
     sensor_height_mm: Optional[float] = None
 
 class SpatialOrientation(BaseModel):
-    heading_deg: Optional[float] = None
-    tilt_deg: Optional[float] = None
-    roll_deg: Optional[float] = None
-    elevation_m: Optional[float] = None
+    heading_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=360, init=0)
+    tilt_deg: Union[float, FitConstraint] = FitConstraint(min=0, max=90, init=45)
+    roll_deg: Union[float, FitConstraint] = FitConstraint(min=-90, max=90, init=0)
+    elevation_m: Union[float, FitConstraint] = FitConstraint(min=0, max=25, init=10)
     pos_x_m: float = 0
     pos_y_m: float = 0
 
 class BrownLensDistortion(BaseModel):
-    k1: Optional[float] = 0
-    k2: Optional[float] = 0
-    k3: Optional[float] = 0
+    k1: Union[float, FitConstraint] = FitConstraint(min=-1.5, max=1.5, init=0)
+    k2: Union[float, FitConstraint] = FitConstraint(min=-0.2, max=0.2, init=0)
+    k3: Union[float, FitConstraint] = FitConstraint(min=-0.2, max=0.2, init=0)
 
 class GPSLocation(BaseModel):
     lat: float
@@ -75,6 +80,15 @@ class AutofitConfig(BaseModel):
     @property
     def px_locations(self):
         return np.array([(lm.image_coords.px_x, lm.image_coords.px_y) for lm in self.landmarks])
+    
+
+def to_param(param: Optional[Union[float, FitConstraint]]) -> Optional[float]:
+    if type(param) is float:
+        return param
+    return None
+
+def to_fit_parameter(name: str, cnstr: FitConstraint) -> ct.FitParameter:
+    return ct.FitParameter(name=name, lower=cnstr.min, upper=cnstr.max, value=cnstr.init)
 
 
 class Camerafit():
@@ -129,18 +143,18 @@ class Camerafit():
                 sensor_height_mm=rectl_params.sensor_height_mm
             ),
             orientation=ct.SpatialOrientation(
-                heading_deg=spato_params.heading_deg,
-                tilt_deg=spato_params.tilt_deg,
-                roll_deg=spato_params.roll_deg,
+                heading_deg=to_param(spato_params.heading_deg),
+                tilt_deg=to_param(spato_params.tilt_deg),
+                roll_deg=to_param(spato_params.roll_deg),
+                elevation_m=to_param(spato_params.elevation_m),
                 pos_x_m=spato_params.pos_x_m,
                 pos_y_m=spato_params.pos_y_m,
-                elevation_m=spato_params.elevation_m
             ),
             lens=ct.BrownLensDistortion(
-                k1=brownld_params.k1,
-                k2=brownld_params.k2,
-                k3=brownld_params.k3
-            )
+                k1=to_param(brownld_params.k1),
+                k2=to_param(brownld_params.k2),
+                k3=to_param(brownld_params.k3),
+            ),
         )
         camera.setGPSpos(gps_params.lat, gps_params.lon)
         return camera
@@ -152,24 +166,24 @@ class Camerafit():
         fit_parameters = []
 
         # Add missing spatial orientation parameters to fit
-        if spato_params.elevation_m is None:
-            fit_parameters.append(ct.FitParameter("elevation_m", lower=0, upper=25, value=10))
-        if spato_params.tilt_deg is None:
-            fit_parameters.append(ct.FitParameter("tilt_deg", lower=0, upper=180, value=60))
-        if spato_params.roll_deg is None:
-            fit_parameters.append(ct.FitParameter("roll_deg", lower=-180, upper=180, value=0))
-        if spato_params.heading_deg is None:
-            fit_parameters.append(ct.FitParameter("heading_deg", lower=0, upper=360, value=0))
+        if type(spato_params.elevation_m) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("elevation_m", spato_params.elevation_m))
+        if type(spato_params.tilt_deg) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("tilt_deg", spato_params.tilt_deg))
+        if type(spato_params.roll_deg) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("roll_deg", spato_params.roll_deg))
+        if type(spato_params.heading_deg) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("heading_deg", spato_params.heading_deg))
 
         # Add missing lens distortion parameters to fit
-        if brownld_params.k1 is None:
-            fit_parameters.append(ct.FitParameter("k1", lower=-1.5, upper=1.5, value=0))
-        if brownld_params.k2 is None:
-            fit_parameters.append(ct.FitParameter("k2", lower=-0.2, upper=0.2, value=0))
-        if brownld_params.k3 is None:
-            fit_parameters.append(ct.FitParameter("k3", lower=-0.2, upper=0.2, value=0))
+        if type(brownld_params.k1) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("k1", brownld_params.k1))
+        if type(brownld_params.k2) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("k2", brownld_params.k2))
+        if type(brownld_params.k3) is FitConstraint:
+            fit_parameters.append(to_fit_parameter("k3", brownld_params.k3))
 
-        return fit_parameters    
+        return fit_parameters   
 
     def _calculate_distances(self, calculated_points, groundtruth_points):
         """Calculate distances between calculated and ground truth GPS points."""
