@@ -1,16 +1,15 @@
 from math import cos, radians, sqrt
-from typing import Any, Dict, Optional, List, NamedTuple, Union
+from pathlib import Path
+from typing import List, NamedTuple, Optional, Union
 
 import cameratransform as ct
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from typing_extensions import Annotated
-import numpy.typing as npt
-import yaml
 from cameratransform import Camera
 from pydantic import BaseModel, Field
-from pathlib import Path
-from typing import Optional
+from typing_extensions import Annotated
+
 
 class FitConstraint(BaseModel):
     min: float
@@ -195,13 +194,41 @@ class Camerafit():
     
     def _gps_distance_m(self, lat1, lon1, lat2, lon2):
         """Calculate the approximate distance between two GPS coordinates in meters."""
-        lat_dist_m = 111320 * (lat2 - lat1)
-        lon_dist_m = 111320 * cos(radians(lat1)) * (lon2 - lon1)
+        lat_dist_m = self._distance_lat_m(lat1, lat2)
+        lon_dist_m = self._distance_lon_m(lat1, lon1, lon2)
         return sqrt(lat_dist_m**2 + lon_dist_m**2)
+    
+    def _distance_lat_m(self, lat1, lat2):
+        return 111320 * (lat2 - lat1)
+    
+    def _distance_lon_m(self, lat, lon1, lon2):
+        return 111320 * cos(radians(lat)) * (lon2 - lon1)
 
-    def topview(self):
+    def get_topview(self):
         if self._fitconfig.top_view.do_plot:
-            return self.camera.getTopViewOfImage(self.img, extent=self._fitconfig.top_view.extent, scaling=self._fitconfig.top_view.m_per_pixel)
+            topview_image = self.camera.getTopViewOfImage(self.img, extent=self._fitconfig.top_view.extent, scaling=self._fitconfig.top_view.m_per_pixel)
+            cv2.circle(topview_image, self._topview_origin_px(), 10, color=(255,128,128), thickness=-1)
+            for lm in self._fitconfig.landmarks:
+                fit_point = self.camera.gpsFromImage((lm.image_coords.px_x, lm.image_coords.px_y), Z=lm.gps_coords.elevation_m)[:2]
+                actual_point = (lm.gps_coords.lat, lm.gps_coords.lon)
+                cv2.circle(topview_image, self._map_gps_to_topview(actual_point), 5, color=(0,0,255), thickness=-1)
+                cv2.line(topview_image, self._map_gps_to_topview(fit_point), self._map_gps_to_topview(actual_point), color=(0,0,255), thickness=2)
+                cv2.circle(topview_image, self._map_gps_to_topview(fit_point), 5, color=(0,255,0), thickness=-1)
+            return topview_image
+        
+    def _map_gps_to_topview(self, point_gps):
+        origin_offset_px = self._topview_origin_px()
+        origin = self._fitconfig.camera_parameters.gps_location
+        diff_lat_m = self._distance_lat_m(origin.lat, point_gps[0])
+        diff_lon_m = self._distance_lon_m(origin.lat, origin.lon, point_gps[1])
+        m_per_pixel = self._fitconfig.top_view.m_per_pixel
+        diff_lat_px = int(diff_lat_m // m_per_pixel)
+        diff_lon_px = int(diff_lon_m // m_per_pixel)
+        return (origin_offset_px[0] + diff_lon_px, origin_offset_px[1] + -diff_lat_px)
+
+    def _topview_origin_px(self):
+        m_per_pixel = self._fitconfig.top_view.m_per_pixel
+        return (int(-self._fitconfig.top_view.extent[0] // m_per_pixel), int(-self._fitconfig.top_view.extent[2] // m_per_pixel))
         
     def save_cam(self):
         if self._fitconfig.save_cam:
@@ -212,3 +239,20 @@ class Camerafit():
         distances = self._calculate_distances(calculated_points, self._fitconfig.gps_locations)
         average_distance = sum(distances) / len(distances)
         print(f"Average Distance: {average_distance:.2f} meters")
+
+    def plot_trace(self, path: Path):
+        plt.rcParams["figure.figsize"] = (10,10)
+        self.camera.plotTrace()
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
+    def plot_fit_information_image_space(self, path: Path):
+        plt.rcParams["figure.figsize"] = (10,10)
+        self.camera.plotFitInformation(self.img)
+        plt.legend()
+        plt.savefig(path)
+        plt.close()
+
+    def get_undistorted_image(self):
+        return self.camera.undistortImage(self.img, extent=(-2000, 4000, -2000, 4000))

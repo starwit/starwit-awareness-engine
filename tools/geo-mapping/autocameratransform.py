@@ -17,8 +17,11 @@ config_obj = AutofitConfig.model_validate(yaml_config)
 camera = Camerafit(fitconfig=config_obj)
 
 camera.show_perf()
+camera.plot_fit_information_image_space('info.png')
+camera.plot_trace('trace.png')
+cv2.imwrite('undistorted.png', camera.get_undistorted_image())
 
-topview_im = camera.topview()
-cv2.imwrite('topview1.jpg',topview_im)
+topview_im = camera.get_topview()
+cv2.imwrite('topview.jpg', topview_im)
 
 camera.save_cam()
