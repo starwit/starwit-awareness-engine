@@ -111,7 +111,7 @@ class Camerafit():
         self.img = plt.imread(self._fitconfig.image_path)
         camera = self._initialize_camera()
         space_location = camera.spaceFromGPS(self._fitconfig.gps_locations)
-        camera.addLandmarkInformation(self._fitconfig.px_locations, space_location, [1, 1, 1e-2])
+        camera.addLandmarkInformation(self._fitconfig.px_locations, space_location, [1e-3, 1e-3, 1e-2])
         fit_parameters = self._create_fit_parameters()
         trace = camera.metropolis(fit_parameters, iterations=self._fitconfig.iteration_num)
 
