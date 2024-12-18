@@ -102,7 +102,6 @@ class Camerafit():
             if fitconfig is None:
                 raise ValueError('Either pre-defined camera parameter and auto-fitting parameter are missing')
             else: 
-                print('Trying to autofit camera')
                 self.camera = self._camera_fitting()
         
         self.img: np.ndarray
@@ -113,13 +112,7 @@ class Camerafit():
         space_location = camera.spaceFromGPS(self._fitconfig.gps_locations)
         camera.addLandmarkInformation(self._fitconfig.px_locations, space_location, [1e-3, 1e-3, 1e-2])
         fit_parameters = self._create_fit_parameters()
-        trace = camera.metropolis(fit_parameters, iterations=self._fitconfig.iteration_num)
-
-        # Print all camera parameters after fitting
-        print("All Camera Parameters After Fitting:")
-        for attr, value in camera.__dict__.items():
-            print(f"{attr}: {value}")
-
+        trace = camera.metropolis(fit_parameters, iterations=self._fitconfig.iteration_num, print_trace=False, disable_bar=True)
         return camera
     
     def _initialize_camera(self):
@@ -234,11 +227,17 @@ class Camerafit():
         if self._fitconfig.save_cam:
             self.camera.save('fitted_cam.json')
 
-    def show_perf(self):
+    def get_perf(self) -> float:
         calculated_points = self.camera.gpsFromImage(self._fitconfig.px_locations, Z=0)
         distances = self._calculate_distances(calculated_points, self._fitconfig.gps_locations)
         average_distance = sum(distances) / len(distances)
-        print(f"Average Distance: {average_distance:.2f} meters")
+        return average_distance
+    
+    def print_parameters(self):
+        # Print all camera parameters after fitting
+        print("All Camera Parameters:")
+        for attr, value in self.camera.__dict__.items():
+            print(f"{attr}: {value}")
 
     def plot_trace(self, path: Path):
         plt.rcParams["figure.figsize"] = (10,10)

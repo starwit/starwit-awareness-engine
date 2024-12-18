@@ -6,3 +6,4 @@ temp
 .python-version
 autofit.*.yaml
 __pycache__
+*.json
