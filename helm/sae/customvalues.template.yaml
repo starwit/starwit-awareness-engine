@@ -65,6 +65,7 @@ geoMapper:
           coordinates: [[                   # [lon,lat] list of polygon points. The last point must equal the first to close the polygon!
               [10, 50],
             ]]
+        remove_unmapped_detections: false   # # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
 
 geoMerger:
   enabled: false
