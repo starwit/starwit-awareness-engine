@@ -26,6 +26,7 @@ batch_mins = []
 
 if args.lower_angle_x:
     best_camera = None
+    best_view_x = 0
     view_x_deg_grid = np.arange(args.lower_angle_x, args.upper_angle_x, args.step_size)
     for view_x_deg in tqdm(view_x_deg_grid):
         batch_min = 999
@@ -34,14 +35,16 @@ if args.lower_angle_x:
             cam = Camerafit(fitconfig=config_obj)
             if best_camera is None or cam.get_perf() < best_camera.get_perf():
                 best_camera = cam
+                best_view_x = view_x_deg
             if cam.get_perf() < batch_min:
                 batch_min = cam.get_perf()
         batch_mins.append((view_x_deg, round(batch_min, 2)))
     pprint(batch_mins)
 else:
     best_camera = Camerafit(fitconfig=config_obj)
+    best_view_x = config_obj.camera_parameters.rectilinear_projection.view_x_deg
 
-print(f"Average Distance: {best_camera.get_perf():.2f} meters")
+print(f"Best solution: Average Distance {best_camera.get_perf():.2f} meters (view_x_deg={best_view_x})")
 best_camera.plot_fit_information_image_space('info.png')
 best_camera.plot_trace('trace.png')
 cv2.imwrite('undistorted.png', best_camera.get_undistorted_image())
