@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import redis
 from common import choose_stream, default_arg_parser, register_stop_handler
-from visionapi.messages_pb2 import Detection, SaeMessage
+from visionapi.sae_pb2 import Detection, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 

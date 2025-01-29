@@ -3,7 +3,7 @@ import time
 
 from common import choose_stream, default_arg_parser, register_stop_handler
 from redis import Redis
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 
 
 def get_timestamp(sae_message_bytes):

@@ -2,7 +2,7 @@ import time
 
 import pybase64
 from common import default_arg_parser, register_stop_handler
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.publisher import RedisPublisher
 from visionlib.saedump import DumpMeta, Event, message_splitter
 

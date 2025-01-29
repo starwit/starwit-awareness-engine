@@ -5,7 +5,7 @@ import cv2
 import pybase64
 import redis
 from turbojpeg import TurboJPEG
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta

@@ -1,7 +1,7 @@
 import redis
 from common import choose_streams, default_arg_parser, register_stop_handler
 from google.protobuf.json_format import MessageToJson
-from visionapi.messages_pb2 import SaeMessage
+from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
 
