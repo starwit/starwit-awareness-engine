@@ -11,6 +11,9 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 6.3.0
+- Update `geo-mapper` to 0.7.0 (update `vision-api` to 3.1.0), which now adds the configured camera location to the output message (`frame.camera_location`); in the case of `passthrough==True` a configured location is still honoured, i.e. added to the message
+
 ## 6.2.0
 - Update `geo-mapper` to 0.6.0 (adds `remove_unmapped_detections` feature extending geo-filtering)
 
