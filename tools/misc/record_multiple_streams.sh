@@ -23,3 +23,5 @@ start_time=$(date --iso-8601=sec)
 while IFS=';' read -r name uri; do
     ffmpeg -nostdin -rtsp_transport tcp -i "${uri}" -c:v copy "file:recordings/${start_time}-${name}.mp4" &
 done < "$csv_file"
+
+wait
