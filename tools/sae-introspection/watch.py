@@ -60,8 +60,11 @@ def annotate(image, detection: Detection):
 
 def showImage(stream_id, image):
     if not isWindowVisible(window_name=stream_id):
-        cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
-        cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
+        if args.unscaled:
+            cv2.namedWindow(stream_id, cv2.WINDOW_AUTOSIZE)
+        else:
+            cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
         
     cv2.imshow(stream_id, image)
     if cv2.waitKey(1) == ord('q'):
@@ -99,6 +102,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
+    arg_parser.add_argument('-u', '--unscaled', action='store_true', help='Display image in its original resolution (1:1 display)')
     args = arg_parser.parse_args()
 
     if args.stdout and sys.stdout.isatty():
