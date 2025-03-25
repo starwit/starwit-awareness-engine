@@ -59,14 +59,24 @@ def annotate(image, detection: Detection):
     cv2.putText(image, label, (bbox_x1, bbox_y1 - 10), fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=ANNOTATION_COLOR, thickness=round(line_width/3), fontScale=line_width/4, lineType=cv2.LINE_AA)
 
 def showImage(stream_id, image):
+    displayed_image = image
+    
+    # When using fixed scale, resize the image before displaying
+    if args.fixed_scale:
+        scale_factor = args.fixed_scale
+        new_width = image.shape[1] // scale_factor
+        new_height = image.shape[0] // scale_factor
+        displayed_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    
     if not isWindowVisible(window_name=stream_id):
-        if args.unscaled:
+        if args.fixed_scale:
+            # Use WINDOW_AUTOSIZE to match the exact size of the scaled image
             cv2.namedWindow(stream_id, cv2.WINDOW_AUTOSIZE)
         else:
             cv2.namedWindow(stream_id, cv2.WINDOW_NORMAL + cv2.WINDOW_KEEPRATIO)
             cv2.resizeWindow(stream_id, *DEFAULT_WINDOW_SIZE)
         
-    cv2.imshow(stream_id, image)
+    cv2.imshow(stream_id, displayed_image)
     if cv2.waitKey(1) == ord('q'):
         stop_event.set()
         cv2.destroyAllWindows()
@@ -102,7 +112,8 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
-    arg_parser.add_argument('-u', '--unscaled', action='store_true', help='Display image in its original resolution (1:1 display)')
+    arg_parser.add_argument('-f', '--fixed-scale', type=int, 
+                           help='Display with fixed scale factor (1=original size, 2=half size, etc.)')
     args = arg_parser.parse_args()
 
     if args.stdout and sys.stdout.isatty():
