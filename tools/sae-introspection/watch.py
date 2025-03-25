@@ -64,8 +64,8 @@ def showImage(stream_id, image):
     # When using fixed scale, resize the image before displaying
     if args.fixed_scale:
         scale_factor = args.fixed_scale
-        new_width = image.shape[1] // scale_factor
-        new_height = image.shape[0] // scale_factor
+        new_width = int(image.shape[1] * scale_factor)
+        new_height = int(image.shape[0] * scale_factor)
         displayed_image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
     
     if not isWindowVisible(window_name=stream_id):
@@ -112,8 +112,10 @@ if __name__ == '__main__':
     arg_parser.add_argument('-s', '--stream', type=str)
     arg_parser.add_argument('-i', '--image-file', type=str, default=None)
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
-    arg_parser.add_argument('-f', '--fixed-scale', type=int, 
-                           help='Display with fixed scale factor (1=original size, 2=half size, etc.)')
+    arg_parser.add_argument('-f', '--fixed-scale', type=float, 
+                           help='Display with fixed scaling factor and high-quality scaling (2=double size, 1=original size, 0.75=75%% size , 0.5=half size, etc.)')
+
+
     args = arg_parser.parse_args()
 
     if args.stdout and sys.stdout.isatty():
