@@ -22,6 +22,8 @@
         --namespace nvidia-device-plugin --create-namespace \
         --version 0.14.5 -f nvidia-device-plugin.values.yaml
     ```
+- Disable upgrades for nvidia driver components (fill in the correct nvidia driver version from above)\
+    `apt-mark hold nvidia-container-toolkit nvidia-driver-550-server`
 
 # Sources
 - K3s instructions for NVIDIA setup... (https://docs.k3s.io/advanced#nvidia-container-runtime-support)
