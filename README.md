@@ -41,11 +41,20 @@ As this is highly debatable, here is what we are currently trying to maintain:
 
 ### Installation Steps
 1. Set up K3s cluster \
-    `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san <tailscale_host_name> --write-kubeconfig-mode 644 --disable traefik --disable servicelb" sh -`
-    - `--tls-san` only has to be set if the hostname the cluster is suppose to be managed through is not equal to the actual hostname (e.g. it is on Tailscale)
-    - As we currently do not open any ports and do not host publicly host any services `traefik` and `servicelb` can be disabled
-    - `--write-kubeconfig-mode 644` enables managing the cluster through any user on the machine
-    - If the machine you install K3s on has a NVIDIA GPU available and want to use it for running the pipeline, 
+    - Create K3s config file (adapt the value of `tls-san`)
+        ```yaml
+        write-kubeconfig-mode: "0644"
+        tls-san:
+            - "TAILSCALE_HOSTNAME"
+        disable:
+            - servicelb
+            - traefik
+        ```
+        - `tls-san` only has to be set if the hostname the cluster is supposed to be managed through is not equal to the actual hostname (e.g. it is on Tailscale)
+        - As we currently do not open any ports and do not host publicly host any services `traefik` and `servicelb` can be disabled
+        - `--write-kubeconfig-mode 644` enables managing the cluster through any user on the machine
+    - Install K3s `curl -sfL https://get.k3s.io | sh -s -`
+    - If the machine you install K3s on has a NVIDIA GPU available and wants to use it for running the pipeline, 
     you have to follow the instructions in [`./nvidia/notes.md`](nvidia/notes.md)
 2. Install Timescale DB (if do not have one on another machine and you want to store the pipeline output data)
     - Create a database for pipeline data and a table / hypertable. See [`./doc/database.md`](doc/database.md) for instructions.
