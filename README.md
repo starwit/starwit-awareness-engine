@@ -53,7 +53,7 @@ As this is highly debatable, here is what we are currently trying to maintain:
         - `tls-san` only has to be set if the hostname the cluster is supposed to be managed through is not equal to the actual hostname (e.g. it is on Tailscale)
         - As we currently do not open any ports and do not host publicly host any services `traefik` and `servicelb` can be disabled
         - `--write-kubeconfig-mode 644` enables managing the cluster through any user on the machine
-    - Install K3s `curl -sfL https://get.k3s.io | sh -s -`
+    - Install K3s `curl -sfL https://get.k3s.io | sh -s -` (use the same command for upgrading, assuming you have the config file in place)
     - If the machine you install K3s on has a NVIDIA GPU available and wants to use it for running the pipeline, 
     you have to follow the instructions in [`./nvidia/notes.md`](nvidia/notes.md)
 2. Install Timescale DB (if do not have one on another machine and you want to store the pipeline output data)
