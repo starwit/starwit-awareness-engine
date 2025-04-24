@@ -1,5 +1,7 @@
 !values.yaml
 *.values.yaml
+customvalues.yaml
+*.env.sh
 
 charts
 *.tgz
