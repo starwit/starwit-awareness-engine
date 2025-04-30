@@ -51,10 +51,10 @@ if __name__ == '__main__':
                 event = Event.model_validate_json(message)
                 proto_bytes = pybase64.standard_b64decode(event.data_b64)
 
+                wait_until(playback_start, dump_meta.start_time, event.meta.record_time)
+
                 if args.adjust_timestamps:
                     proto_bytes = set_frame_timestamp_to_now(proto_bytes)
-
-                wait_until(playback_start, dump_meta.start_time, event.meta.record_time)
 
                 publish(event.meta.source_stream, proto_bytes)
 
