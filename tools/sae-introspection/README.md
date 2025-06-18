@@ -33,7 +33,11 @@ You can increase the quality (and file size) by lowering the `crf` value (-6 app
 
 ## Pipeline Recording (`record.py`)
 The `record.py` script provides a simple way to record messages from some or all Redis streams into a file, i.e. create a log of all pipeline activities / state.
-See `python record.py --help` for how to use it.
+See `python record.py --help` for how to use it. \
+For creating longer recordings, the script offers several options to control the file size, as JPEG frames are very big in comparison to efficient video codecs like H.264/H.265 and there are some inefficiencies regarding space in the saedump format. `-r` / `--remove-frame` removes frames from messages before writing them to the dump file. `-d` / `--downscale-frames` (with `-q` / `--downscale-jpeg-quality`) enables trading some quality loss for smaller file sizes.
+
+### Examples
+- `python record.py -s geomapper:StreamID -t 86400 -d 320 -q 90 -o output.saedump` records 24 hours of geomapper output, scaling down video frames to a width of 320px (at a quality of 90%)
 
 ## Pipeline Playback (`play.py`)
 The `play.py` script plays back a pipeline log into a running pipeline (i.e. at least a running Redis instance). It'll read the log file it is given and play back all messages into the corresponding streams they were recorded from. The messages will be spaced exactly as they were recorded (i.e. a 5fps recording will be played back at the same speed). For many real-world test cases the option `-t` might be interesting, which enables rewriting the message timestamps to the present moment (while still preserving message cadence).
