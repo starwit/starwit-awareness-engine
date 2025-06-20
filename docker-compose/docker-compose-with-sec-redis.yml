@@ -1,6 +1,8 @@
 include:
   - docker-compose.yml
 
+name: sae
+
 services:
   redis-writer:
     image: ${IMAGE_REGISTRY}/sae-redis-writer:${REDIS_WRITER_VERSION}
