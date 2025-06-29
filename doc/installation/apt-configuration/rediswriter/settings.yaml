@@ -1,0 +1,17 @@
+log_level: DEBUG
+remove_frame_data: true
+redis:
+  host: localhost
+  port: 6379
+  input_stream_prefix: objecttracker
+target_redis:
+  host: hostname
+  port: port
+  output_stream_prefix: output
+  buffer_length: 10                   # How many messages the internal ring buffer will hold before discarding old messages
+  target_stream_maxlen: 100           # maxlen for redis XADD (Redis will delete oldest messages from stream to stay within maxlen)
+  tls: false                          # Whether to use mutual TLS for communication. See README for details on how to configure.
+stream_ids: 
+  - stream1
+
+prometheus_port: 8004
