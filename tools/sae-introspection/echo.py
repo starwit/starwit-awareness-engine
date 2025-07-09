@@ -1,23 +1,32 @@
+import sys
+
 import redis
-from common import choose_streams, default_arg_parser, register_stop_handler
 from google.protobuf.json_format import MessageToJson
+from visionapi.analytics_pb2 import DetectionCountMessage
 from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
+from common import (MessageType, choose_streams, default_arg_parser,
+                    determine_message_type, register_stop_handler)
 
-def handle_sae_message(sae_message_bytes, preserve_frame=False, output_file=None):
+
+def handle_sae_message(message_bytes: bytes, preserve_frame=False):
     sae_msg = SaeMessage()
-    sae_msg.ParseFromString(sae_message_bytes)
+    sae_msg.ParseFromString(message_bytes)
 
     if not preserve_frame:
         sae_msg.frame.ClearField('frame_data')
         sae_msg.frame.ClearField('frame_data_jpeg')
 
     msg_json = MessageToJson(sae_msg)
-    if output_file is not None:
-        output_file.write(msg_json)
-    else:
-        print(msg_json)
+    print(msg_json, flush=True)
+
+def handle_detection_count_message(message_bytes: bytes):
+    msg = DetectionCountMessage()
+    msg.ParseFromString(message_bytes)
+
+    msg_json = MessageToJson(msg)
+    print(msg_json, flush=True)
 
 if __name__ == '__main__':
 
@@ -38,6 +47,8 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
 
+    message_type: MessageType = None
+
     with consume:
         for stream_key, proto_data in consume():
             if stop_event.is_set():
@@ -45,5 +56,13 @@ if __name__ == '__main__':
 
             if stream_key is None:
                 continue
-            
-            handle_sae_message(proto_data, args.preserve_frame)
+
+            if message_type is None:
+                message_type = determine_message_type(proto_data)
+                print(f'Detected message type {message_type} on stream.', file=sys.stderr)
+
+
+            if message_type == MessageType.SAE:
+                handle_sae_message(proto_data, args.preserve_frame)
+            elif message_type == MessageType.DETECTION_COUNT:
+                handle_detection_count_message(proto_data)
