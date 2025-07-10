@@ -2,9 +2,16 @@ import argparse
 import signal
 import sys
 import threading
+from enum import StrEnum
+from visionapi.sae_pb2 import SaeMessage
+from visionapi.analytics_pb2 import DetectionCountMessage
 
 from simple_term_menu import TerminalMenu
 
+class MessageType(StrEnum):
+    SAE = 'SAE'
+    DETECTION_COUNT = 'DETECTION_COUNT'
+    
 
 def choose_stream(redis_client):
     available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM', count=100)[1]))
@@ -51,3 +58,43 @@ def register_stop_handler():
     signal.signal(signal.SIGINT, sig_handler)
 
     return stop_event
+
+def is_sae_message(message_bytes: bytes) -> bool:
+    msg = SaeMessage()
+    msg.ParseFromString(message_bytes)
+
+    return all((
+        msg.HasField('frame'),
+        msg.frame.source_id != '',
+        msg.frame.timestamp_utc_ms != 0,
+        msg.frame.HasField('shape'),
+        msg.HasField('metrics')
+    ))
+    
+def is_detection_count_message(message_bytes: bytes) -> bool:
+    msg = DetectionCountMessage()
+    msg.ParseFromString(message_bytes)
+
+    return all((
+        msg.timestamp_utc_ms != 0,
+    ))
+
+def determine_message_type(message_bytes: bytes) -> MessageType:
+    """
+    Determines the type of a protobuf message based on parsing its content and applying some simple heuristics.
+
+    Args:
+        message_bytes (bytes): The serialized protobuf message.
+
+    Returns:
+        MessageType: The detected message type (SAE or DETECTION_COUNT).
+
+    Raises:
+        ValueError: If the message type cannot be determined.
+    """
+    if is_detection_count_message(message_bytes):
+        return MessageType.DETECTION_COUNT
+    elif is_sae_message(message_bytes):
+        return MessageType.SAE
+    else:
+        raise ValueError('Unknown message type. Could not determine message type from the first message.')

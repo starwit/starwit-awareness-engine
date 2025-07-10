@@ -44,4 +44,5 @@ The `play.py` script plays back a pipeline log into a running pipeline (i.e. at 
 See `python play.py --help` for how to use it.
 
 ## JSON Output (`echo.py`)
-The `echo.py` script echoes all SAE messages it receives into stdout as a JSON string (output of protobufs `MessageToJSON()`). Frame data is removed by default as to not clutter the output. `echo.py` can be very useful when combined with other tools like jq. For example, to print the source id, frame timestamp and number of detections for each received message: `python echo.py | jq -r '[.frame.sourceId, .frame.timestampUtcMs, (.detections | length)] | @tsv'`
+The `echo.py` script echoes all messages it receives into stdout as a JSON string (output of protobufs `MessageToJSON()`). It currently supports `SaeMessage` and `DetectionCountMessage` - the message type on the chosen stream is autodetected. All selected streams must carry the same message type. For `SaeMessage` payloads frame data is removed by default as to not clutter the output.\
+`echo.py` can be very useful when combined with other tools like jq. For example, to print the source id, frame timestamp and number of detections for each received message: `python echo.py | jq -r '[.frame.sourceId, .frame.timestampUtcMs, (.detections | length)] | @tsv'`
