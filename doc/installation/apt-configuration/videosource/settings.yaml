@@ -1,0 +1,21 @@
+# The id is used as part of stream identifier in Redis
+id: stream1
+uri: rtsp://username:password@host # RTSP example
+# # This sets a lower bound on frame times (i.e. frames are skipped), 0 means no limit
+max_fps: 10
+# # Encode the video frame data as JPEG (using libturbojpeg)
+jpeg_encode: True
+# # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points: 2160 = 80, 1080 = 90, <720 = 95
+jpeg_quality: 95
+# # If > 0, scale the image to the given width (preserving aspect ratio)
+scale_width: 1280
+# # Path to a b/w mask (ideally same resolution as frame after scaling down), black=blacken, white=keep
+mask_path: null
+# # How long to wait in seconds in case the connection is lost before the next retry
+reconnect_backoff_time: 1
+log_level: DEBUG
+redis:
+  host: localhost
+  port: 6379
+#
+prometheus_port: 8000

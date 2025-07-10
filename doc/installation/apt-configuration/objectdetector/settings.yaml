@@ -1,0 +1,18 @@
+model:
+  # Load yolo weights from file; If auto_download is enabled then this needs to match "yolov8[nsmlx].pt"
+  weights_path: yolov8m.pt
+  device: "cuda" # or "cpu"
+  # auto_download: True
+inference_size: [ 544, 960 ]
+classes: [ 0, 1, 2 ]
+max_batch_size: 1
+max_batch_interval: 2
+log_level: DEBUG
+drop_edge_detections: False
+redis:
+  host: localhost
+  port: 6379
+  stream_ids:
+    - stream1
+
+prometheus_port: 8001
