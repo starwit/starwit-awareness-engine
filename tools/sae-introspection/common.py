@@ -3,10 +3,12 @@ import signal
 import sys
 import threading
 from enum import StrEnum
-from visionapi.sae_pb2 import SaeMessage
-from visionapi.analytics_pb2 import DetectionCountMessage
 
 from simple_term_menu import TerminalMenu
+from visionapi.analytics_pb2 import DetectionCountMessage
+from visionapi.sae_pb2 import SaeMessage
+from visionlib.pipeline.formats import is_sae_message
+
 
 class MessageType(StrEnum):
     SAE = 'SAE'
@@ -59,19 +61,13 @@ def register_stop_handler():
 
     return stop_event
 
-def is_sae_message(message_bytes: bytes) -> bool:
+def check_sae_message(message_bytes: bytes) -> bool:
     msg = SaeMessage()
     msg.ParseFromString(message_bytes)
 
-    return all((
-        msg.HasField('frame'),
-        msg.frame.source_id != '',
-        msg.frame.timestamp_utc_ms != 0,
-        msg.frame.HasField('shape'),
-        msg.HasField('metrics')
-    ))
+    return is_sae_message(msg)
     
-def is_detection_count_message(message_bytes: bytes) -> bool:
+def check_detection_count_message(message_bytes: bytes) -> bool:
     msg = DetectionCountMessage()
     msg.ParseFromString(message_bytes)
 
@@ -92,9 +88,9 @@ def determine_message_type(message_bytes: bytes) -> MessageType:
     Raises:
         ValueError: If the message type cannot be determined.
     """
-    if is_detection_count_message(message_bytes):
+    if check_detection_count_message(message_bytes):
         return MessageType.DETECTION_COUNT
-    elif is_sae_message(message_bytes):
+    elif check_sae_message(message_bytes):
         return MessageType.SAE
     else:
         raise ValueError('Unknown message type. Could not determine message type from the first message.')

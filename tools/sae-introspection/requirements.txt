@@ -109,7 +109,7 @@ typing_extensions==4.8.0
 uri-template==1.3.0
 urllib3==2.2.1
 visionapi @ git+https://github.com/starwit/vision-api.git@3.2.2#subdirectory=python/visionapi
-visionlib @ git+https://github.com/starwit/vision-lib.git@0.11.1#subdirectory=python
+visionlib @ git+https://github.com/starwit/vision-lib.git@0.12.0#subdirectory=python
 wcwidth==0.2.13
 webcolors==1.13
 webencodings==0.5.1
