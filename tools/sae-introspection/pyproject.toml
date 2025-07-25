@@ -21,8 +21,8 @@ numpy = ">=1.24.0,<2.0.0"
 protobuf = ">=6.31.1,<7.0.0"
 jupyter = ">=1.1.1,<2.0.0"
 pynmeagps = ">=1.0.50,<2.0.0"
-visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "3.2.2" }
-visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.12.0" }
+visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", rev = "1db3c47" }
+visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.13.0" }
 pyturbojpeg = "^1.8.2"
 ipyleaflet = "^0.20.0"
 
