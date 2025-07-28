@@ -18,7 +18,8 @@ The components of the vision pipeline can be found in the following repositories
 | Video Source     | https://github.com/starwit/video-source-py                 |
 | Object Detector  | https://github.com/starwit/object-detector                 |
 | Object Tracker   | https://github.com/starwit/object-tracker                  |
-| Geo-Mapper       | https://github.com/starwit/geo-mapper                      |
+| Geo Mapper       | https://github.com/starwit/geo-mapper                      |
+| Position Source  | https://github.com/starwit/sae-position-source             |
 | Redis Writer     | https://github.com/starwit/sae-redis-writer                |
 | Database Writer  | https://github.com/starwit/vision-api-jms-client           |
 | vision-api       | https://github.com/starwit/vision-api                      |
