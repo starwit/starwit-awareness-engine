@@ -1,13 +1,12 @@
 import sys
 
 import redis
-from google.protobuf.json_format import MessageToJson
-from visionapi.analytics_pb2 import DetectionCountMessage
-from visionapi.sae_pb2 import SaeMessage
-from visionlib.pipeline.consumer import RedisConsumer
-
 from common import (MessageType, choose_streams, default_arg_parser,
                     determine_message_type, register_stop_handler)
+from google.protobuf.json_format import MessageToJson
+from visionapi.analytics_pb2 import DetectionCountMessage
+from visionapi.sae_pb2 import PositionMessage, SaeMessage
+from visionlib.pipeline.consumer import RedisConsumer
 
 
 def handle_sae_message(message_bytes: bytes, preserve_frame=False):
@@ -26,6 +25,13 @@ def handle_detection_count_message(message_bytes: bytes):
     msg.ParseFromString(message_bytes)
 
     msg_json = MessageToJson(msg)
+    print(msg_json, flush=True)
+
+def handle_position_message(message_bytes: bytes):
+    msg = PositionMessage()
+    msg.ParseFromString(message_bytes)
+
+    msg_json = MessageToJson(msg, always_print_fields_with_no_presence=True)
     print(msg_json, flush=True)
 
 if __name__ == '__main__':
@@ -64,5 +70,7 @@ if __name__ == '__main__':
 
             if message_type == MessageType.SAE:
                 handle_sae_message(proto_data, args.preserve_frame)
+            elif message_type == MessageType.POSITION:
+                handle_position_message(proto_data)
             elif message_type == MessageType.DETECTION_COUNT:
                 handle_detection_count_message(proto_data)

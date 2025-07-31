@@ -1,0 +1,31 @@
+[project]
+name = "sae-introspection"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "flonix8",email = "flstanek@googlemail.com"}
+]
+readme = "README.md"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+simple-term-menu = ">=1.6.6,<2.0.0"
+opencv-python = ">=3,<5.0.0.0"
+pybase64 = ">=1.4.1,<2.0.0"
+redis = ">=5.0.0,<6.0.0"
+requests = ">=2.32.4,<3.0.0"
+numpy = ">=1.24.0,<2.0.0"
+protobuf = ">=6.31.1,<7.0.0"
+jupyter = ">=1.1.1,<2.0.0"
+pynmeagps = ">=1.0.50,<2.0.0"
+visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", rev = "1db3c47" }
+visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.13.0" }
+pyturbojpeg = "^1.8.2"
+ipyleaflet = "^0.20.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
