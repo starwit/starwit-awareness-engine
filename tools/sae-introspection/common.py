@@ -6,15 +6,15 @@ from enum import StrEnum
 
 from simple_term_menu import TerminalMenu
 from visionapi.analytics_pb2 import DetectionCountMessage
-from visionapi.sae_pb2 import PositionMessage, SaeMessage
-from visionlib.pipeline.formats import is_position_message, is_sae_message
+from visionapi.common_pb2 import MessageType, TypeMessage
+from visionapi.sae_pb2 import SaeMessage
+from visionlib.pipeline.formats import is_sae_message
 
 
-class MessageType(StrEnum):
+class InternalMessageType(StrEnum):
     SAE = 'SAE'
     DETECTION_COUNT = 'DETECTION_COUNT'
     POSITION = 'POSITION'
-    
 
 def choose_stream(redis_client):
     available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM', count=100)[1]))
@@ -62,19 +62,13 @@ def register_stop_handler():
 
     return stop_event
 
-def check_sae_message(message_bytes: bytes) -> bool:
+def check_legacy_sae_message(message_bytes: bytes) -> bool:
     msg = SaeMessage()
     msg.ParseFromString(message_bytes)
 
     return is_sae_message(msg)
 
-def check_position_message(message_bytes: bytes) -> bool:
-    msg = PositionMessage()
-    msg.ParseFromString(message_bytes)
-
-    return is_position_message(msg)
-    
-def check_detection_count_message(message_bytes: bytes) -> bool:
+def check_legacy_detection_count_message(message_bytes: bytes) -> bool:
     msg = DetectionCountMessage()
     msg.ParseFromString(message_bytes)
 
@@ -82,24 +76,35 @@ def check_detection_count_message(message_bytes: bytes) -> bool:
         msg.timestamp_utc_ms != 0,
     ))
 
-def determine_message_type(message_bytes: bytes) -> MessageType:
+def determine_message_type(message_bytes: bytes) -> InternalMessageType:
     """
-    Determines the type of a protobuf message based on parsing its content and applying some simple heuristics.
+    Determines the type of a protobuf message based on its type field. 
+    If the type field is not set or set to an unknown value, try to use heuristics to find message type.
 
     Args:
         message_bytes (bytes): The serialized protobuf message.
 
     Returns:
-        MessageType: The detected message type (SAE or DETECTION_COUNT).
+        MessageType: The contained message type.
 
     Raises:
         ValueError: If the message type cannot be determined.
     """
-    if check_sae_message(message_bytes):
-        return MessageType.SAE
-    elif check_position_message(message_bytes):
-        return MessageType.POSITION
-    elif check_detection_count_message(message_bytes):
-        return MessageType.DETECTION_COUNT
+
+    # First try parsing the version field
+    msg = TypeMessage()
+    msg.ParseFromString(message_bytes)
+    if msg.type == MessageType.SAE:
+        return InternalMessageType.SAE
+    elif msg.type == MessageType.DETECTION_COUNT:
+        return InternalMessageType.DETECTION_COUNT
+    elif msg.type == MessageType.POSITION:
+        return InternalMessageType.POSITION
+    
+    # Then try the legacy heuristics 
+    if check_legacy_sae_message(message_bytes):
+        return InternalMessageType.SAE
+    elif check_legacy_detection_count_message(message_bytes):
+        return InternalMessageType.DETECTION_COUNT
     else:
-        raise ValueError('Unknown message type. Could not determine message type from the first message.')
+        raise ValueError('Unknown message type. Could not determine message type.')
