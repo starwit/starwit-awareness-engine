@@ -22,7 +22,7 @@ protobuf = ">=6.31.1,<7.0.0"
 jupyter = ">=1.1.1,<2.0.0"
 pynmeagps = ">=1.0.50,<2.0.0"
 visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", rev = "7d70dd3" }
-visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.13.0" }
+visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.13.1" }
 pyturbojpeg = "^1.8.2"
 ipyleaflet = "^0.20.0"
 

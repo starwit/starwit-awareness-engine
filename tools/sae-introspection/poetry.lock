@@ -2866,7 +2866,7 @@ subdirectory = "python/visionapi"
 
 [[package]]
 name = "visionlib"
-version = "0.13.0"
+version = "0.13.1"
 description = ""
 optional = false
 python-versions = "^3.10"
@@ -2886,8 +2886,8 @@ redis = "^5.0.0"
 [package.source]
 type = "git"
 url = "https://github.com/starwit/vision-lib.git"
-reference = "0.13.0"
-resolved_reference = "fee8b79b543615e9d9d71cbeff60d125702b2229"
+reference = "0.13.1"
+resolved_reference = "b4832c9d7974dde58eb0209f7516a8e40703f50e"
 subdirectory = "python"
 
 [[package]]
@@ -2970,4 +2970,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "e8e31ecdf55aca76b584a1402b865b3fd27c1e1ec4d2802c3dba1da9008a84a8"
+content-hash = "2273729a6826fcdec0e4006939df730d1c43b756633c4699d3cfdb4bb99c5c82"
