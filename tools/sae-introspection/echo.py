@@ -1,34 +1,28 @@
 import sys
 
 import redis
-from common import (MessageType, choose_streams, default_arg_parser,
-                    determine_message_type, register_stop_handler)
 from google.protobuf.json_format import MessageToJson
+from google.protobuf.message import Message
 from visionapi.analytics_pb2 import DetectionCountMessage
 from visionapi.sae_pb2 import PositionMessage, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
+from common import (InternalMessageType, choose_streams, default_arg_parser,
+                    determine_message_type, register_stop_handler)
+
 
 def handle_sae_message(message_bytes: bytes, preserve_frame=False):
-    sae_msg = SaeMessage()
-    sae_msg.ParseFromString(message_bytes)
-
-    if not preserve_frame:
-        sae_msg.frame.ClearField('frame_data')
-        sae_msg.frame.ClearField('frame_data_jpeg')
-
-    msg_json = MessageToJson(sae_msg)
-    print(msg_json, flush=True)
-
-def handle_detection_count_message(message_bytes: bytes):
-    msg = DetectionCountMessage()
+    msg = SaeMessage()
     msg.ParseFromString(message_bytes)
 
-    msg_json = MessageToJson(msg)
+    if not preserve_frame:
+        msg.frame.ClearField('frame_data')
+        msg.frame.ClearField('frame_data_jpeg')
+
+    msg_json = MessageToJson(msg, always_print_fields_with_no_presence=True)
     print(msg_json, flush=True)
 
-def handle_position_message(message_bytes: bytes):
-    msg = PositionMessage()
+def handle_generic_message(message_bytes: bytes, msg: Message) -> None:
     msg.ParseFromString(message_bytes)
 
     msg_json = MessageToJson(msg, always_print_fields_with_no_presence=True)
@@ -53,7 +47,7 @@ if __name__ == '__main__':
 
     consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
 
-    message_type: MessageType = None
+    message_type: InternalMessageType = None
 
     with consume:
         for stream_key, proto_data in consume():
@@ -68,9 +62,9 @@ if __name__ == '__main__':
                 print(f'Detected message type {message_type} on stream.', file=sys.stderr)
 
 
-            if message_type == MessageType.SAE:
+            if message_type == InternalMessageType.SAE:
                 handle_sae_message(proto_data, args.preserve_frame)
-            elif message_type == MessageType.POSITION:
-                handle_position_message(proto_data)
-            elif message_type == MessageType.DETECTION_COUNT:
-                handle_detection_count_message(proto_data)
+            elif message_type == InternalMessageType.POSITION:
+                handle_generic_message(proto_data, PositionMessage())
+            elif message_type == InternalMessageType.DETECTION_COUNT:
+                handle_generic_message(proto_data, DetectionCountMessage())

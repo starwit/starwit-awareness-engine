@@ -11,9 +11,14 @@ def main():
     args = parser.parse_args()
 
     master_fd, slave_fd = pty.openpty()
-
     slave_name = os.ttyname(slave_fd)
-    print(f'You can read the simulated data at {slave_name}')
+
+    LINK_NAME = "/tmp/gps-simulator"
+    if os.path.exists(LINK_NAME):
+        os.remove(LINK_NAME)
+    os.symlink(slave_name, LINK_NAME)
+
+    print(f'You can read the simulated data at {LINK_NAME} (linked to {slave_name})')
 
     # Read first timestamp
     with open(args.source_file, 'r') as log_file:
