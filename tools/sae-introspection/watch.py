@@ -132,7 +132,7 @@ if __name__ == '__main__':
     
     stop_event = register_stop_handler()
 
-    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200)
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, [STREAM_KEY], block=200, start_at_head=args.start_at_head)
 
     with consume:
         for stream_key, proto_data in consume():

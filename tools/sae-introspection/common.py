@@ -47,6 +47,8 @@ def default_arg_parser():
     arg_parser.add_argument('--help', action='help', help='Show help message and exit')
     arg_parser.add_argument('-h', '--redis-host', type=str, default='localhost')
     arg_parser.add_argument('-p', '--redis-port', type=int, default=6379)
+    arg_parser.add_argument('--start-at-head', action='store_true', 
+                            help='Start reading at the stream head, i.e. the oldest element, instead of attaching to the end')
     return arg_parser
 
 def register_stop_handler():

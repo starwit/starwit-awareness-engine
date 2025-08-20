@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     stop_event = register_stop_handler()
 
-    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200)
+    consume = RedisConsumer(REDIS_HOST, REDIS_PORT, STREAM_KEYS, block=200, start_at_head=args.start_at_head)
 
     start_time = time.time()
 
