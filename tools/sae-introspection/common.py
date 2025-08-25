@@ -2,7 +2,7 @@ import argparse
 import signal
 import sys
 import threading
-from enum import StrEnum
+from enum import Enum
 
 from simple_term_menu import TerminalMenu
 from visionapi.analytics_pb2 import DetectionCountMessage
@@ -11,7 +11,7 @@ from visionapi.sae_pb2 import SaeMessage
 from visionlib.pipeline.formats import is_sae_message
 
 
-class InternalMessageType(StrEnum):
+class InternalMessageType(str, Enum):
     SAE = 'SAE'
     DETECTION_COUNT = 'DETECTION_COUNT'
     POSITION = 'POSITION'
