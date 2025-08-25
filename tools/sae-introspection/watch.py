@@ -110,9 +110,9 @@ if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--stream', type=str)
-    arg_parser.add_argument('-i', '--image-file', type=str, default=None)
+    arg_parser.add_argument('-i', '--image-file', type=str, default=None, metavar='FILE')
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
-    arg_parser.add_argument('-f', '--fixed-scale', type=float, 
+    arg_parser.add_argument('-f', '--fixed-scale', type=float, metavar='SCALE',
                            help='Display with fixed scaling factor and high-quality scaling (2=double size, 1=original size, 0.75=75%% size , 0.5=half size, etc.)')
 
 

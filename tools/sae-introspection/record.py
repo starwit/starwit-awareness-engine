@@ -69,11 +69,11 @@ if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
     arg_parser.add_argument('-s', '--streams', type=str, nargs='*', metavar='STREAM')
-    arg_parser.add_argument('-o', '--output-file', type=str, default=f'./{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump')
-    arg_parser.add_argument('-t', '--time-limit', type=int, help='Stop recording after TIME_LIMIT seconds (default 60)', default=60)
+    arg_parser.add_argument('-o', '--output-file', type=str, default=f'./{time.strftime("%Y-%m-%dT%H-%M-%S%z")}.saedump', metavar='FILE')
+    arg_parser.add_argument('-t', '--time-limit', type='natural_timedelta', help='Stop recording after TIME_LIMIT (default "60s")', default='60s')
     arg_parser.add_argument('-r', '--remove-frame', action='store_true', help='Remove frame data from messages (reduces size significantly)')
-    arg_parser.add_argument('-d', '--downscale-frames', default=0, type=int, help='Downscale frames to given width (preserving aspect ratio)')
-    arg_parser.add_argument('-q', '--downscale-jpeg-quality', default=85, type=int, help='JPEG quality for downscaling frames (0-100, sane values 80-95)')
+    arg_parser.add_argument('-d', '--downscale-frames', default=0, type=int, help='Downscale frames to given width (preserving aspect ratio)', metavar='WIDTH')
+    arg_parser.add_argument('-q', '--downscale-jpeg-quality', default=85, type=int, help='JPEG quality for downscaling frames (0-100, sane values 80-95)', metavar='QUALITY')
     args = arg_parser.parse_args()
 
     STREAM_KEYS = args.streams

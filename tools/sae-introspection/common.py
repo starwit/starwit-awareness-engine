@@ -2,8 +2,10 @@ import argparse
 import signal
 import sys
 import threading
+from datetime import timedelta
 from enum import Enum
 
+import tempora
 from simple_term_menu import TerminalMenu
 from visionapi.analytics_pb2 import DetectionCountMessage
 from visionapi.common_pb2 import MessageType, TypeMessage
@@ -42,13 +44,21 @@ def choose_streams(redis_client):
         exit(0)
     return [available_streams[idx] for idx in selected_idx_list]
 
+def _parse_duration(value: str) -> timedelta:
+    try:
+        return tempora.parse_timedelta(value)
+    except Exception as e:
+        raise argparse.ArgumentTypeError(f"Invalid duration '{value}': {e}")
+
 def default_arg_parser():
-    arg_parser = argparse.ArgumentParser(add_help=False)
+    arg_parser = argparse.ArgumentParser(add_help=False, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     arg_parser.add_argument('--help', action='help', help='Show help message and exit')
-    arg_parser.add_argument('-h', '--redis-host', type=str, default='localhost')
-    arg_parser.add_argument('-p', '--redis-port', type=int, default=6379)
-    arg_parser.add_argument('--start-at-head', action='store_true', 
+    arg_parser.add_argument('-h', '--redis-host', type=str, default='localhost', help='Redis/Valkey host to connect to', metavar='HOST')
+    arg_parser.add_argument('-p', '--redis-port', type=int, default=6379, help='Redis/Valkey port to connect to', metavar='PORT')
+    arg_parser.add_argument('--start-at-head', action='store_true',
                             help='Start reading at the stream head, i.e. the oldest element, instead of attaching to the end')
+
+    arg_parser.register('type', 'natural_timedelta', _parse_duration)
     return arg_parser
 
 def register_stop_handler():
