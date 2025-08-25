@@ -10,7 +10,8 @@ from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
 from visionlib.saedump import MESSAGE_SEPARATOR, DumpMeta, Event, EventMeta
 
-from common import choose_streams, default_arg_parser, register_stop_handler
+from common import (InternalMessageType, choose_streams, default_arg_parser,
+                    determine_message_type, register_stop_handler)
 
 jpeg = TurboJPEG()
 
@@ -22,14 +23,8 @@ def write_meta(file: TextIO, start_time: float, stream_keys: list[str]):
     file.write(meta.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
-def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False, scale_width=0, scale_quality=85):
+def write_event(file: TextIO, stream_key: str, proto_data: bytes):
     bytes_to_write = proto_data
-    
-    if is_remove_frame:
-        bytes_to_write = remove_frame(proto_data)
-
-    if scale_width > 0:
-        bytes_to_write = resize_frame(proto_data, scale_width, scale_quality)
     
     event = Event(
         meta=EventMeta(
@@ -42,29 +37,35 @@ def write_event(file: TextIO, stream_key: str, proto_data, is_remove_frame=False
     file.write(event.model_dump_json())
     file.write(MESSAGE_SEPARATOR)
 
-def remove_frame(proto_data):
+def process_sae_message(proto_data: bytes, is_remove_frame=False, scale_width=0, scale_quality=85) -> bytes:
     msg = SaeMessage()
     msg.ParseFromString(proto_data)
-    msg.frame.ClearField('frame_data')
-    msg.frame.ClearField('frame_data_jpeg')
+
+    if is_remove_frame:
+        remove_frame(msg)
+
+    if scale_width > 0:
+        resize_frame(msg, scale_width, scale_quality)
+
     return msg.SerializeToString()
 
-def resize_frame(proto_data, scale_width=0, quality=85):
-    msg = SaeMessage()
-    msg.ParseFromString(proto_data)
-    msg.frame.frame_data_jpeg
+def remove_frame(msg: SaeMessage):
+    msg.frame.ClearField('frame_data')
+    msg.frame.ClearField('frame_data_jpeg')
 
+def resize_frame(msg: SaeMessage, scale_width=0, quality=85):
     frame = get_raw_frame_data(msg.frame)
+
+    if frame is None:
+        return
 
     original_width = frame.shape[1]
     scale_factor = scale_width / original_width
     frame = cv2.resize(frame, None, fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_AREA)
 
     msg.frame.frame_data_jpeg = jpeg.encode(frame, quality)
-    
-    return msg.SerializeToString()
 
-    
+
 if __name__ == '__main__':
 
     arg_parser = default_arg_parser()
@@ -84,7 +85,7 @@ if __name__ == '__main__':
         redis_client = redis.Redis(REDIS_HOST, REDIS_PORT)
         STREAM_KEYS = choose_streams(redis_client)
 
-    print(f'Recording streams {STREAM_KEYS} for {args.time_limit}s into {args.output_file}')
+    print(f'Recording streams {STREAM_KEYS} for {args.time_limit} into {args.output_file}')
 
     stop_event = register_stop_handler()
 
@@ -100,11 +101,14 @@ if __name__ == '__main__':
             if stop_event.is_set():
                 break
 
+            if time.time() - start_time > args.time_limit.total_seconds():
+                print(f'Reached configured time limit of {args.time_limit}')
+                break
+
             if stream_key is None:
                 continue
 
-            if time.time() - start_time > args.time_limit:
-                print(f'Reached configured time limit of {args.time_limit}s')
-                break
+            if determine_message_type(proto_data) == InternalMessageType.SAE:
+                proto_data = process_sae_message(proto_data, args.remove_frame, args.downscale_frames, args.downscale_jpeg_quality)
 
-            write_event(output_file, stream_key, proto_data, args.remove_frame, args.downscale_frames, args.downscale_jpeg_quality)
+            write_event(output_file, stream_key, proto_data)

@@ -1,14 +1,15 @@
 import sys
-import os
 import time
 
 import cv2
 import numpy as np
 import redis
-from common import choose_stream, default_arg_parser, register_stop_handler
 from visionapi.sae_pb2 import Detection, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 from visionlib.pipeline.tools import get_raw_frame_data
+
+from common import (InternalMessageType, choose_stream, default_arg_parser,
+                    determine_message_type, register_stop_handler)
 
 ANNOTATION_COLOR = (0, 0, 255)
 DEFAULT_WINDOW_SIZE = (1280, 720)
@@ -141,5 +142,9 @@ if __name__ == '__main__':
 
             if stream_key is None:
                 continue
+            
+            if (msg_type := determine_message_type(proto_data)) != InternalMessageType.SAE:
+                print(f'Detected message type on stream {stream_key} is {msg_type.name}. Only type SAE is supported.')
+                exit(1)
             
             handle_sae_message(proto_data, stream_key)

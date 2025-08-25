@@ -2,10 +2,13 @@ import time
 from datetime import timedelta
 
 import pybase64
-from common import default_arg_parser, register_stop_handler
-from visionapi.sae_pb2 import SaeMessage
+from visionapi.analytics_pb2 import DetectionCountMessage
+from visionapi.sae_pb2 import PositionMessage, SaeMessage
 from visionlib.pipeline.publisher import RedisPublisher
 from visionlib.saedump import DumpMeta, Event, message_splitter
+
+from common import (InternalMessageType, default_arg_parser,
+                    determine_message_type, register_stop_handler)
 
 
 def wait_until_record_time(playback_start_time: float, record_start_time: float, record_target_time: float):
@@ -19,17 +22,31 @@ def wait_until_interval(prev_message_time: float, target_interval: timedelta):
     current_time = time.time()
     target_time = prev_message_time + target_interval.total_seconds()
     sleep_time = target_time - current_time
-    print(target_time, sleep_time)
     if sleep_time > 0:
         time.sleep(sleep_time)
 
 def set_frame_timestamp_to_now(proto_bytes: str):
-    proto = SaeMessage()
-    proto.ParseFromString(proto_bytes)
+    msg_type = determine_message_type(proto_bytes)
 
-    proto.frame.timestamp_utc_ms = time.time_ns() // 1000000
-    
-    return proto.SerializeToString()
+    match msg_type:
+        case InternalMessageType.SAE:
+            msg = SaeMessage()
+            msg.ParseFromString(proto_bytes)
+
+            msg.frame.timestamp_utc_ms = time.time_ns() // 1000000
+            return msg.SerializeToString()
+        case InternalMessageType.POSITION:
+            msg = PositionMessage()
+            msg.ParseFromString(proto_bytes)
+
+            msg.timestamp_utc_ms = time.time_ns() // 1000000
+            return msg.SerializeToString()
+        case InternalMessageType.DETECTION_COUNT:
+            msg = DetectionCountMessage()
+            msg.ParseFromString(proto_bytes)
+
+            msg.timestamp_utc_ms = time.time_ns() // 1000000
+            return msg.SerializeToString()
 
 
 if __name__ == '__main__':
