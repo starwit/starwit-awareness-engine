@@ -13,6 +13,15 @@ services:
       interval: 1s
       start_period: 5s
 
+  position-source:
+    image: ${IMAGE_REGISTRY}/sae-position-source:${POSITION_SOURCE_VERSION}
+    volumes:
+      - ./position-source/position-source.settings.yaml:/code/settings.yaml
+      - /tmp/gps-simulator:/dev/ttyACM0
+    depends_on:
+      redis:
+        condition: service_healthy
+
   video-source-stream1:
     image: ${IMAGE_REGISTRY}/sae-video-source-py:${VIDEO_SOURCE_VERSION}
     volumes:
@@ -25,6 +34,7 @@ services:
     image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
+      - /home/anett/Documents/Starwit/WAS/models/2025-07-08-UAVVaste-Test.pt:/code/yolov8n.pt
     depends_on:
       redis:
         condition: service_healthy
@@ -54,6 +64,16 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    volumes:
+      - redisinsight:/data
+    ports:
+      - 5540:5540
+
+volumes:
+  redisinsight:
 
 networks:
   default:
