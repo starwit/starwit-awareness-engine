@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   object-detector:
-    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
+    image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
       - /home/anett/Documents/Starwit/WAS/models/2025-07-08-UAVVaste-Test.pt:/code/yolov8n.pt
