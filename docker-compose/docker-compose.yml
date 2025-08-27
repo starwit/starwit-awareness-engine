@@ -34,18 +34,18 @@ services:
     image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
-      - /home/anett/Documents/Starwit/WAS/models/2025-07-08-UAVVaste-Test.pt:/code/yolov8n.pt
+      - /home/anett/git/waste-detection/runs/taco-uavvaste-50-epochs-1280/best.pt:/code/yolov8n.pt
     depends_on:
       redis:
         condition: service_healthy
 
-  object-tracker-stream1:
-    image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
-    volumes:
-      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
+  # object-tracker-stream1:
+  #   image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
+  #   volumes:
+  #     - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
   streaming-server:
     image: bluenviron/mediamtx:1.0.0-ffmpeg
@@ -65,12 +65,12 @@ services:
       redis:
         condition: service_healthy
 
-  redis-insight:
-    image: redis/redisinsight:latest
-    volumes:
-      - redisinsight:/data
-    ports:
-      - 5540:5540
+  # redis-insight:
+  #   image: redis/redisinsight:latest
+  #   volumes:
+  #     - redisinsight:/data
+  #   ports:
+  #     - 5540:5540
 
 volumes:
   redisinsight:
