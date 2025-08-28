@@ -120,6 +120,10 @@ if __name__ == '__main__':
     arg_parser.add_argument('gps_log', type=Path, help='Corresponding gps log file', metavar='FILE')
     args = arg_parser.parse_args()
 
+    if args.video.stem.split('_')[:2] != args.gps_log.stem.split('_')[:2]:
+        print('Given files must match in timestamp prefix!')
+        exit(1)
+
     publisher = RedisPublisher(args.redis_host, args.redis_port)
 
     with publisher as publish:
