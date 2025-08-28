@@ -116,6 +116,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-p', '--redis-port', type=int, default=6379, help='Redis/Valkey port to connect to', metavar='PORT')
     arg_parser.add_argument('-s', '--scale-width', type=int, default=0, help='Downscale frames to width in px (preserving aspect ratio)', metavar='WIDTH')
     arg_parser.add_argument('-f', '--fps', type=int, default=0, help='Target FPS', metavar='FPS')
+    arg_parser.add_argument('-k', '--stream-key', type=str, default='videosource:test', help='Stream output key', metavar='KEY')
     arg_parser.add_argument('video', type=Path, help='Video file to play', metavar='FILE')
     arg_parser.add_argument('gps_log', type=Path, help='Corresponding gps log file', metavar='FILE')
     args = arg_parser.parse_args()
@@ -128,4 +129,4 @@ if __name__ == '__main__':
 
     with publisher as publish:
         for msg in iter_recording(args.video, args.gps_log, scale_width=args.scale_width, fps=args.fps):
-            publish('test', msg.SerializeToString())
+            publish(args.stream_key, msg.SerializeToString())
