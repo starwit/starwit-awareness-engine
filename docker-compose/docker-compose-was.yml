@@ -24,7 +24,7 @@ services:
   geo-mapper:
     image: ${IMAGE_REGISTRY}/sae-geo-mapper:${GEO_MAPPER_VERSION}
     volumes:
-      - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
+      - ./geo-mapper/geo-mapper-was.settings.yaml:/code/settings.yaml
     depends_on:
       redis:
         condition: service_healthy
@@ -32,7 +32,7 @@ services:
   aggregator:
     image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
     volumes:
-      - ./aggregator/aggregator.settings.yaml:/code/settings.yaml
+      - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
     depends_on:
       redis:
         condition: service_healthy
