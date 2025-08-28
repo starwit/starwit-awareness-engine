@@ -13,6 +13,13 @@ services:
       interval: 1s
       start_period: 5s
 
+  object-detector:
+    image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
+    volumes:
+      - ./object-detector/object-detector-was.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
 
   geo-mapper:
     image: ${IMAGE_REGISTRY}/sae-geo-mapper:${GEO_MAPPER_VERSION}
