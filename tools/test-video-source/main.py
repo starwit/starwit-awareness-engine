@@ -87,7 +87,7 @@ def create_sae_msg(frame: Frame, pos: Position) -> SaeMessage:
     msg = SaeMessage()
     msg.type = MessageType.SAE
     msg.frame.source_id = 'test'
-    msg.frame.timestamp_utc_ms = int(frame.timestamp.timestamp() * 1000)
+    msg.frame.timestamp_utc_ms = int((frame.timestamp + frame.start_offset).timestamp() * 1000)
     msg.frame.frame_data_jpeg = _jpeg_encoder.encode(frame.data, quality=90)
     msg.frame.shape.height = frame.data.shape[0]
     msg.frame.shape.width = frame.data.shape[1]

@@ -26,6 +26,7 @@ visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = 
 pyturbojpeg = "^1.8.2"
 ipyleaflet = "^0.20.0"
 tempora = "^5.8.1"
+pydeck = "^0.9.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
