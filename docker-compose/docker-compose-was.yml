@@ -17,6 +17,7 @@ services:
     image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector-was.settings.yaml:/code/settings.yaml
+      - /home/anett/git/waste-detection/runs/taco-uavvaste-50-epochs-1280/weights/best.pt:/yolov8n.pt
     depends_on:
       redis:
         condition: service_healthy
@@ -29,20 +30,13 @@ services:
       redis:
         condition: service_healthy
 
-  aggregator:
-    image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
-    volumes:
-      - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  # redis-insight:
-  #   image: redis/redisinsight:latest
+  # aggregator:
+  #   image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
   #   volumes:
-  #     - redisinsight:/data
-  #   ports:
-  #     - 5540:5540
+  #     - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
 
 volumes:
   redisinsight:

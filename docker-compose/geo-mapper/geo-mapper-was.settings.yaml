@@ -1,5 +1,5 @@
 cameras:
-  - stream_id: was-pod01
+  - stream_id: test
     passthrough: true
 mapping_strategy:
   mode: dynamic
@@ -8,3 +8,5 @@ redis:
   input_stream_prefix: objectdetector
   host: redis
   port: 6379
+  stream_ids:
+    - test
