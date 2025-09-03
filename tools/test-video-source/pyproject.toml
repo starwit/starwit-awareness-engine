@@ -14,7 +14,7 @@ package-mode = false
 python = ">=3.10,<4.0"
 opencv-python = ">=3,<5.0.0.0"
 pynmeagps = ">=1.0.50,<2.0.0"
-visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "3.4.0" }
+visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "3.5.1" }
 visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.14.0" }
 pyturbojpeg = "^1.8.2"
 

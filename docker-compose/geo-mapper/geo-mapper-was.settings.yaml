@@ -1,0 +1,12 @@
+cameras:
+  - stream_id: test
+    passthrough: true
+mapping_strategy:
+  mode: dynamic
+log_level: INFO
+redis:
+  input_stream_prefix: objectdetector
+  host: redis
+  port: 6379
+  stream_ids:
+    - test

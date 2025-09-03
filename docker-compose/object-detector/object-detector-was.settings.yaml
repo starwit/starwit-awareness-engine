@@ -1,0 +1,12 @@
+model:
+  weights_path: waste.pt
+  device: "cpu"
+inference_size: [ 640, 640 ]
+#classes: [ 2 ]
+log_level: DEBUG
+redis:
+  input_stream_prefix: videosource
+  host: redis
+  port: 6379
+  stream_ids:
+    - test

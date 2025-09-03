@@ -1,0 +1,46 @@
+name: sae
+
+services:
+  redis:
+    image: valkey/valkey:7.2.6
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+
+  object-detector:
+    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
+    volumes:
+      - ./object-detector/object-detector-was.settings.yaml:/code/settings.yaml
+      - ../../waste-detection/runs/taco-uavvaste-50-epochs-1280/weights/best.pt:/code/waste.pt
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  geo-mapper:
+    image: ${IMAGE_REGISTRY}/sae-geo-mapper:${GEO_MAPPER_VERSION}
+    volumes:
+      - ./geo-mapper/geo-mapper-was.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # aggregator:
+  #   image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
+  #   volumes:
+  #     - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+
+volumes:
+  redisinsight:
+
+networks:
+  default:
+    name: sae

@@ -1,0 +1,15 @@
+log_level: DEBUG
+skip_empty_detections: False
+redis:
+  host: redis
+  port: 6379
+  stream_id: test
+  input_stream_prefix: geomapper
+  output_stream_prefix: aggregator
+chunk:
+  buffer_size: 1
+  time_in_ms: 1
+  geo_coordinate:
+    latitude: 0
+    longitude: 0
+prometheus_port: 8000
