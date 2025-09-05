@@ -11,19 +11,17 @@ from common import (InternalMessageType, default_arg_parser,
                     determine_message_type, register_stop_handler)
 
 
-def wait_until_record_time(playback_start_time: float, record_start_time: float, record_target_time: float):
+def time_until_record_time(playback_start_time: float, record_start_time: float, record_target_time: float):
     current_time = time.time()
     playback_delta = current_time - playback_start_time
     target_delta = record_target_time - record_start_time
-    if playback_delta <= target_delta:
-        time.sleep(target_delta - playback_delta)
+    return max(0, target_delta - playback_delta)
 
-def wait_until_interval(prev_message_time: float, target_interval: timedelta):
+def time_until_interval(prev_message_time: float, target_interval: timedelta):
     current_time = time.time()
     target_time = prev_message_time + target_interval.total_seconds()
     sleep_time = target_time - current_time
-    if sleep_time > 0:
-        time.sleep(sleep_time)
+    return max(0, sleep_time)
 
 def set_frame_timestamp_to_now(proto_bytes: str):
     msg_type = determine_message_type(proto_bytes)
@@ -66,23 +64,23 @@ if __name__ == '__main__':
     publish = RedisPublisher(REDIS_HOST, REDIS_PORT)
 
     with publish, open(args.dumpfile, 'r') as input_file:
-        while True:
-            messages = message_splitter(input_file)
+        while not stop_event.is_set():
+            message_iter = message_splitter(input_file)
 
             playback_start_ts = time.time()
             prev_message_ts = 0
-            start_message = next(messages)
+            start_message = next(message_iter)
             dump_meta = DumpMeta.model_validate_json(start_message)
             print(f'Starting playback from file {args.dumpfile} containing streams {dump_meta.recorded_streams}')
 
-            for message in messages:
+            for message in message_iter:
                 event = Event.model_validate_json(message)
                 proto_bytes = pybase64.standard_b64decode(event.data_b64)
 
                 if args.fixed_interval is not None:
-                    wait_until_interval(prev_message_ts, args.fixed_interval)
+                    stop_event.wait(time_until_interval(prev_message_ts, args.fixed_interval))
                 else:
-                    wait_until_record_time(playback_start_ts, dump_meta.start_time, event.meta.record_time)
+                    stop_event.wait(time_until_record_time(playback_start_ts, dump_meta.start_time, event.meta.record_time))
 
                 if args.adjust_timestamps:
                     proto_bytes = set_frame_timestamp_to_now(proto_bytes)
@@ -94,8 +92,7 @@ if __name__ == '__main__':
                 if stop_event.is_set():
                     break
             
-            if not args.loop or stop_event.is_set():
+            if not args.loop:
                 break
             else:
                 input_file.seek(0)
-            
