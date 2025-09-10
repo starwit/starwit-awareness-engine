@@ -1,0 +1,12 @@
+{{- with .Values.positionSource }}
+{{- $instanceName := printf "position-source" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instanceName }}-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+---
+{{- end }}
+{{- end }}
