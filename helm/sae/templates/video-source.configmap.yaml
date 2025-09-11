@@ -1,5 +1,5 @@
 {{- with .Values.videoSource }}
-{{- range .configs -}}
+{{- range .settingsYamls -}}
 {{- $instanceName := printf "video-source-%s" (lower .id) }}
 apiVersion: v1
 kind: ConfigMap

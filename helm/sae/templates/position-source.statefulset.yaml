@@ -3,7 +3,7 @@
 {{- $imageRepo := required "image repository for position-source is required" .image.repository }}
 {{- $imageTag := required "image tag for position-source is required" .image.tag }}
 {{- $rootConfig := . }}
-{{- with .config -}}
+{{- with .settingsYaml -}}
 {{- $instanceName := printf "position-source" }}
 apiVersion: apps/v1
 kind: StatefulSet

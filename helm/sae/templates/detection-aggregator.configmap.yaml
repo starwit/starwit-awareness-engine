@@ -1,13 +1,14 @@
-{{- with .Values.geoMerger }}
+{{- with .Values.detectionAggregator }}
 {{- if .enabled }}
-{{- with .config }}
+{{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: geo-merger-config
+  name: detection-aggregator-config
 data:
   settings.yaml: |
     {{- toYaml . | nindent 4 }}
+---
 {{- end }}
 {{- end }}
 {{- end }}
