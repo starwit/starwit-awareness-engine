@@ -43,7 +43,7 @@ spec:
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
           volumeMounts:
-            - name: gpsDevice
+            - name: gps-device
               mountPath: /dev/gps
         {{- end }}
         - name: {{ $instanceName }}
@@ -70,7 +70,7 @@ spec:
           configMap:
             name: {{ $instanceName }}-config
         {{- if $rootConfig.gpsdSidecar.enabled }}
-        - name: gpsDevice
+        - name: gps-device
           hostPath:
             path: {{ $rootConfig.gpsdSidecar.hostGpsDevice }}
             type: CharDevice
