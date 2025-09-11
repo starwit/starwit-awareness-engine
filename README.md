@@ -13,17 +13,18 @@ Please note, that regardless of deployment method - SAE works in all of them wit
 
 ## Repositories
 The components of the vision pipeline can be found in the following repositories:
-| Component        | Repository / URI                                           |
-| ---------------- | ---------------------------------------------------------- |  
-| Video Source     | https://github.com/starwit/sae-video-source                |
-| Object Detector  | https://github.com/starwit/sae-object-detector             |
-| Object Tracker   | https://github.com/starwit/object-tracker                  |
-| Geo Mapper       | https://github.com/starwit/geo-mapper                      |
-| Position Source  | https://github.com/starwit/sae-position-source             |
-| Redis Writer     | https://github.com/starwit/sae-redis-writer                |
-| Database Writer  | https://github.com/starwit/sae-database-writer             |
-| vision-api       | https://github.com/starwit/vision-api                      |
-| vision-lib       | https://github.com/starwit/vision-lib                      |
+| Component            | Repository / URI                                           |
+| -------------------- | ---------------------------------------------------------- |  
+| Video Source         | https://github.com/starwit/sae-video-source                |
+| Position Source      | https://github.com/starwit/sae-position-source             |
+| Object Detector      | https://github.com/starwit/sae-object-detector             |
+| Object Tracker       | https://github.com/starwit/sae-object-tracker              |
+| Geo Mapper           | https://github.com/starwit/sae-geo-mapper                  |
+| Detection Aggregator | https://github.com/starwit/detection-aggregator            |
+| Redis Writer         | https://github.com/starwit/sae-redis-writer                |
+| Database Writer      | https://github.com/starwit/sae-database-writer             |
+| vision-api           | https://github.com/starwit/vision-api                      |
+| vision-lib           | https://github.com/starwit/vision-lib                      |
 
 ## Content Overview
 - [`/doc`](doc/README.md) - Documentation of the architecture and some details of the technical setup

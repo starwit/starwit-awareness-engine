@@ -27,6 +27,8 @@ positionSource:
       repository: starwitorg/sae-gpsd
       tag: 2025-09-10
     hostGpsDevice: /path/to/gpsdevice         # the path to a character device gpsd can use (e.g. /dev/ttyACM0) (is passed to hostPath volume mount)
+    entrypointSh: |
+      sleep 3600
 
 videoSource:
   image: 

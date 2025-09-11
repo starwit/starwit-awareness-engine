@@ -10,5 +10,15 @@ data:
     {{- toYaml . | nindent 4 }}
 ---
 {{- end }}
+{{- with .gpsdSidecar }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: position-source-gpsd-config
+data:
+  entrypoint.sh: |-
+    {{- .entrypointSh | nindent 4 }}
+---
+{{- end }}
 {{- end }}
 {{- end }}

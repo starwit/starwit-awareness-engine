@@ -27,17 +27,16 @@ spec:
         app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
-      securityContext:
-        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: wait-for-redis
           image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
       containers:
         {{- with $rootConfig.gpsdSidecar }}
+        {{- if .enabled }}
         - name: gpsd
           securityContext:
-            {{- toYaml $.Values.securityContext | nindent 12 }}
+            privileged: true
           image: "{{ .image.repository }}:{{ .image.tag }}"
           imagePullPolicy: IfNotPresent
           resources:
@@ -45,6 +44,10 @@ spec:
           volumeMounts:
             - name: gps-device
               mountPath: /dev/gps
+            - name: gpsd-config
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+        {{- end }}
         {{- end }}
         - name: {{ $instanceName }}
           securityContext:
@@ -58,6 +61,10 @@ spec:
               value: {{ include "sae.redisServiceName" $ }}
             - name: REDIS__PORT
               value: {{ include "sae.redisServicePort" $ }}
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           ports:
             - name: prometheus
               containerPort: 8000
@@ -69,11 +76,16 @@ spec:
         - name: config
           configMap:
             name: {{ $instanceName }}-config
-        {{- if $rootConfig.gpsdSidecar.enabled }}
+        {{- with $rootConfig.gpsdSidecar }}
+        {{- if .enabled }}
         - name: gps-device
           hostPath:
-            path: {{ $rootConfig.gpsdSidecar.hostGpsDevice }}
+            path: {{ .hostGpsDevice }}
             type: CharDevice
+        - name: gpsd-config
+          configMap:
+            name: {{ $instanceName }}-gpsd-config
+        {{- end }}
         {{- end }}
       {{- with $.Values.nodeSelector }}
       nodeSelector:
