@@ -15,13 +15,13 @@ Please note, that regardless of deployment method - SAE works in all of them wit
 The components of the vision pipeline can be found in the following repositories:
 | Component        | Repository / URI                                           |
 | ---------------- | ---------------------------------------------------------- |  
-| Video Source     | https://github.com/starwit/video-source-py                 |
-| Object Detector  | https://github.com/starwit/object-detector                 |
+| Video Source     | https://github.com/starwit/sae-video-source                |
+| Object Detector  | https://github.com/starwit/sae-object-detector             |
 | Object Tracker   | https://github.com/starwit/object-tracker                  |
 | Geo Mapper       | https://github.com/starwit/geo-mapper                      |
 | Position Source  | https://github.com/starwit/sae-position-source             |
 | Redis Writer     | https://github.com/starwit/sae-redis-writer                |
-| Database Writer  | https://github.com/starwit/vision-api-jms-client           |
+| Database Writer  | https://github.com/starwit/sae-database-writer             |
 | vision-api       | https://github.com/starwit/vision-api                      |
 | vision-lib       | https://github.com/starwit/vision-lib                      |
 

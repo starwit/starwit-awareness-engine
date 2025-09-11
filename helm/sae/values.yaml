@@ -9,7 +9,6 @@ positionSource:
     repository: starwitorg/sae-position-source
     tag: 1.1.1
   enabled: false
-  # gpsDevice: /path/to/gpsdevice             # the path to a device gpsd can use (e.g. /dev/ttyACM0) (is passed to hostPath volume mount); unset if you don't need gpsd / use static config
   settingsYaml:
     log_level: INFO
     position_source:                          # static source outputs the same coordinates twice a second
@@ -22,11 +21,17 @@ positionSource:
     # position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
     #   type: dynamic
     #   serial_device: /dev/ttyACM0
+  gpsdSidecar:
+    enabled: false                            # only enable if non-static config above
+    image:
+      repository: starwitorg/sae-gpsd
+      tag: 2025-09-10
+    hostGpsDevice: /path/to/gpsdevice         # the path to a character device gpsd can use (e.g. /dev/ttyACM0) (is passed to hostPath volume mount)
 
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 1.0.1
+    tag: 2.3.0
   configs: 
   - id: stream1
     uri: 'uri'
