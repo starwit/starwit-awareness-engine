@@ -2,6 +2,7 @@
 {{- $imageRepo := required "image repository for object-detector is required" .image.repository }}
 {{- $imageTag := required "image tag for object-detector is required" .image.tag }}
 {{- $isUsingNvidia := hasPrefix "cuda" .settingsYaml.model.device }}
+{{- $isUsingIntel := hasPrefix "intel" .settingsYaml.model.device }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -50,6 +51,11 @@ spec:
           resources:
             limits:
               nvidia.com/gpu: 1
+          {{- end }}
+          {{- if $isUsingIntel }}
+          resources:
+            limits:
+              gpu.intel.com/i915: 1
           {{- end }}
           env:
             - name: REDIS__HOST
