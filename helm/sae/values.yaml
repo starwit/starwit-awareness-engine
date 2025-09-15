@@ -42,7 +42,7 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 4.0.0
+    tag: 4.1.0
   customWeights: 
     enabled: false
     imageTag: weights-image-tag

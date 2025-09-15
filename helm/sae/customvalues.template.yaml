@@ -1,35 +1,58 @@
+positionSource:
+  enabled: false
+  settingsYaml:                               # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
+    log_level: INFO
+    position_source:                          # static source outputs the same coordinates twice a second
+      type: static
+      lat: 52
+      lon: 10
+    # position_source:                        # command source tries to read NMEA sentences from stdout of given command (this is recommended)
+    #   type: command
+    #   command: ["gpspipe", "-r"]            # this is passed to Popen; if you want to use a bash pipeline do ["bash", "-c", "command | command2"]
+    # position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
+    #   type: dynamic
+    #   serial_device: /dev/ttyACM0
+  gpsdSidecar:
+    enabled: false                            # only enable if non-static config above
+    image:
+      repository: starwitorg/sae-gpsd
+      tag: 2025-09-10
+    hostGpsDevice: /path/to/gpsdevice         # the path to a character device gpsd can use (e.g. /dev/ttyACM0) (is passed to hostPath volume mount)
+    entrypointSh: |
+      sleep 3600
+
 videoSource:
-  logLevel: DEBUG                           # Options: ERROR, WARNING, INFO, DEBUG
-  configs: 
+  settingsYamls:                            # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
   - id: stream1                             # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
     uri: 'uri'                              # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
     max_fps: 5                              # Effectively sets a lower bound on the time between to frames. 0 means off. Integer fractions of original frame rate make the most sense (i.e. 15, 10, 5 for a 30fps source).
     scale_width: 0                          # If > 0, scale the image to the given width (preserving aspect ratio)
     jpeg_quality: 80                        # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points (for image height): 2160 = 80, 1080 = 90, <720 = 95
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
 
 objectDetector:
-  logLevel: DEBUG                           # Options: ERROR, WARNING, INFO, DEBUG
   customWeights: 
     enabled: false                          # Whether to inject custom weights from init container (into custom_weights/*)
     imageTag: weights-image-tag             # Which tag of the starwitorg/sae-object-detector-weights image to use
-  config:
+  settingsYaml:
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
     model:
       weights_path: custom_weights/xyz      # Which weights to load. yolov8[nsmlx].pt are shipped with the object-detector. For custom weights see above.
       device: cpu                           # Options: cpu, cuda (uses gpu; needs proper setup; see README)
       nms_agnostic: false                   # Whether to use class-agnostic non-maximum suppression (NMS) (for overlapping detections)
+      inference_size: [ 640, 640 ]          # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
+      classes: [ 2 ]                        # Which object classes to detect (refer to coco object classes)
     drop_edge_detections: false             # Drop detections touching the frame borders
-    inference_size: [ 640, 640 ]            # What resolution the image will be downscaled to before object-detection inference (should be square and a multiple of 32)
-    classes: [ 2 ]                          # Which object classes to detect (refer to coco object classes)
     redis:
       stream_ids:
         - stream1                           # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
-  logLevel: INFO                            # Options: ERROR, WARNING, INFO, DEBUG
   needsGpu: False                           # Whether the algorithm needs gpu support (needs proper setup; see README)
   streamIds:                                # On which video streams to track objects (the same as object-detector stream ids above)
     - stream1
-  config:                                   # Tracker specific config (see object-tracker repo / Boxmot for details)
+  settingsYaml:                             # Tracker specific config (see object-tracker repo / Boxmot for details)
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
     tracker_algorithm: OCSORT
     tracker_config:
       det_thresh: 0.2
@@ -45,7 +68,8 @@ objectTracker:
 
 geoMapper:
   enabled: false                            # If the geomapper should be deployed (by default it reads from "objecttracker:*"" and outputs into "geomapper:*")
-  config:
+  settingsYaml:
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
     cameras:                                # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
       - stream_id: stream1                  # This must match one of the existing camera streams
         passthrough: false                  # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
@@ -67,33 +91,22 @@ geoMapper:
             ]]
         remove_unmapped_detections: false   # # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
 
-geoMerger:
-  enabled: false
-  config:
-    merging_config:
-      max_distance_m: 2
-      merging_window_ms: 1000
-      target_mps: 10
-      input_stream_ids: 
-        - stream1
-        - stream2
-      output_stream_id: merged
-
 redisWriter:
   enabled: false                            # If the redis-writer should be deployed (off by default)
-  configs:                                  # One config per target
+  instances:                                  # One config per target
     - name: writer1                         # A unique name to identify the instance
-      redis:                                # The SAE internal Redis instance
-        input_stream_prefix: objecttracker  # The prefix of the input stream (e.g. objecttracker or geomapper)
-      target_redis:                         # The Redis instance to write to
-        host: redis-host
-        port: 6379
-        output_stream_prefix: saeoutput     # The prefix of the output stream (e.g. data will be published to saeoutput:<stream_id>)
-        buffer_length: 10                   # How many messages to buffer before discarding
-        target_stream_maxlen: 100           # How many messages to keep in the output stream (translates to XADD maxlen option)
-        tls: false
-      stream_ids:                           # Which video stream to attach to
-        - stream1
+      settingsYaml:
+        log_level: INFO                     # Options: ERROR, WARNING, INFO, DEBUG
+        #remove_frame_data: null            # If frame data should be removed (default true; only applies to SAE messages; beware of privacy and bandwidth consequences!)
+        target_redis:                       # The Valkey instance to send this to 
+          host: host
+          port: 6379
+          buffer_length: 10
+          target_stream_maxlen: 100
+          tls: false
+        mapping_config:                     # A list of source (i.e. this SAE instance) to target stream (i.e. on target_redis) mappings
+          - source: geomapper:stream1       # Source stream name (fully-qualified, including stream prefix)
+            target: geomapper:mysae1        # (optional) Target stream name; Source name is used if omitted
 
 databaseWriter:
   enabled: true                             # If the database-writer should be deployed
