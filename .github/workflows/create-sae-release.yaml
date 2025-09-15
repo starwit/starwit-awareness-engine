@@ -1,0 +1,79 @@
+name: Create SAE helm release
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      versionChoice:
+        type: choice
+        required: true
+        description: Version Change
+        options:
+        - patch
+        - minor
+        - major
+
+permissions:
+  contents: write
+
+env:
+  VERSION_CHOICE: ${{ github.event.inputs.versionChoice }}
+  CHART_NAME: sae
+  DOCKERHUB_USERNAME: starwit
+  DOCKERHUB_ORG: starwitorg  
+
+jobs:
+  publish-helm:
+    if: false
+    name: Publish helm chart
+    runs-on: [self-hosted, linux, X64]
+
+    steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 
+
+      - name: Install GH CLI
+        uses: dev-hanz-ops/install-gh-cli-action@v0.2.1
+        with:
+          gh-cli-version: 2.78.0
+
+      - name: Login to Helm registry
+        run: helm registry login registry-1.docker.io -u $DOCKERHUB_USERNAME -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Run Helm update
+        working-directory: helm/sae
+        run: helm dep update
+
+      - name: Bump version and commit
+        working-directory: helm/sae
+        run: |
+          CURRENT_VERSION=$(grep version: Chart.yaml | head -1 | awk '{print $2}')
+          echo "RELEASE_VERSION=$(npx semver $CURRENT_VERSION -i ${{ env.VERSION_CHOICE }})" >> $GITHUB_ENV
+
+          sed -i -r "s/^version: [0-9]+\.[0-9]+\.[0-9]+$/version: ${{ env.RELEASE_VERSION }}/" Chart.yaml
+
+          git add Chart.yaml
+          git commit -m "Bump version to ${{ env.RELEASE_VERSION }}"
+          git tag ${{ env.RELEASE_VERSION }}
+          git push
+
+      - name: Do Helm release
+        working-directory: helm/sae
+        run: |
+          rm sae-*.tgz
+          helm dependency build     
+          helm package .
+          helm push sae-*.tgz oci://registry-1.docker.io/$DOCKERHUB_ORG
+
+
+          
