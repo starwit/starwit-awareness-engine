@@ -22,7 +22,7 @@ services:
         condition: service_healthy
 
   object-detector:
-    image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
     depends_on:

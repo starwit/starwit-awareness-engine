@@ -30,13 +30,13 @@ services:
       redis:
         condition: service_healthy
 
-  # aggregator:
-  #   image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
-  #   volumes:
-  #     - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
-  #   depends_on:
-  #     redis:
-  #       condition: service_healthy
+  aggregator:
+    image: ${IMAGE_REGISTRY}/detection-aggregator:${AGGREGATOR_VERSION}
+    volumes:
+      - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
 
 volumes:
   redisinsight:
