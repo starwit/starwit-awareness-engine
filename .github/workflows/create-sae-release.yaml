@@ -65,6 +65,10 @@ jobs:
       #     git commit -m "Bump version to ${{ env.RELEASE_VERSION }}"
       #     git tag ${{ env.RELEASE_VERSION }}
       #     git push
+      # - name: Create Github release
+      #   run: gh release create ${{ env.RELEASE_VERSION }} --generate-notes 
+      #   env:
+      #       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # - name: Do Helm release
       #   working-directory: helm/sae
