@@ -1,6 +1,7 @@
 name: Create SAE helm release
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       versionChoice:
@@ -60,18 +61,18 @@ jobs:
 
           sed -i -r "s/^version: [0-9]+\.[0-9]+\.[0-9]+$/version: ${{ env.RELEASE_VERSION }}/" Chart.yaml
 
-          git add Chart.yaml
-          git commit -m "Bump version to ${{ env.RELEASE_VERSION }}"
-          git tag ${{ env.RELEASE_VERSION }}
-          git push
+      #     git add Chart.yaml
+      #     git commit -m "Bump version to ${{ env.RELEASE_VERSION }}"
+      #     git tag ${{ env.RELEASE_VERSION }}
+      #     git push
 
-      - name: Do Helm release
-        working-directory: helm/sae
-        run: |
-          rm sae-*.tgz
-          helm dependency build     
-          helm package .
-          helm push sae-*.tgz oci://registry-1.docker.io/$DOCKERHUB_ORG
+      # - name: Do Helm release
+      #   working-directory: helm/sae
+      #   run: |
+      #     rm sae-*.tgz
+      #     helm dependency build     
+      #     helm package .
+      #     helm push sae-*.tgz oci://registry-1.docker.io/$DOCKERHUB_ORG
 
 
           
