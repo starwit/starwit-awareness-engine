@@ -14,6 +14,9 @@ cameras:
     abc_distortion_b: 0.345
     abc_distortion_c: -0.705
 
+mapping_strategy:
+  mode: static
+
 log_level: INFO
 redis:
   host: redis

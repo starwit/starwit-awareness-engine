@@ -1,15 +1,17 @@
-{{- with .Values.geoMerger }}
+{{- with .Values.positionSource }}
 {{- if .enabled }}
-{{- $imageRepo := required "image repository for geo-merger is required" .image.repository }}
-{{- $imageTag := required "image tag for geo-merger is required" .image.tag }}
-{{- $instanceName := "geo-merger" }}
+{{- $imageRepo := required "image repository for position-source is required" .image.repository }}
+{{- $imageTag := required "image tag for position-source is required" .image.tag }}
+{{- $rootConfig := . }}
+{{- with .settingsYaml -}}
+{{- $instanceName := printf "position-source" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
   labels:
     {{- include "sae.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: geo-merger
+    app.kubernetes.io/component: position-source
 spec:
   selector:
     matchLabels:
@@ -18,20 +20,35 @@ spec:
   template:
     metadata:
       annotations:
-        sae.starwit.de/stage: geo-merger
-        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/geo-merger.configmap.yaml") $ | sha256sum }}
+        sae.starwit.de/stage: position-source
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/position-source.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
         app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
-      securityContext:
-        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: wait-for-redis
           image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
       containers:
+        {{- with $rootConfig.gpsdSidecar }}
+        {{- if .enabled }}
+        - name: gpsd
+          securityContext:
+            privileged: true
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: gps-device
+              mountPath: /dev/gps
+            - name: gpsd-config
+              mountPath: /entrypoint.sh
+              subPath: entrypoint.sh
+        {{- end }}
+        {{- end }}
         - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
@@ -40,12 +57,14 @@ spec:
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
           env:
-            - name: LOG_LEVEL
-              value: {{ default "INFO" .logLevel | quote }}
             - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
             - name: REDIS__PORT
               value: {{ include "sae.redisServicePort" $ }}
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           ports:
             - name: prometheus
               containerPort: 8000
@@ -57,6 +76,17 @@ spec:
         - name: config
           configMap:
             name: {{ $instanceName }}-config
+        {{- with $rootConfig.gpsdSidecar }}
+        {{- if .enabled }}
+        - name: gps-device
+          hostPath:
+            path: {{ .hostGpsDevice }}
+            type: CharDevice
+        - name: gpsd-config
+          configMap:
+            name: {{ $instanceName }}-gpsd-config
+        {{- end }}
+        {{- end }}
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -70,5 +100,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

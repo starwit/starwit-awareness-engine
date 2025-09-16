@@ -40,8 +40,6 @@ spec:
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
           env:
-            - name: LOG_LEVEL
-              value: {{ default "INFO" .logLevel | quote }}
             - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
             - name: REDIS__PORT

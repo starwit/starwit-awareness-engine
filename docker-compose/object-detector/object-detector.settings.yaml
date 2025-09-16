@@ -1,8 +1,8 @@
 model:
   weights_path: yolov8n.pt
   device: "cpu"
-inference_size: [ 640, 640 ]
-classes: [ 2 ]
+  inference_size: [ 640, 640 ]
+  classes: [ 2 ]
 log_level: DEBUG
 redis:
   host: redis

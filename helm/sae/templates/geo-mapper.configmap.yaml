@@ -1,6 +1,6 @@
 {{- with .Values.geoMapper }}
 {{- if .enabled }}
-{{- with .config }}
+{{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

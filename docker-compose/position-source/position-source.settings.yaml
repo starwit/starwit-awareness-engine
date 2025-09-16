@@ -1,16 +1,16 @@
-#position_source:                          # static source outputs the same coordinates twice a second
-#  type: static
-#  lat: 52
-#  lon: 10
-position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
-  type: serial
-  serial_device: /dev/ttyACM0
+position_source:                          # static source outputs the same coordinates twice a second
+  type: static
+  lat: 52
+  lon: 10
+# position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
+#   type: serial
+#   serial_device: /dev/ttyACM0
 # position_source:                        # command source tries to read NMEA sentences from stdout of given command
 #   type: command
 #   command: ["gpspipe", "-r"]            # this is passed to Popen; if you want to use a bash pipeline do ["bash", "-c", "command | command2"]
 
 
-log_level: DEBUG
+log_level: INFO
 redis:
   host: redis
   port: 6379

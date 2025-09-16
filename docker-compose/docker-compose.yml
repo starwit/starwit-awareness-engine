@@ -20,9 +20,17 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+  
+  position-source:
+    image: ${IMAGE_REGISTRY}/sae-position-source:${POSITION_SOURCE_VERSION}
+    volumes:
+      - ./position-source/position-source.settings.yaml:/code/settings.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
 
   object-detector:
-    image: ${IMAGE_REGISTRY}/object-detector:${OBJECT_DETECTOR_VERSION}
+    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
     depends_on:

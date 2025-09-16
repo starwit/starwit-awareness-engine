@@ -4,29 +4,57 @@ fullnameOverride: ""
 # extraImagePullSecrets:
 #   - name: extra-pull-secret
 
+positionSource:
+  image:
+    repository: starwitorg/sae-position-source
+    tag: 1.1.1
+  enabled: false
+  settingsYaml:
+    log_level: INFO
+    position_source:                          # static source outputs the same coordinates twice a second
+      type: static
+      lat: 52
+      lon: 10
+    # position_source:                        # command source tries to read NMEA sentences from stdout of given command (this is recommended)
+    #   type: command
+    #   command: ["gpspipe", "-r"]            # this is passed to Popen; if you want to use a bash pipeline do ["bash", "-c", "command | command2"]
+    # position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
+    #   type: dynamic
+    #   serial_device: /dev/ttyACM0
+  gpsdSidecar:
+    enabled: false                            # only enable if non-static config above
+    image:
+      repository: starwitorg/sae-gpsd
+      tag: 2025-09-10
+    hostGpsDevice: /path/to/gpsdevice         # the path to a character device gpsd can use (e.g. /dev/ttyACM0) (is passed to hostPath volume mount)
+    entrypointSh: |
+      sleep 3600
+
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 1.0.1
-  configs: 
+    tag: 2.3.1
+  settingsYamls:
   - id: stream1
     uri: 'uri'
+    log_level: INFO
 
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 3.0.0
+    tag: 4.1.0
   customWeights: 
     enabled: false
     imageTag: weights-image-tag
-  logLevel: INFO
-  config:
+  settingsYaml:
+    log_level: INFO
     model:
       weights_path: yolov8n.pt
       device: cpu
       nms_agnostic: false
-    inference_size: [ 640, 640 ]
-    classes: null
+      inference_size: [ 640, 640 ]
+      classes: null
+    drop_edge_detections: false
     redis:
       stream_ids:
         - stream1
@@ -34,12 +62,13 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 3.1.0
-  logLevel: INFO
-  needsGpu: False
+    tag: 3.3.0
+  enabled: true
+  needsGpu: false
   streamIds:
     - stream1
-  config:
+  settingsYaml:
+    log_level: INFO
     tracker_algorithm: OCSORT
     tracker_config:
       det_thresh: 0.2
@@ -49,16 +78,17 @@ objectTracker:
       delta_t: 3
       asso_func: 'iou'
       inertia: 0.2
-      use_byte: False
+      use_byte: false
       Q_xy_scaling: 1
       Q_s_scaling: 1
 
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
-    tag: 0.7.0
+    tag: 0.10.0
   enabled: false
-  config:
+  settingsYaml:
+    log_level: INFO
     cameras:                  
       - stream_id: stream1    
         passthrough: false    
@@ -74,45 +104,44 @@ geoMapper:
         brown_distortion_k2: 0
         brown_distortion_k3: 0
 
-geoMerger:
+detectionAggregator:
   image:
-    repository: starwitorg/sae-geo-merger
-    tag: 0.1.0
+    repository: starwitorg/detection-aggregator
+    tag: 0.2.7
   enabled: false
-  config:
-    merging_config:
-      max_distance_m: 2
-      merging_window_ms: 1000
-      target_mps: 10
-      input_stream_ids: 
-        - stream1
-        - stream2
-      output_stream_id: merged
+  settingsYaml:
+    log_level: INFO
+    chunk:
+      buffer_size: 1
+      time_in_ms: 20
+      geo_coordinate:
+        latitude: 0
+        longitude: 0
 
 redisWriter:
   image:
     repository: starwitorg/sae-redis-writer
-    tag: 1.2.2
+    tag: 2.0.2
   enabled: false
-  configs:
+  instances:
     - name: output1
-      redis:
-        input_stream_prefix: objecttracker
-      target_redis:
-        output_stream_prefix: saeoutput
-        host: host
-        port: 6379
-        buffer_length: 10
-        target_stream_maxlen: 100
-        tls: false
-      stream_ids:
-        - stream1
+      settingsYaml:
+        log_level: INFO
+        target_redis:
+          host: host
+          port: 6379
+          buffer_length: 10
+          target_stream_maxlen: 100
+          tls: false
+        mapping_config:
+          - source: geomapper:stream1
+            target: geomapper:mysae1
 
 databaseWriter:
   image:
     repository: starwitorg/sae-database-writer
     tag: 2.0.0
-  enabled: true
+  enabled: false
   config:
     redisStreamIds:
       - stream1
@@ -166,7 +195,7 @@ prometheus:
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
             action: keep
-            regex: (video-source|object-detector|object-tracker|geo-mapper|geo-merger|redis-writer)
+            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer)
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod
