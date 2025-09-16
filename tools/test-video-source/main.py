@@ -1,6 +1,6 @@
 import argparse
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Generator, List, NamedTuple, Dict, Iterable
 
@@ -43,6 +43,7 @@ def main():
     arg_parser.add_argument('-s', '--scale-width', type=int, default=0, help='Downscale frames to width in px (preserving aspect ratio)', metavar='WIDTH')
     arg_parser.add_argument('-f', '--fps', type=int, default=0, help='Target FPS', metavar='FPS')
     arg_parser.add_argument('-k', '--stream-key', type=str, default='videosource:test', help='Stream output key', metavar='KEY')
+    arg_parser.add_argument('-t', '--set-time-to-now', action='store_true', help='Whether to set message timestamp to now instead of recorded time.')
     arg_parser.add_argument('path', type=Path, help='Directory of video/gps_log pairs OR Video file to play (matching gps_log must be in the same directory)', metavar='FILE')
     args = arg_parser.parse_args()
 
@@ -53,6 +54,8 @@ def main():
     with publisher as publish:
         for pair in file_pairs:
             for msg in iter_recording(pair.video, pair.gps_log, scale_width=args.scale_width, fps=args.fps):
+                if args.set_time_to_now:
+                    set_timestamp_to_now(msg)
                 publish(args.stream_key, msg.SerializeToString())
 
 def parse_input_path(path: Path) -> List[FilePair]:
@@ -187,6 +190,9 @@ def create_sae_msg(frame: Frame, pos: Position) -> SaeMessage:
     msg.frame.camera_location.latitude = pos.lat
     msg.frame.camera_location.longitude = pos.lon
     return msg
+
+def set_timestamp_to_now(msg: SaeMessage) -> None:
+    msg.frame.timestamp_utc_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
 
 if __name__ == '__main__':
     main()
