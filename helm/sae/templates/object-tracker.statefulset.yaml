@@ -1,10 +1,9 @@
 {{- with .Values.objectTracker }}
 {{- if .enabled }}
-{{- with .settingsYaml }}
 {{- $imageRepo := required "image repository for object-tracker is required" .image.repository }}
 {{- $imageTag := required "image tag for object-tracker is required" .image.tag }}
-{{- $config := . }}
-{{- range .redis.streamIds }}
+{{- $needsGpu := .needsGpu }}
+{{- range .streamIds }}
 {{- $streamId := . -}}
 {{- $instanceName := printf "object-tracker-%s" (lower .) }}
 apiVersion: apps/v1
@@ -31,7 +30,7 @@ spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $config.needsGpu }}
+      {{- if $needsGpu }}
       runtimeClassName: nvidia
       {{- end }}
       initContainers:
@@ -44,7 +43,7 @@ spec:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $config.needsGpu }}
+          {{- if $needsGpu }}
           resources:
             limits:
               nvidia.com/gpu: 1
@@ -80,7 +79,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
