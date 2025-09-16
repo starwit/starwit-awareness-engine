@@ -78,7 +78,7 @@ jobs:
       - name: Do Helm release
         working-directory: helm/sae
         run: |
-          rm sae-*.tgz
+          rm -f sae-*.tgz
           helm dependency build     
           helm package .
           helm push sae-*.tgz oci://registry-1.docker.io/$DOCKERHUB_ORG
