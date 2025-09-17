@@ -121,7 +121,7 @@ detectionAggregator:
 aiControl:
   image:
     repository: starwitorg/sae-ai-control
-    tag: 0.2.7
+    tag: 0.1.2
   enabled: false
   settingsYaml:
     log_level: INFO
