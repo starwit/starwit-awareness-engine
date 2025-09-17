@@ -118,6 +118,15 @@ detectionAggregator:
         latitude: 0
         longitude: 0
 
+aiControl:
+  image:
+    repository: starwitorg/sae-ai-control
+    tag: 0.1.2
+  enabled: false
+  settingsYaml:
+    log_level: INFO
+    time_past: 1d
+
 redisWriter:
   image:
     repository: starwitorg/sae-redis-writer
