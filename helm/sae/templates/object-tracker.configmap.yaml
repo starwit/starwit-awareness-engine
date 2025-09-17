@@ -1,7 +1,13 @@
+{{- with .Values.objectTracker }}
+{{- if .enabled }}
+{{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: object-tracker-config
 data:
   settings.yaml: |
-    {{- toYaml .Values.objectTracker.config | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

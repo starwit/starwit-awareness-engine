@@ -11,6 +11,22 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 7.0.0
+- Add `position-source`
+- Add `detection-aggregator`
+- Remove `geo-merger`
+- Update components
+  - `video-source` to 2.3.1 (supports setting camera position from position-source stream; supports NVIDIA hardware video decoder)
+  - `object-detector` to 4.1.0 (supports Intel GPUs through openvino)
+  - `object-tracker` to 3.3.0
+  - `geo-mapper` to 0.10.0 (supports dynamic position mode)
+  - `redis-writer` to 2.0.2 (support more flexible mapping; supports more message types)
+- Config changes
+  - All component configs now closer resemble actual individual config files -> all components now have a `settingsYaml` key in some way, which contains the settings.yaml contents and is used more consistently throughout the values, please refer to `customvalues.template.yaml` for details
+  - Log levels are not set by helm anymore and need to be configured within the `settingsYaml` sections
+  - `object-detector` had config changes (`inference_size` and `classes` now in `model`)
+  - `redis-writer` had a major config update
+
 ## 6.3.0
 - Update `geo-mapper` to 0.7.0 (update `vision-api` to 3.1.0), which now adds the configured camera location to the output message (`frame.camera_location`); in the case of `passthrough==True` a configured location is still honoured, i.e. added to the message
 

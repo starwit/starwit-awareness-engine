@@ -1,62 +1,46 @@
-{{- with .Values.objectDetector }}
-{{- $imageRepo := required "image repository for object-detector is required" .image.repository }}
-{{- $imageTag := required "image tag for object-detector is required" .image.tag }}
-{{- $isUsingNvidia := hasPrefix "cuda" .settingsYaml.model.device }}
-{{- $isUsingIntel := hasPrefix "intel" .settingsYaml.model.device }}
+{{- with .Values.detectionAggregator }}
+{{- if .enabled }}
+{{- $imageRepo := required "image repository for detection-aggregator is required" .image.repository }}
+{{- $imageTag := required "image tag for detection-aggregator is required" .image.tag }}
+{{- $rootConfig := . }}
+{{- with .settingsYaml -}}
+{{- $instanceName := printf "detection-aggregator" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "sae.fullname" $ }}-object-detector
+  name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
   labels:
     {{- include "sae.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: object-detector
+    app.kubernetes.io/component: detection-aggregator
 spec:
   selector:
     matchLabels:
       {{- include "sae.selectorLabels" $ | nindent 6 }}
-      app.kubernetes.io/component: object-detector
+      app.kubernetes.io/component: {{ $instanceName }}
   template:
     metadata:
       annotations:
-        sae.starwit.de/stage: object-detector
-        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/object-detector.configmap.yaml") $ | sha256sum }}
+        sae.starwit.de/stage: detection-aggregator
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/detection-aggregator.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
-        app.kubernetes.io/component: object-detector
+        app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $isUsingNvidia }}
-      runtimeClassName: nvidia
-      {{- end }}
       initContainers:
         - name: wait-for-redis
           image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
-        {{- if .customWeights.enabled }}
-        - name: install-model-weights
-          image: starwitorg/sae-object-detector-weights:{{ .customWeights.imageTag }}
-          volumeMounts:
-            - name: custom-weights
-              mountPath: /weights_target
-        {{- end }}
       containers:
-        - name: object-detector
+        - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $isUsingNvidia }}
           resources:
-            limits:
-              nvidia.com/gpu: 1
-          {{- end }}
-          {{- if $isUsingIntel }}
-          resources:
-            limits:
-              gpu.intel.com/i915: 1
-          {{- end }}
+            {{- toYaml $.Values.resources | nindent 12 }}
           env:
             - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
@@ -69,14 +53,10 @@ spec:
             - name: config
               mountPath: /code/settings.yaml
               subPath: settings.yaml
-            - name: custom-weights
-              mountPath: /code/custom_weights
       volumes:
         - name: config
           configMap:
-            name: object-detector-config
-        - name: custom-weights
-          emptyDir: {}
+            name: {{ $instanceName }}-config
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -89,4 +69,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+---
+{{- end }}
+{{- end }}
 {{- end }}

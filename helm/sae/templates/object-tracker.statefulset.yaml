@@ -1,7 +1,8 @@
 {{- with .Values.objectTracker }}
+{{- if .enabled }}
 {{- $imageRepo := required "image repository for object-tracker is required" .image.repository }}
 {{- $imageTag := required "image tag for object-tracker is required" .image.tag }}
-{{- $config := . }}
+{{- $needsGpu := .needsGpu }}
 {{- range .streamIds }}
 {{- $streamId := . -}}
 {{- $instanceName := printf "object-tracker-%s" (lower .) }}
@@ -29,7 +30,7 @@ spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $config.needsGpu }}
+      {{- if $needsGpu }}
       runtimeClassName: nvidia
       {{- end }}
       initContainers:
@@ -42,14 +43,12 @@ spec:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $config.needsGpu }}
+          {{- if $needsGpu }}
           resources:
             limits:
               nvidia.com/gpu: 1
           {{- end }}
           env:
-            - name: LOG_LEVEL
-              value: {{ $config.logLevel | quote }}
             - name: REDIS__HOST
               value: {{ include "sae.redisServiceName" $ }}
             - name: REDIS__PORT
@@ -80,5 +79,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

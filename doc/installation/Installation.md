@@ -9,7 +9,7 @@ Please note, that regardless of deployment method - SAE works in all of them wit
 
 ## Installation on Kubernetes cluster
 1. Set up K3s cluster \
-    - Create K3s config file (adapt the value of `tls-san`)
+    - Create K3s config file at `/etc/rancher/k3s/config.yaml` (adapt the value of `tls-san`)
         ```yaml
         write-kubeconfig-mode: "0644"
         tls-san:

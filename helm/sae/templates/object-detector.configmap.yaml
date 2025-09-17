@@ -1,5 +1,5 @@
 {{- with .Values.objectDetector }}
-{{- with .config }}
+{{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

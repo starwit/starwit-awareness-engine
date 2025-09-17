@@ -1,6 +1,6 @@
 {{- with .Values.redisWriter }}
 {{- if .enabled }}
-{{- range .configs }}
+{{- range .instances }}
 {{- $instanceName := printf "redis-writer-%s" (lower .name) }}
 apiVersion: v1
 kind: ConfigMap
@@ -8,7 +8,7 @@ metadata:
   name: {{ $instanceName }}-config
 data:
   settings.yaml: |
-    {{- toYaml . | nindent 4 }}
+    {{- toYaml .settingsYaml | nindent 4 }}
 ---
 {{- end }}
 {{- end }}
