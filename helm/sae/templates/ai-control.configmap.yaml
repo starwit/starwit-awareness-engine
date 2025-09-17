@@ -1,0 +1,14 @@
+{{- with .Values.aiControl }}
+{{- if .enabled }}
+{{- with .settingsYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-control-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
