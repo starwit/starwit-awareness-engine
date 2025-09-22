@@ -102,8 +102,8 @@ aiControl:
     time_past: 1d                        # e.g. 1d, 5h, 10m, 30s time interval after which a message is sent even if no other criteria are met
     redis:
       stream_id: stream1                      # On which video streams to detect objects on. Mostly all video source stream ids.
-      input_stream_prefix: objecttracker      # Prefix of the input stream to read from
-      output_stream_prefix: detectionselector # Prefix of the output stream to write to
+      input_stream_prefix: objectdetector     # Prefix of the input stream to read from
+      output_stream_prefix: aicontrol         # Prefix of the output stream to write to
 
 redisWriter:
   enabled: false                            # If the redis-writer should be deployed (off by default)
