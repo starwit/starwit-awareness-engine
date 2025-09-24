@@ -82,7 +82,7 @@ def showImage(stream_id, image):
         stop_event.set()
         cv2.destroyAllWindows()
 
-def handle_sae_message(sae_message_bytes, stream_key):
+def handle_sae_message(sae_message_bytes, stream_key, show_image=True):
     global previous_frame_timestamp, args
 
     sae_msg = SaeMessage()
@@ -103,8 +103,9 @@ def handle_sae_message(sae_message_bytes, stream_key):
     
     if args.stdout:
         sys.stdout.buffer.write(image)
-    
-    showImage(stream_key, image)
+
+    if show_image:
+        showImage(stream_key, image)
 
 
 if __name__ == '__main__':
@@ -115,7 +116,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-o', '--stdout', action='store_true', help='Output annotated raw frames to stdout (e.g. to pipe into ffmpeg)')
     arg_parser.add_argument('-f', '--fixed-scale', type=float, metavar='SCALE',
                            help='Display with fixed scaling factor and high-quality scaling (2=double size, 1=original size, 0.75=75%% size , 0.5=half size, etc.)')
-
+    arg_parser.add_argument('-n', '--no-gui', action='store_true', help='Do not display a GUI window. Useful when only piping to stdout.')
 
     args = arg_parser.parse_args()
 
@@ -147,4 +148,4 @@ if __name__ == '__main__':
                 print(f'Detected message type on stream {stream_key} is {msg_type.name}. Only type SAE is supported.')
                 exit(1)
             
-            handle_sae_message(proto_data, stream_key)
+            handle_sae_message(proto_data, stream_key, show_image=not args.no_gui)
