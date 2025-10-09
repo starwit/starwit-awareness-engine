@@ -1,0 +1,11 @@
+{{- with .Values.cleaningStatusFilter }}
+{{- with .settingsYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cleaning-status-filter-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}

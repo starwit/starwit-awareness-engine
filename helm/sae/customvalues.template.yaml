@@ -30,6 +30,30 @@ videoSource:
     jpeg_quality: 80                        # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points (for image height): 2160 = 80, 1080 = 90, <720 = 95
     log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
 
+cleaningStatusFilter:
+  enabled: false
+  customWeights:
+    image:
+      repository: starwitorg/sae-cleaning-status-filter-weights
+      tag: 0.1.0
+  settingsYaml:
+    log_level: INFO
+    redis:
+      stream_id: stream1
+    mirror_detection:
+      y_up_threshold: 0.4                           # y-coordinate in normalized image space (0.0-1.0) above which mirror up position is assumed (top is 0, bottom is 1)
+      y_down_threshold: 0.6                         # y-coordinate in normalized image space (0.0-1.0) below which mirror down position is assumed (top is 0, bottom is 1)
+      required_stable_readings: 5                   # How long the mirror position needs to be constant until a new status is set
+      interval_s: 1.0                               # The minimum interval at which inference is executed
+      model:
+        weights_path: custom_weights/xyz     # Path to weights for mirror detection (needs to have a `mirror` class)
+        device: cpu
+        confidence_threshold: 0.25
+        iou_threshold: 0.45
+        fp16: false
+        nms_agnostic: true
+        inference_size: [ 640, 640 ]
+    
 objectDetector:
   customWeights: 
     enabled: false                          # Whether to inject custom weights from init container (into custom_weights/*)

@@ -1,0 +1,90 @@
+{{- with .Values.cleaningStatusFilter }}
+{{- $imageRepo := required "image repository for cleaning-status-filter is required" .image.repository }}
+{{- $imageTag := required "image tag for cleaning-status-filter is required" .image.tag }}
+{{- $isUsingNvidia := hasPrefix "cuda" .settingsYaml.mirror_detection.model.device }}
+{{- $isUsingIntel := hasPrefix "intel" .settingsYaml.mirror_detection.model.device }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sae.fullname" $ }}-cleaning-status-filter
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: cleaning-status-filter
+spec:
+  selector:
+    matchLabels:
+      {{- include "sae.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: cleaning-status-filter
+  template:
+    metadata:
+      annotations:
+        sae.starwit.de/stage: cleaning-status-filter
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/cleaning-status-filter.configmap.yaml") $ | sha256sum }}
+      labels:
+        {{- include "sae.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: cleaning-status-filter
+    spec:
+      serviceAccountName: {{ include "sae.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      {{- if $isUsingNvidia }}
+      runtimeClassName: nvidia
+      {{- end }}
+      initContainers:
+        - name: wait-for-redis
+          image: valkey/valkey:7.2.6-alpine
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
+        - name: install-model-weights
+          image: {{ .customWeights.image.repository }}:{{ .customWeights.image.tag }}
+          volumeMounts:
+            - name: custom-weights
+              mountPath: /weights_target
+      containers:
+        - name: cleaning-status-filter
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: IfNotPresent
+          {{- if $isUsingNvidia }}
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          {{- end }}
+          {{- if $isUsingIntel }}
+          resources:
+            limits:
+              gpu.intel.com/i915: 1
+          {{- end }}
+          env:
+            - name: REDIS__HOST
+              value: {{ include "sae.redisServiceName" $ }}
+            - name: REDIS__PORT
+              value: {{ include "sae.redisServicePort" $ }}
+          ports:
+            - name: prometheus
+              containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+            - name: custom-weights
+              mountPath: /code/custom_weights
+      volumes:
+        - name: config
+          configMap:
+            name: cleaning-status-filter-config
+        - name: custom-weights
+          emptyDir: {}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

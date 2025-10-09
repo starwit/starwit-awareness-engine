@@ -39,6 +39,19 @@ videoSource:
     uri: 'uri'
     log_level: INFO
 
+cleaningStatusFilter:
+  image:
+    repository: starwitorg/sae-object-detector
+    tag: 0.2.0
+  enabled: false
+  customWeights:
+    image:
+      repository: starwitorg/sae-cleaning-status-filter-weights
+      tag: 0.1.0
+  settingsYaml:
+    redis:
+      stream_id: stream1
+
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
