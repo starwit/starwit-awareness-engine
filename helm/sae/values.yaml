@@ -162,6 +162,8 @@ databaseWriter:
       hypertable: tablename
 
 redis:
+  image:
+    repository: bitnamilegacy/valkey
   architecture: standalone
   auth:
     enabled: false
@@ -179,12 +181,16 @@ redis:
         memory: 256Mi
         cpu: 250m
   metrics:
+    image:
+      repository: bitnamilegacy/redis-exporter
     enabled: true
 
 prometheus:
   alertmanager:
     enabled: false
   server:
+    image:
+      repository: bitnamilegacy/prometheus
     service:
       type: ClusterIP
     scrapeInterval: 10s
@@ -214,6 +220,8 @@ prometheus:
           
 
 grafana:
+  image:
+    repository: bitnamilegacy/grafana
   admin:
     password: admin
   datasources:
@@ -227,4 +235,6 @@ grafana:
 
 
 nodeexporter:
+  image:
+    repository: bitnamilegacy/node-exporter
   enabled: true
