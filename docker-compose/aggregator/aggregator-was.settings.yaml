@@ -3,7 +3,7 @@ skip_empty_detections: False
 redis:
   host: redis
   port: 6379
-  stream_id: test
+  stream_id: stream1
   input_stream_prefix: geomapper
   output_stream_prefix: aggregator
 chunk:

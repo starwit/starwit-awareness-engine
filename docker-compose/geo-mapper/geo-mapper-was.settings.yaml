@@ -1,5 +1,5 @@
 cameras:
-  - stream_id: test
+  - stream_id: stream1
     passthrough: true
 mapping_strategy:
   mode: dynamic
@@ -9,4 +9,4 @@ redis:
   host: redis
   port: 6379
   stream_ids:
-    - test
+    - stream1
