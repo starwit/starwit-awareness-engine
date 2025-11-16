@@ -11,11 +11,16 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 7.1.2
+- Update `redis-writer` to 2.0.3 (fix discarding all messages bug)
+
 ## 7.1.1
 - Fix Bitnami charts, uses bitnamilegacy now; Long-term solution is needed
+
 ## 7.1.0
 - Update components
   - `position-source` to 1.2.0
+  
 ## 7.0.0
 - Add `position-source`
 - Add `detection-aggregator`
