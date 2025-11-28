@@ -28,6 +28,8 @@ ipyleaflet = "^0.20.0"
 tempora = "^5.8.1"
 pydeck = "^0.9.1"
 pandas = "^2.3.2"
+tqdm = "^4.67.1"
+palettable = "^3.3.3"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

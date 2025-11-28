@@ -4,6 +4,7 @@ import sys
 import threading
 from datetime import timedelta
 from enum import Enum
+from typing import List
 
 import tempora
 from simple_term_menu import TerminalMenu
@@ -18,7 +19,7 @@ class InternalMessageType(str, Enum):
     DETECTION_COUNT = 'DETECTION_COUNT'
     POSITION = 'POSITION'
 
-def choose_stream(redis_client):
+def choose_stream(redis_client) -> str:
     available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM', count=100)[1]))
     menu = TerminalMenu(available_streams, title='Choose Redis stream to attach to:', show_search_hint=True)
     selected_idx = menu.show()
@@ -27,7 +28,7 @@ def choose_stream(redis_client):
         exit(0)
     return available_streams[selected_idx]
 
-def choose_streams(redis_client):
+def choose_streams(redis_client) -> str:
     available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM', count=100)[1]))
     menu = TerminalMenu(
         available_streams, 
@@ -43,6 +44,19 @@ def choose_streams(redis_client):
         print('No stream chosen. Exiting.', file=sys.stderr)
         exit(0)
     return [available_streams[idx] for idx in selected_idx_list]
+
+def choose_stream_from_list(stream_list: List[str]) -> str:
+    sorted_streams = sorted(stream_list)
+    menu = TerminalMenu(
+        sorted_streams, 
+        title='Choose stream:', 
+        show_search_hint=True,
+    )
+    selected_idx = menu.show()
+    if selected_idx is None:
+        print('No entry chosen. Exiting.', file=sys.stderr)
+        exit(0)
+    return sorted_streams[selected_idx]
 
 def _parse_duration(value: str) -> timedelta:
     try:

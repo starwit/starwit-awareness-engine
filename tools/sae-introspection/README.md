@@ -45,3 +45,8 @@ See `python play.py --help` for how to use it.
 ## JSON Output (`echo.py`)
 The `echo.py` script echoes all messages it receives into stdout as a JSON string (output of protobufs `MessageToJSON()`), everything else goes to stderr. It currently supports `SaeMessage`, `DetectionCountMessage` and `PositionMessage` - the message type on the chosen stream is autodetected (either using the type field or if that is not set a rather crude heuristic is used). All selected streams must carry the same message type. For `SaeMessage` payloads frame data is removed by default as to not clutter the output.\
 `echo.py` can be very useful when combined with other tools like jq. For example, to print the source id, frame timestamp and number of detections for each received message: `python echo.py | jq -r '[.frame.sourceId, .frame.timestampUtcMs, (.detections | length)] | @tsv'`
+
+
+## Plot SAE Dump
+The `plot.py` script reads a SAE dump file and plots contained object trajectories onto an existing image file or a grey background if no image is provided.\
+Example usage: `python plot.py -i image.png dump_file.saedump`\
