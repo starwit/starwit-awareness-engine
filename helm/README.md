@@ -11,6 +11,10 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 8.0.0
+- Update `geo-mapper` to 1.0.0
+- Breaking config change, refer to geo-mapper [changelog](https://github.com/starwit/sae-geo-mapper?tab=readme-ov-file#changelog) to see details (TL;DR: use the updated values template to recreate geo-mapper config)
+
 ## 7.1.2
 - Update `redis-writer` to 2.0.3 (fix discarding all messages bug)
 
