@@ -72,24 +72,24 @@ geoMapper:
     log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
     cameras:                                # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
       - stream_id: stream1                  # This must match one of the existing camera streams
-        passthrough: false                  # If the stream should be passed through without geo mapping (all other parameters are ignored if true)
+        mode: map                           # Either `map` (actual geomapping using all spatial parameters) or `copy` (i.e. map to a point, see below)
         view_x_deg: 90                      # The horizontal angle of view 
         image_width_px: 1920
         image_height_px: 1080
         elevation_m: 10                     # Height of the camera above ground
         tilt_deg: 45                        # 0° = camera facing straight down (image plane parallel to the ground), 90° camera pointed at horizon (image plane 90° to the ground)
-        pos_lat: 52                         # Camera location latitude 
-        pos_lon: 10                         # Camera location longitude
         heading_deg: 90                     # Heading the camera is pointed at
         brown_distortion_k1: 0              # Distortion correction (abc-model is also available)
         brown_distortion_k2: 0
         brown_distortion_k3: 0
-        mapping_area:                       # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
-          type: Polygon
-          coordinates: [[                   # [lon,lat] list of polygon points. The last point must equal the first to close the polygon!
-              [10, 50],
-            ]]
-        remove_unmapped_detections: false   # # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
+        #mapping_area:                      # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set)
+        #  type: Polygon
+        #  coordinates: [[                  # [lon,lat] list of polygon points. The last point must equal the first to close the polygon!
+        #      [10, 50],
+        #    ]]
+        #remove_unmapped_detections: false  # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
+      - stream_id: stream1-copy
+        mode: copy
 
 aiControl:
   enabled: false

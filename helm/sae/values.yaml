@@ -85,24 +85,11 @@ objectTracker:
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
-    tag: 0.10.0
+    tag: 1.0.0
   enabled: false
   settingsYaml:
     log_level: INFO
-    cameras:                  
-      - stream_id: stream1    
-        passthrough: false    
-        view_x_deg: 90        
-        image_width_px: 1920
-        image_height_px: 1080
-        elevation_m: 10       
-        tilt_deg: 45          
-        pos_lat: 52           
-        pos_lon: 10           
-        heading_deg: 90       
-        brown_distortion_k1: 0
-        brown_distortion_k2: 0
-        brown_distortion_k3: 0
+    cameras: []
 
 detectionAggregator:
   image:
