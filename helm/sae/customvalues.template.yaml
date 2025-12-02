@@ -29,6 +29,10 @@ videoSource:
     scale_width: 0                          # If > 0, scale the image to the given width (preserving aspect ratio)
     jpeg_quality: 80                        # JPEG quality 0 - 100 (100 is lossless and big); Reasonable starting points (for image height): 2160 = 80, 1080 = 90, <720 = 95
     log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
+    #camera_position_source:                # If not configured, frames will have no cameraLocation set (i.e. feature disabled)
+    #  stream_id: "positionsource:self"     # where to read position data (the default should be fine in single camera deployments, see position-source above)
+    #  max_position_skew: 1000              # max absolute offset in ms between frame time and position update time
+    #  drop_frames_if_no_position: False    # if true, frames will be discarded if there is no position or position is stale (according to skew)
 
 objectDetector:
   customWeights: 
