@@ -123,7 +123,7 @@ redisWriter:
             target: geomapper:mysae1        # (optional) Target stream name; Source name is used if omitted
 
 databaseWriter:
-  enabled: true                             # If the database-writer should be deployed
+  enabled: false                            # If the database-writer should be deployed
   config:
     redisStreamIds:
       - stream1                             # Which video streams to read (and extract detection and tracking data from)
