@@ -1,8 +1,7 @@
 cameras:
   - stream_id: stream1
-    passthrough: true
-mapping_strategy:
-  mode: dynamic
+    mode: copy
+
 log_level: INFO
 redis:
   input_stream_prefix: objectdetector
