@@ -95,6 +95,17 @@ geoMapper:
       - stream_id: stream1-copy
         mode: copy
 
+detectionAggregator:
+  enabled: false
+  settingsYaml:
+    log_level: INFO
+    chunk:
+      buffer_size: 1
+      time_in_ms: 20
+      geo_coordinate:
+        latitude: 0
+        longitude: 0
+
 aiControl:
   enabled: false
   settingsYaml:
@@ -108,6 +119,34 @@ aiControl:
       stream_id: stream1                      # On which video streams to detect objects on. Mostly all video source stream ids.
       input_stream_prefix: objectdetector     # Prefix of the input stream to read from
       output_stream_prefix: aicontrol         # Prefix of the output stream to write to
+
+cleaningStatusFilter:
+  enabled: false
+  detectionWeights: 
+    imageTag: weights-image-tag             # Which tag of the starwitorg/sae-object-detector-weights image to use
+  settingsYaml:
+    log_level: INFO
+    mirror_detection:
+      y_up_threshold: 0.4                           # y-coordinate in normalized image space (0.0-1.0) above which mirror up position is assumed (top is 0, bottom is 1)
+      y_down_threshold: 0.6                         # y-coordinate in normalized image space (0.0-1.0) below which mirror down position is assumed (top is 0, bottom is 1)
+      required_stable_readings: 5                   # How long the mirror position needs to be constant until a new status is set
+      interval_s: 1.0                               # The shortest interval at which inference is executed (cached values will be used inbetween)
+      model:
+        weights_path: custom_weights/model.pt     # Path to weights for mirror detection (needs to have a `mirror` class)
+        device: cpu
+        confidence_threshold: 0.25
+        nms_agnostic: true
+        inference_size: [640, 640]
+
+    no_cleaning_areas: []                           # list of Geojson `Polygon` where message will never be forwarded (i.e. `not cleaning`` is assumed)
+    # - type: Polygon
+    #   coordinates: [[                             # [lon, lat] format. The last point must equal the first!
+    #       [10.01, 50.01],
+    #       [10.02, 50.02],
+    #       [10.02, 50.03],
+    #       [10.03, 50.02],
+    #       [10.01, 50.01]
+    #     ]]
 
 redisWriter:
   enabled: false                            # If the redis-writer should be deployed (off by default)

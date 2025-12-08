@@ -42,7 +42,7 @@ videoSource:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 4.1.0
+    tag: 4.2.0
   customWeights: 
     enabled: false
     imageTag: weights-image-tag
@@ -108,16 +108,26 @@ detectionAggregator:
 aiControl:
   image:
     repository: starwitorg/sae-ai-control
-    tag: 0.1.2
+    tag: 0.1.3
   enabled: false
   settingsYaml:
     log_level: INFO
     time_past: 1d
 
+cleaningStatusFilter:
+  image:
+    repository: starwitorg/sae-cleaning-status-filter
+    tag: 0.4.0
+  enabled: false
+  detectionWeights: 
+    imageTag: weights-image-tag
+  settingsYaml:
+    log_level: INFO
+
 redisWriter:
   image:
     repository: starwitorg/sae-redis-writer
-    tag: 2.0.3
+    tag: 2.1.0
   enabled: false
   instances:
     - name: output1
@@ -197,7 +207,7 @@ prometheus:
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
             action: keep
-            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer)
+            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: pod
