@@ -11,6 +11,9 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 8.1.1
+- Update `video-source` to 2.3.2 (fixes >10fps framerates being impossible)
+
 ## 8.1.0
 - Add `cleaning-status-filter`
 - Update `object-detector` to 4.2.0 (no functional changes, improves docker build)

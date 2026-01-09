@@ -33,7 +33,7 @@ positionSource:
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 2.3.1
+    tag: 2.3.2
   settingsYamls:
   - id: stream1
     uri: 'uri'
