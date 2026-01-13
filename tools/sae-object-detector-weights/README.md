@@ -6,7 +6,8 @@ once init has completed.
 ## How-To create a new release
 - Move the .pt file you want to release into `./weights`
 - Run the openvino export for deployment on Intel\
-  `yolo export format=openvino model=weights.pt imgsz=1280 half=True dynamic=True nms=True`
+  `yolo export format=openvino model=weights.pt imgsz=736,1280 half=True dynamic=False nms=True`\
+  Note that `dynamic=False` is very important as dynamic input seems to introduce memory-leak-like behavior and we don't really need dynamic inputs in many cases
 - Optionally run the tensorrt optimization for deployment on NVIDIA (this has a lot of constraints, like TensorRT version, CUDA version, GPU architecture, etc.)
 - Run `docker_build.sh` and choose a tag
 - Run `docker_push.sh`
