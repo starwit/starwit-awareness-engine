@@ -11,6 +11,9 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 8.1.3
+- Update `redis-writer` to 2.1.1 (fix bug where frame data removal would quietly fail)
+
 ## 8.1.2
 - Update `object-detector` to 4.2.1 (updates Intel dependencies)
 
