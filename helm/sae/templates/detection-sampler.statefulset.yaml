@@ -1,17 +1,17 @@
-{{- with .Values.aiControl }}
+{{- with .Values.detectionSampler }}
 {{- if .enabled }}
-{{- $imageRepo := required "image repository for ai-control is required" .image.repository }}
-{{- $imageTag := required "image tag for ai-control is required" .image.tag }}
+{{- $imageRepo := required "image repository for detection-sampler is required" .image.repository }}
+{{- $imageTag := required "image tag for detection-sampler is required" .image.tag }}
 {{- $rootConfig := . }}
 {{- with .settingsYaml -}}
-{{- $instanceName := printf "ai-control" }}
+{{- $instanceName := printf "detection-sampler" }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
   labels:
     {{- include "sae.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: ai-control
+    app.kubernetes.io/component: detection-sampler
 spec:
   selector:
     matchLabels:
@@ -20,8 +20,8 @@ spec:
   template:
     metadata:
       annotations:
-        sae.starwit.de/stage: ai-control
-        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/ai-control.configmap.yaml") $ | sha256sum }}
+        sae.starwit.de/stage: detection-sampler
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/detection-sampler.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
         app.kubernetes.io/component: {{ $instanceName }}

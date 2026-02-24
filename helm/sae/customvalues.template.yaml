@@ -106,7 +106,7 @@ detectionAggregator:
         latitude: 0
         longitude: 0
 
-aiControl:
+detectionSampler:
   enabled: false
   settingsYaml:
     log_level: INFO                      # Options: ERROR, WARNING, INFO, DEBUG 
@@ -118,7 +118,7 @@ aiControl:
     redis:
       stream_id: stream1                      # On which video streams to detect objects on. Mostly all video source stream ids.
       input_stream_prefix: objectdetector     # Prefix of the input stream to read from
-      output_stream_prefix: aicontrol         # Prefix of the output stream to write to
+      output_stream_prefix: detectionsampler  # Prefix of the output stream to write to
 
 cleaningStatusFilter:
   enabled: false

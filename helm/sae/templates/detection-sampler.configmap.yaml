@@ -1,10 +1,10 @@
-{{- with .Values.aiControl }}
+{{- with .Values.detectionSampler }}
 {{- if .enabled }}
 {{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ai-control-config
+  name: detection-sampler-config
 data:
   settings.yaml: |
     {{- toYaml . | nindent 4 }}

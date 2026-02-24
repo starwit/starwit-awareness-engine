@@ -105,9 +105,9 @@ detectionAggregator:
         latitude: 0
         longitude: 0
 
-aiControl:
+detectionSampler:
   image:
-    repository: starwitorg/sae-ai-control
+    repository: starwitorg/sae-detection-sampler
     tag: 0.1.3
   enabled: false
   settingsYaml:
