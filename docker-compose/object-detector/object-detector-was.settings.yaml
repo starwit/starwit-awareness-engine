@@ -1,5 +1,5 @@
 model:
-  weights_path: waste.pt
+  weights_path: model.pt
   device: "cpu"
   inference_size: [ 640, 640 ]
   #classes: [ 2 ]
