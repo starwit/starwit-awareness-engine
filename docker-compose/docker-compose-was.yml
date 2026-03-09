@@ -43,7 +43,7 @@ services:
     image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector-was.settings.yaml:/code/settings.yaml
-      - ${MODEL_PATH}:/code/model.pt
+      - ${WAS_MODEL_PATH}:/code/model.pt
     depends_on:
       redis:
         condition: service_healthy
