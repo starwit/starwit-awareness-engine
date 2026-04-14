@@ -9,6 +9,7 @@ import numpy as np
 from cameratransform import Camera
 from pydantic import BaseModel, Field
 from typing_extensions import Annotated
+import statistics
 
 
 class FitConstraint(BaseModel):
@@ -227,11 +228,18 @@ class Camerafit():
         if self._fitconfig.save_cam:
             self.camera.save('fitted_cam.json')
 
-    def get_perf(self) -> float:
-        calculated_points = self.camera.gpsFromImage(self._fitconfig.px_locations, Z=0)
-        distances = self._calculate_distances(calculated_points, self._fitconfig.gps_locations)
+    def get_avg_dist(self) -> float:
+        distances = self.get_distances()
         average_distance = sum(distances) / len(distances)
         return average_distance
+    
+    def get_stddev_dist(self) -> float:
+        return statistics.stdev(self.get_distances())
+    
+    def get_distances(self) -> List[float]:
+        calculated_points = self.camera.gpsFromImage(self._fitconfig.px_locations, Z=0)
+        distances = self._calculate_distances(calculated_points, self._fitconfig.gps_locations)
+        return distances
     
     def print_parameters(self):
         # Print all camera parameters after fitting

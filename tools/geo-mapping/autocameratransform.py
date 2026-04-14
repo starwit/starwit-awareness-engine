@@ -7,6 +7,7 @@ import numpy as np
 import yaml
 from CameraFit import AutofitConfig, Camerafit
 from tqdm import tqdm
+import statistics
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-l', '--lower-angle-x', type=float, help='Lower value of view_x_deg for parameter search')
@@ -33,18 +34,19 @@ if args.lower_angle_x:
         for _ in range(ITERATIONS):
             config_obj.camera_parameters.rectilinear_projection.view_x_deg = view_x_deg
             cam = Camerafit(fitconfig=config_obj)
-            if best_camera is None or cam.get_perf() < best_camera.get_perf():
+            if best_camera is None or cam.get_avg_dist() < best_camera.get_avg_dist():
                 best_camera = cam
                 best_view_x = view_x_deg
-            if cam.get_perf() < batch_min:
-                batch_min = cam.get_perf()
-        batch_mins.append((view_x_deg, round(batch_min, 2)))
+            if cam.get_avg_dist() < batch_min:
+                batch_min = cam.get_avg_dist()
+                batch_min_stddev = cam.get_stddev_dist()
+        batch_mins.append((view_x_deg, round(batch_min, 2), round(batch_min_stddev, 2)))
     pprint(batch_mins)
 else:
     best_camera = Camerafit(fitconfig=config_obj)
     best_view_x = config_obj.camera_parameters.rectilinear_projection.view_x_deg
 
-print(f"Best solution: Average Distance {best_camera.get_perf():.2f} meters (view_x_deg={best_view_x})")
+print(f"Best solution: dist avg {best_camera.get_avg_dist():.2f} m, dist stddev {best_camera.get_stddev_dist():.2f} m (view_x_deg={best_view_x})")
 best_camera.plot_fit_information_image_space('info.png')
 best_camera.plot_trace('trace.png')
 cv2.imwrite('undistorted.png', best_camera.get_undistorted_image())
