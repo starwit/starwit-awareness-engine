@@ -213,6 +213,9 @@ prometheus:
 
 grafana:
   adminPassword: admin
+  sidecar:
+    dashboards:
+      enabled: true
   datasources:
     datasources.yaml: 
       apiVersion: 1
