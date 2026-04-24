@@ -216,6 +216,11 @@ grafana:
   sidecar:
     dashboards:
       enabled: true
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Viewer
   datasources:
     datasources.yaml: 
       apiVersion: 1
