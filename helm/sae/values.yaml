@@ -212,12 +212,9 @@ prometheus:
           
 
 grafana:
-  image:
-    repository: bitnamilegacy/grafana
-  admin:
-    password: admin
+  adminPassword: admin
   datasources:
-    secretDefinition: 
+    datasources.yaml: 
       apiVersion: 1
       datasources:
         - name: Prometheus

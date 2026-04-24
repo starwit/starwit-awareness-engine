@@ -31,8 +31,8 @@ dependencies:
     version: 0.2.2
     repository: oci://registry-1.docker.io/bitnamicharts
   - name: grafana
-    version: 9.2.1
-    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 12.1.1
+    repository: oci://ghcr.io/grafana-community/helm-charts
   - name: node-exporter
     alias: nodeexporter
     version: 3.8.0

@@ -6,10 +6,10 @@ dependencies:
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 0.2.2
 - name: grafana
-  repository: oci://registry-1.docker.io/bitnamicharts
-  version: 9.2.1
+  repository: oci://ghcr.io/grafana-community/helm-charts
+  version: 12.1.1
 - name: node-exporter
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.8.0
-digest: sha256:945eca52b7ac6b43326cb165ddc4e93443f58b4b119e7a9feaf7303b728326d4
-generated: "2026-04-24T15:07:20.962152572+02:00"
+digest: sha256:d5342ad9746b26dc6cbe9416493a853bb107fd047982883884ebec6d5c2a9bac
+generated: "2026-04-24T15:49:06.176903805+02:00"
