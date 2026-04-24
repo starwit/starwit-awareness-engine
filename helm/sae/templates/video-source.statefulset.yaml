@@ -29,9 +29,9 @@ spec:
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       initContainers:
-        - name: wait-for-redis
+        - name: wait-for-valkey
           image: valkey/valkey:7.2.6-alpine
-          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.redisServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for redis\"; sleep 1; done"]
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.valkeyServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for valkey\"; sleep 1; done"]
       containers:
         - name: {{ $instanceName }}
           securityContext:
@@ -42,9 +42,9 @@ spec:
             {{- toYaml $.Values.resources | nindent 12 }}
           env:
             - name: REDIS__HOST
-              value: {{ include "sae.redisServiceName" $ }}
+              value: {{ include "sae.valkeyServiceName" $ }}
             - name: REDIS__PORT
-              value: {{ include "sae.redisServicePort" $ }}
+              value: {{ include "sae.valkeyServicePort" $ }}
           ports:
             - name: prometheus
               containerPort: 8000

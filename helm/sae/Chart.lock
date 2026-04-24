@@ -1,7 +1,7 @@
 dependencies:
 - name: valkey
-  repository: oci://registry-1.docker.io/bitnamicharts
-  version: 0.3.14
+  repository: https://valkey.io/valkey-helm/
+  version: 0.9.4
 - name: prometheus
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 0.2.2
@@ -11,5 +11,5 @@ dependencies:
 - name: node-exporter
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.8.0
-digest: sha256:215ce723747d9bd0af91a74c496727c684ec97c63f8a714e22c0c4c57c7c4ef6
-generated: "2024-08-16T14:06:08.518095673+02:00"
+digest: sha256:945eca52b7ac6b43326cb165ddc4e93443f58b4b119e7a9feaf7303b728326d4
+generated: "2026-04-24T15:07:20.962152572+02:00"

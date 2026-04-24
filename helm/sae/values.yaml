@@ -158,28 +158,23 @@ databaseWriter:
       password: password
       hypertable: tablename
 
-redis:
-  image:
-    repository: bitnamilegacy/valkey
+valkey:
   architecture: standalone
   auth:
     enabled: false
-  commonConfiguration: |-
+  valkeyConfig: |-
     save ""
     appendonly no
-  master:
-    persistence:
-      enabled: false
-    resources:
-      limits:
-        memory: 512Mi
-        cpu: 500m
-      requests:
-        memory: 256Mi
-        cpu: 250m
+  dataStorage:
+    enabled: false
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
   metrics:
-    image:
-      repository: bitnamilegacy/redis-exporter
     enabled: true
 
 prometheus:
@@ -193,9 +188,9 @@ prometheus:
     scrapeInterval: 10s
     evaluationInterval: 10s
     extraScrapeConfigs:
-      - job_name: redis_exporter
+      - job_name: valkey_exporter
         static_configs:
-          - targets: ['{{ include "sae.redisMetricsServiceName" $ }}:9121']
+          - targets: ['{{ include "sae.valkeyMetricsServiceName" $ }}:9121']
       - job_name: node_exporter
         static_configs:
           - targets: ['{{ include "sae.nodeExporterServiceName" $ }}:9100']

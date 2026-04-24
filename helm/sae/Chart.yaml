@@ -25,9 +25,8 @@ appVersion: ""
 
 dependencies:
   - name: valkey
-    alias: redis
-    version: 0.3.14
-    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 0.9.4
+    repository: https://valkey.io/valkey-helm/
   - name: prometheus
     version: 0.2.2
     repository: oci://registry-1.docker.io/bitnamicharts

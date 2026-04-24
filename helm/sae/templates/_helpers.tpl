@@ -58,28 +58,28 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Derive redis service name
+Derive valkey service name
 */}}
-{{- define "sae.redisServiceName" -}}
-{{- printf "%s-%s" .Release.Name "redis-master" -}}
+{{- define "sae.valkeyServiceName" -}}
+{{- printf "%s-%s" .Release.Name "valkey" -}}
 {{- end }}
 
 {{/*
-Derive redis metrics service name
+Derive valkey metrics service name
 */}}
-{{- define "sae.redisMetricsServiceName" -}}
-{{- printf "%s-%s" .Release.Name "redis-metrics" -}}
+{{- define "sae.valkeyMetricsServiceName" -}}
+{{- printf "%s-%s" .Release.Name "valkey-metrics" -}}
 {{- end }}
 
 {{/*
-Hard-code Redis service port (for now)
+Hard-code valkey service port (for now)
 */}}
-{{- define "sae.redisServicePort" -}}
+{{- define "sae.valkeyServicePort" -}}
 "6379"
 {{- end }}
 
 {{/*
-Derive redis metrics service name
+Derive valkey metrics service name
 */}}
 {{- define "sae.nodeExporterServiceName" -}}
 {{- printf "%s-%s" .Release.Name "nodeexporter" -}}
