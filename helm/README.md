@@ -1,14 +1,6 @@
 # How-To Install
 `helm install sae oci://registry-1.docker.io/starwitorg/sae`
 
-# How-To Build and Publish
-```sh
-cd sae/
-helm dependency build
-helm package .
-helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
-```
-
 # How-To Edit Grafana Dashboards
 - Open SAE-Grafana -> _Sign In_ (admin:admin, klick _Skip_)
 - Open Dashboard you want to edit
