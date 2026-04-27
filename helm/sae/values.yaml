@@ -158,80 +158,74 @@ databaseWriter:
       password: password
       hypertable: tablename
 
-redis:
-  image:
-    repository: bitnamilegacy/valkey
+valkey:
   architecture: standalone
   auth:
     enabled: false
-  commonConfiguration: |-
+  valkeyConfig: |-
     save ""
     appendonly no
-  master:
-    persistence:
-      enabled: false
-    resources:
-      limits:
-        memory: 512Mi
-        cpu: 500m
-      requests:
-        memory: 256Mi
-        cpu: 250m
+  dataStorage:
+    enabled: false
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
   metrics:
-    image:
-      repository: bitnamilegacy/redis-exporter
     enabled: true
 
 prometheus:
   alertmanager:
     enabled: false
+  kube-state-metrics:
+    enabled: false
+  prometheus-pushgateway:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: true
   server:
-    image:
-      repository: bitnamilegacy/prometheus
-    service:
-      type: ClusterIP
-    scrapeInterval: 10s
-    evaluationInterval: 10s
-    extraScrapeConfigs:
-      - job_name: redis_exporter
-        static_configs:
-          - targets: ['{{ include "sae.redisMetricsServiceName" $ }}:9121']
-      - job_name: node_exporter
-        static_configs:
-          - targets: ['{{ include "sae.nodeExporterServiceName" $ }}:9100']
-      - job_name: sae_pods
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              own_namespace: true
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
-            action: keep
-            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
-          - source_labels: [__meta_kubernetes_pod_name]
-            action: replace
-            target_label: pod
-          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
-            action: replace
-            target_label: stage
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 10s
+  extraScrapeConfigs: |-
+    - job_name: valkey_exporter
+      static_configs:
+        - targets: ['{{ include "sae.valkeyMetricsServiceName" $ }}:9121']
+    - job_name: sae_pods
+      kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            own_namespace: true
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+          action: keep
+          regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+          action: replace
+          target_label: stage
           
 
 grafana:
-  image:
-    repository: bitnamilegacy/grafana
-  admin:
-    password: admin
+  adminPassword: admin
+  sidecar:
+    dashboards:
+      enabled: true
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Viewer
   datasources:
-    secretDefinition: 
+    datasources.yaml: 
       apiVersion: 1
       datasources:
         - name: Prometheus
           type: prometheus
           access: proxy
           url: http://{{ include "sae.prometheusServiceName" . }}
-
-
-nodeexporter:
-  image:
-    repository: bitnamilegacy/node-exporter
-  enabled: true

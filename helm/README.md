@@ -9,6 +9,9 @@ helm package .
 helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 ```
 
+# Acknowledgements
+- `node_exporter_full.json` was sourced from [`rfmoz/grafana-dashboards`](https://github.com/rfmoz/grafana-dashboards/blob/fa9f41fa3efed31d5c2de73cd332a340797c0ec7/prometheus/node-exporter-full.json)
+
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
 ## 8.1.3
