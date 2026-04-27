@@ -9,6 +9,17 @@ helm package .
 helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 ```
 
+# How-To Edit Grafana Dashboards
+- Open SAE-Grafana -> _Sign In_ (admin:admin, klick _Skip_)
+- Open Dashboard you want to edit
+- Save editable copy (click _Save_ -> _Save as copy_)
+- Enter edit mode (click _Edit_)
+- Apply your changes
+- Export (click _Export_ -> _Export as code_ and check _Share dashboard with another instance_)
+- Replace content of corresponding file in `sae/grafana-dashboards` with exported JSON
+- Replace name in JSON with original name (i.e. remove `copy` suffix)
+- Commit
+
 # Acknowledgements
 - `node_exporter_full.json` was sourced from [`rfmoz/grafana-dashboards`](https://github.com/rfmoz/grafana-dashboards/blob/fa9f41fa3efed31d5c2de73cd332a340797c0ec7/prometheus/node-exporter-full.json)
 
