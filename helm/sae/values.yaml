@@ -33,7 +33,7 @@ positionSource:
 videoSource:
   image: 
     repository: starwitorg/sae-video-source-py
-    tag: 2.3.2
+    tag: 2.3.3
   settingsYamls:
   - id: stream1
     uri: 'uri'
@@ -62,7 +62,7 @@ objectDetector:
 objectTracker:
   image:
     repository: starwitorg/sae-object-tracker
-    tag: 3.3.0
+    tag: 4.0.0
   enabled: true
   streamIds:
     - stream1
