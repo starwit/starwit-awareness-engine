@@ -64,7 +64,6 @@ objectTracker:
     repository: starwitorg/sae-object-tracker
     tag: 3.3.0
   enabled: true
-  needsGpu: false
   streamIds:
     - stream1
   settingsYaml:

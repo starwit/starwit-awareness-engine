@@ -2,7 +2,6 @@
 {{- if .enabled }}
 {{- $imageRepo := required "image repository for object-tracker is required" .image.repository }}
 {{- $imageTag := required "image tag for object-tracker is required" .image.tag }}
-{{- $needsGpu := .needsGpu }}
 {{- range .streamIds }}
 {{- $streamId := . -}}
 {{- $instanceName := printf "object-tracker-%s" (lower .) }}
@@ -30,9 +29,6 @@ spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $needsGpu }}
-      runtimeClassName: nvidia
-      {{- end }}
       initContainers:
         - name: wait-for-valkey
           image: valkey/valkey:7.2.6-alpine
@@ -43,11 +39,6 @@ spec:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $needsGpu }}
-          resources:
-            limits:
-              nvidia.com/gpu: 1
-          {{- end }}
           env:
             - name: REDIS__HOST
               value: {{ include "sae.valkeyServiceName" $ }}

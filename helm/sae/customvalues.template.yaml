@@ -52,7 +52,6 @@ objectDetector:
         - stream1                           # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
-  needsGpu: False                           # Whether the algorithm needs gpu support (needs proper setup; see README)
   streamIds:                                # On which video streams to track objects (the same as object-detector stream ids above)
     - stream1
   settingsYaml:                             # Tracker specific config (see object-tracker repo / Boxmot for details)
