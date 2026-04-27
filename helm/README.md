@@ -25,6 +25,18 @@ helm push sae-x.tgz oci://registry-1.docker.io/starwitorg
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 9.0.0
+**Helm Chart needs to be reinstalled when updating to 9.0.0 (due to migration from Bitnami to official charts)!**
+- Update `video-source` to 2.3.3 (fix 100% CPU load on cam fail, decrease timeouts, improve frame pacing)
+- Update `object-tracker` to 4.0.0 (significantly reduce docker image size, narrow tracking support to OCSort only)
+  - Remove `needsGPU` from values
+- Grafana
+  - Provision SAE overview and node exporter dashboards
+  - Enable unauthenticated dashboard access
+- Migrate Grafana, Valkey and Prometheus from Bitnami to official helm charts
+  - `.Values.redis` is now `.Values.valkey`
+  - If your existing values contain that section please refer to the [Valkey chart](https://github.com/valkey-io/valkey-helm/tree/main/valkey) documentation and adapt your config
+
 ## 8.1.3
 - Update `redis-writer` to 2.1.1 (fix bug where frame data removal would quietly fail)
 
