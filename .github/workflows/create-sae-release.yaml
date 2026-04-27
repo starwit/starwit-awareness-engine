@@ -48,9 +48,12 @@ jobs:
       - name: Login to Helm registry
         run: helm registry login registry-1.docker.io -u $DOCKERHUB_USERNAME -p ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Run Helm update
+      - name: Add Helm repos and run helm update
         working-directory: helm/sae
-        run: helm dep update
+        run: |
+          helm repo add valkey https://valkey.io/valkey-helm/
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm dep update
 
       - name: Bump version and commit
         working-directory: helm/sae
