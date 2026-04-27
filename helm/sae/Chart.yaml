@@ -28,13 +28,8 @@ dependencies:
     version: 0.9.4
     repository: https://valkey.io/valkey-helm/
   - name: prometheus
-    version: 0.2.2
-    repository: oci://registry-1.docker.io/bitnamicharts
+    version: 29.2.1
+    repository: https://prometheus-community.github.io/helm-charts
   - name: grafana
     version: 12.1.1
     repository: oci://ghcr.io/grafana-community/helm-charts
-  - name: node-exporter
-    alias: nodeexporter
-    version: 3.8.0
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: nodeexporter.enabled

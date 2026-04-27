@@ -1,0 +1,13 @@
+{{- range $path, $_ := .Files.Glob "grafana-dashboards/*.json" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-{{ regexReplaceAll "[^a-z0-9]+" (base $path | lower) "-" | trimAll "-" | trunc 40 }}
+  labels:
+    grafana_dashboard: "1"
+data:
+  {{ base $path }}: |-
+    {{- $.Files.Get $path | nindent 4 }}
+
+---
+{{- end }}

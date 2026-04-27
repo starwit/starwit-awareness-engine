@@ -180,39 +180,47 @@ valkey:
 prometheus:
   alertmanager:
     enabled: false
+  kube-state-metrics:
+    enabled: false
+  prometheus-pushgateway:
+    enabled: false
+  prometheus-node-exporter:
+    enabled: true
   server:
-    image:
-      repository: bitnamilegacy/prometheus
-    service:
-      type: ClusterIP
-    scrapeInterval: 10s
-    evaluationInterval: 10s
-    extraScrapeConfigs:
-      - job_name: valkey_exporter
-        static_configs:
-          - targets: ['{{ include "sae.valkeyMetricsServiceName" $ }}:9121']
-      - job_name: node_exporter
-        static_configs:
-          - targets: ['{{ include "sae.nodeExporterServiceName" $ }}:9100']
-      - job_name: sae_pods
-        kubernetes_sd_configs:
-          - role: pod
-            namespaces:
-              own_namespace: true
-        relabel_configs:
-          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
-            action: keep
-            regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
-          - source_labels: [__meta_kubernetes_pod_name]
-            action: replace
-            target_label: pod
-          - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
-            action: replace
-            target_label: stage
+    global:
+      scrape_interval: 10s
+      evaluation_interval: 10s
+  extraScrapeConfigs: |-
+    - job_name: valkey_exporter
+      static_configs:
+        - targets: ['{{ include "sae.valkeyMetricsServiceName" $ }}:9121']
+    - job_name: sae_pods
+      kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            own_namespace: true
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+          action: keep
+          regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: pod
+        - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
+          action: replace
+          target_label: stage
           
 
 grafana:
   adminPassword: admin
+  sidecar:
+    dashboards:
+      enabled: true
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Viewer
   datasources:
     datasources.yaml: 
       apiVersion: 1
@@ -221,9 +229,3 @@ grafana:
           type: prometheus
           access: proxy
           url: http://{{ include "sae.prometheusServiceName" . }}
-
-
-nodeexporter:
-  image:
-    repository: bitnamilegacy/node-exporter
-  enabled: true
