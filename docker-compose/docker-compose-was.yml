@@ -1,15 +1,15 @@
 name: sae
 
 services:
-  redis:
+  valkey:
     image: valkey/valkey:7.2.6
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
     ports:
       - 6379:6379
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./valkey/valkey.conf:/usr/local/etc/valkey/valkey.conf
     healthcheck:
-      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      test: "[ \"$(valkey-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
       interval: 1s
       start_period: 5s
 
@@ -28,7 +28,7 @@ services:
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   position-source:
@@ -36,7 +36,7 @@ services:
     volumes:
       - ./position-source/position-source.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   object-detector:
@@ -45,7 +45,7 @@ services:
       - ./object-detector/object-detector-was.settings.yaml:/code/settings.yaml
       - ${WAS_MODEL_PATH}:/code/model.pt
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   geo-mapper:
@@ -53,7 +53,7 @@ services:
     volumes:
       - ./geo-mapper/geo-mapper-was.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   aggregator:
@@ -61,11 +61,8 @@ services:
     volumes:
       - ./aggregator/aggregator-was.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
-
-volumes:
-  redisinsight:
 
 networks:
   default:

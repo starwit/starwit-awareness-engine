@@ -12,7 +12,7 @@ position_source:                          # static source outputs the same coord
 
 log_level: INFO
 redis:
-  host: redis
+  host: valkey
   port: 6379
   stream_id: self
   output_stream_prefix: positionsource

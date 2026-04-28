@@ -5,7 +5,7 @@ cameras:
 log_level: INFO
 redis:
   input_stream_prefix: objectdetector
-  host: redis
+  host: valkey
   port: 6379
   stream_ids:
     - stream1
