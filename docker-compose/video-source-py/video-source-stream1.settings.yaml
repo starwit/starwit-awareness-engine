@@ -7,5 +7,5 @@ log_level: INFO
 camera_position_source:
   stream_id: "positionsource:self"
 redis:
-  host: redis
+  host: valkey
   port: 6379

@@ -7,7 +7,7 @@ services:
     volumes:
       - ./database-writer/.env:/app/.env
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
       postgres:
         condition: service_healthy

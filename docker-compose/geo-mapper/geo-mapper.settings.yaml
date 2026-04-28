@@ -14,5 +14,5 @@ cameras:
 
 log_level: INFO
 redis:
-  host: redis
+  host: valkey
   port: 6379
