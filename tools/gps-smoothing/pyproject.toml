@@ -1,0 +1,24 @@
+[project]
+name = "gps-smoothing"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "flonix8",email = "flstanek@googlemail.com"}
+]
+readme = "README.md"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+pybase64 = ">=1.4.1,<2.0.0"
+jupyter = ">=1.1.1,<2.0.0"
+visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = "python/visionapi", tag = "3.5.3" }
+visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.14.0" }
+pydeck = "^0.9.1"
+pandas = "^2.3.2"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
