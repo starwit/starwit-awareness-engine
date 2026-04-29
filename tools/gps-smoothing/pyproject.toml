@@ -18,6 +18,7 @@ visionapi = { git = "https://github.com/starwit/vision-api.git", subdirectory = 
 visionlib = { git = "https://github.com/starwit/vision-lib.git", subdirectory = "python", tag = "0.14.0" }
 pydeck = "^0.9.1"
 pandas = "^2.3.2"
+matplotlib = "^3.10.9"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
