@@ -17,6 +17,11 @@
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+
+## 9.0.1
+- Update `object-tracker` to 4.0.1 (no changes, except image build process)
+- Update `redis-writer` to 2.1.1 (improve metrics, no functional changes)
+
 ## 9.0.0
 **Helm Chart needs to be reinstalled when updating to 9.0.0 (due to migration from Bitnami to official charts)!**
 - Update `video-source` to 2.3.3 (fix 100% CPU load on cam fail, decrease timeouts, improve frame pacing)
