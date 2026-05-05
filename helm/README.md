@@ -15,6 +15,13 @@
 # Acknowledgements
 - `node_exporter_full.json` was sourced from [`rfmoz/grafana-dashboards`](https://github.com/rfmoz/grafana-dashboards/blob/fa9f41fa3efed31d5c2de73cd332a340797c0ec7/prometheus/node-exporter-full.json)
 
+# Image Provisioning
+In case you need to pre-download images onto your target machine, you need a list of images to pull (e.g. with `sudo k3s ctr images pull` in the K3s case)
+Create your values first, then run this command:
+```bash
+helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml | grep image: | sort | uniq | sed -r 's/^.*image: "?(.+?)"?$/\1/'
+```
+
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
 
