@@ -2,7 +2,7 @@ name: sae
 
 services:
   valkey:
-    image: valkey/valkey:7.2.6
+    image: valkey/valkey:9.0.3
     command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
     ports:
       - 6379:6379
@@ -14,7 +14,7 @@ services:
       start_period: 5s
 
   streaming-server:
-    image: bluenviron/mediamtx:1.0.0-ffmpeg
+    image: bluenviron/mediamtx:1.18.0-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
       - ${VIDEO_PATH}:/video
