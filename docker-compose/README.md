@@ -21,10 +21,10 @@ If you do not get a consistent framerate or your machine gets slow, try lowering
 If you want to have database output, i.e. store the tracker output in a Postgres DB (which is what prod deployments do), you can replace step 3 from above to `docker compose -f docker-compose-with-db.yaml up`. You'll find a pgadmin web UI to browse the database at http://localhost:5050.
 
 ## How-To Dev
-All relevant components (Redis and Postgres) have healthchecks in place, s.t. `docker compose up` should "just work".\
+All relevant components (Valkey and Postgres) have healthchecks in place, s.t. `docker compose up` should "just work".\
 In order to have more control you might want to start all components separately (e.g. in tmux panes).
 For a working (basic) pipeline you need (at least) the following components running (which is what `docker compose up` will give you by default):
-- redis
+- valkey
 - video-source-py
 - object-detector
 - object-tracker

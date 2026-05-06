@@ -6,7 +6,7 @@ model:
 log_level: DEBUG
 redis:
   input_stream_prefix: videosource
-  host: redis
+  host: valkey
   port: 6379
   stream_ids:
     - stream1

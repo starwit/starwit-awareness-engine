@@ -1,15 +1,15 @@
 name: sae
 
 services:
-  redis:
-    image: valkey/valkey:7.2.6
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+  valkey:
+    image: valkey/valkey:9.0.3
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
     ports:
       - 6379:6379
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./valkey/valkey.conf:/usr/local/etc/valkey/valkey.conf
     healthcheck:
-      test: "[ \"$(redis-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      test: "[ \"$(valkey-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
       interval: 1s
       start_period: 5s
 
@@ -18,7 +18,7 @@ services:
     volumes:
       - ./video-source-py/video-source-stream1.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
   
   position-source:
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./position-source/position-source.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   object-detector:
@@ -34,7 +34,7 @@ services:
     volumes:
       - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   object-tracker-stream1:
@@ -42,11 +42,11 @@ services:
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
   streaming-server:
-    image: bluenviron/mediamtx:1.0.0-ffmpeg
+    image: bluenviron/mediamtx:1.18.0-ffmpeg
     volumes:
       - ./streaming-server/mediamtx.yml:/mediamtx.yml
       - ${VIDEO_PATH}:/video
@@ -60,7 +60,7 @@ services:
     volumes:
       - ./geo-mapper/geo-mapper.settings.yaml:/code/settings.yaml
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
 
 networks:

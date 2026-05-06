@@ -1,7 +1,7 @@
 log_level: DEBUG
 skip_empty_detections: False
 redis:
-  host: redis
+  host: valkey
   port: 6379
   stream_id: stream1
   input_stream_prefix: geomapper

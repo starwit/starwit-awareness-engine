@@ -10,16 +10,16 @@ services:
       - ./redis-writer/redis-writer.settings.yaml:/code/settings.yaml
       - ./redis-writer/certs/:/code/certs/
     depends_on:
-      redis:
+      valkey:
         condition: service_healthy
   
-  secondary-redis:
+  secondary-valkey:
     image: valkey/valkey:7.2.6
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
     ports:
       - 16379:6379
       - 16380:6380
     volumes:
-      - ./secondary-redis/secondary-redis.conf:/usr/local/etc/redis/redis.conf
-      - ./secondary-redis/certs/:/certs/
+      - ./secondary-valkey/secondary-valkey.conf:/usr/local/etc/valkey/valkey.conf
+      - ./secondary-valkey/certs/:/certs/
   

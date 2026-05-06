@@ -5,7 +5,7 @@ model:
   classes: [ 2 ]
 log_level: DEBUG
 redis:
-  host: redis
+  host: valkey
   port: 6379
   stream_ids:
     - stream1
