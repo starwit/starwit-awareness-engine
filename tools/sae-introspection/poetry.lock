@@ -3202,7 +3202,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "visionapi"
-version = "3.5.3"
+version = "3.6.0"
 description = ""
 optional = false
 python-versions = "^3.10"
@@ -3216,8 +3216,8 @@ protobuf = "6.31.1"
 [package.source]
 type = "git"
 url = "https://github.com/starwit/vision-api.git"
-reference = "3.5.3"
-resolved_reference = "e454b95339957b5c99e0f4eebdcd37e095328aee"
+reference = "3.6.0"
+resolved_reference = "3402791787b3a3f789f052793897b2ed6318e587"
 subdirectory = "python/visionapi"
 
 [[package]]
@@ -3326,4 +3326,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "861051f0b6b9932a40aca3bbd0fb56b1681a23e96cb94bd16737b2d52a19f390"
+content-hash = "2228abde9fa0ebd1c4565ec5702e086534b04825e36de8836ba0b0a470c32211"
