@@ -9,9 +9,10 @@ positionSource:
     # position_source:                        # command source tries to read NMEA sentences from stdout of given command (this is recommended)
     #   type: command
     #   command: ["gpspipe", "-r"]            # this is passed to Popen; if you want to use a bash pipeline do ["bash", "-c", "command | command2"]
-    # position_source:                        # dynamic source tries to read NMEA sentences from given serial device (i.e. USB gps receiver)
-    #   type: dynamic
-    #   serial_device: /dev/ttyACM0
+    # gps_filter:                             # enable and configure alpha-beta-filter for GPS data smoothing
+    #   enabled: true
+    #   alpha: 0.7
+    #   beta: 0.04
   gpsdSidecar:
     enabled: false                            # only enable if non-static config above
     image:
