@@ -9,11 +9,11 @@ Please note, that regardless of deployment method - SAE works in all of them wit
 
 ## Installation on Kubernetes cluster
 1. Set up K3s cluster \
-    - Create K3s config file at `/etc/rancher/k3s/config.yaml` (adapt the value of `tls-san`)
+    - Create K3s config file at `/etc/rancher/k3s/config.yaml` (create directory if it does not exist)
         ```yaml
         write-kubeconfig-mode: "0644"
         tls-san:
-            - "TAILSCALE_HOSTNAME"
+            - "TAILSCALE_HOSTNAME" # <-- Adapt this value
         disable:
             - servicelb
             - traefik
@@ -23,9 +23,9 @@ Please note, that regardless of deployment method - SAE works in all of them wit
         - `--write-kubeconfig-mode 644` enables managing the cluster through any user on the machine
     - Install K3s `curl -sfL https://get.k3s.io | sh -s -` (use the same command for upgrading, assuming you have the config file in place)
     - If the machine you install K3s on has a NVIDIA GPU available and wants to use it for running the pipeline, 
-    you have to follow the instructions in [`./nvidia/notes.md`](nvidia/notes.md)
+    you have to follow the instructions in [here](../../nvidia/README.md)
 2. Install Timescale DB (if do not have one on another machine and you want to store the pipeline output data)
-    - Create a database for pipeline data and a table / hypertable. See [`./doc/database.md`](doc/database.md) for instructions.
+    - Create a database for pipeline data and a table / hypertable. See [here](../database.md) for instructions.
 3. Install SAE
     - Copy the values template file and adapt it to your needs (see the file for information)
         ```sh
@@ -35,10 +35,9 @@ Please note, that regardless of deployment method - SAE works in all of them wit
         ```sh
         helm install <release-name> oci://registry-1.docker.io/starwitorg/sae -f my.values.yaml
         ```
-4. Set up and use the watch tool in [`tools/`](tools/watch.py) to inspect the pipeline visually
+4. Set up and use the watch tool (see [here](../../tools/sae-introspection/README.md)) to inspect the pipeline visually
 5. Check out the internal pipeline metrics
     - Forward Grafana port to your local machine and log in (user admin, password admin)
-    - Import dashboard [`./dashboards/sae_overview.json`](/dashboards/sae_overview.json) into Grafana
 
 ## Docker Compose
 
