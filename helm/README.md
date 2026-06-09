@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 11.0.1
+- Update `redis-writer` to 2.1.3 (add metric `redis_writer_output_buffer_size`)
+
 ## 11.0.0
 - Update `position-source` to 3.0.0 (remove spike rejection from gps filter; fixes filter getting stuck)
 
