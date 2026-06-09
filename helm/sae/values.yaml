@@ -7,7 +7,7 @@ fullnameOverride: ""
 positionSource:
   image:
     repository: starwitorg/sae-position-source
-    tag: 3.0.0
+    tag: 3.0.1
   enabled: false
   settingsYaml:
     log_level: INFO
