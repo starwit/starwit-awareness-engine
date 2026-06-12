@@ -44,9 +44,15 @@ objectDetector:
   image:
     repository: starwitorg/sae-object-detector
     tag: 4.2.1
-  customWeights: 
+  customWeights:
     enabled: false
     imageTag: weights-image-tag
+  restart:
+    enabled: false
+    schedule: "0 0 * * *"
+    kubectlImage:
+      repository: alpine/kubectl
+      tag: "1.34.2"
   settingsYaml:
     log_level: INFO
     model:

@@ -1,0 +1,76 @@
+{{- with .Values.objectDetector.restart }}
+{{- if .enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "sae.fullname" $ }}-object-detector-restarter
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: object-detector-restarter
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "sae.fullname" $ }}-object-detector-restarter
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: object-detector-restarter
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "sae.fullname" $ }}-object-detector-restarter
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: object-detector-restarter
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "sae.fullname" $ }}-object-detector-restarter
+    namespace: {{ $.Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "sae.fullname" $ }}-object-detector-restarter
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "sae.fullname" $ }}-object-detector-restarter
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: object-detector-restarter
+spec:
+  schedule: {{ .schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 10
+      backoffLimit: 2
+      template:
+        spec:
+          serviceAccountName: {{ include "sae.fullname" $ }}-object-detector-restarter
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: "{{ .kubectlImage.repository }}:{{ .kubectlImage.tag }}"
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  kubectl delete pod \
+                    -l app.kubernetes.io/component=object-detector \
+                    -n {{ $.Release.Namespace }} \
+                    --ignore-not-found \
+                    --wait=false
+{{- end }}
+{{- end }}
