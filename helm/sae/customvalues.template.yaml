@@ -36,9 +36,12 @@ videoSource:
     #  drop_frames_if_no_position: False    # if true, frames will be discarded if there is no position or position is stale (according to skew)
 
 objectDetector:
-  customWeights: 
+  customWeights:
     enabled: false                          # Whether to inject custom weights from init container (into custom_weights/*)
     imageTag: weights-image-tag             # Which tag of the starwitorg/sae-object-detector-weights image to use
+  restart:
+    enabled: false                          # Whether to periodically restart the object-detector (useful to work around memory leaks)
+    schedule: "0 0 * * *"                   # Cron schedule for the restart (default: midnight UTC)
   settingsYaml:
     log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
     model:

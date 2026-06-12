@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 11.1.0
+- Add optional scheduled restart for `object-detector`
+
 ## 11.0.2
 - Update `position-source` to 3.0.1 (fix no GPS data on `3D DGPS FIX`)
 
