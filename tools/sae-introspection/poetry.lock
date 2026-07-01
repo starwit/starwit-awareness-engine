@@ -3216,8 +3216,8 @@ protobuf = "6.31.1"
 [package.source]
 type = "git"
 url = "https://github.com/starwit/vision-api.git"
-reference = "3.6.0"
-resolved_reference = "3402791787b3a3f789f052793897b2ed6318e587"
+reference = "c895601"
+resolved_reference = "c89560153c7f3a07c36ebe0ac3392c4dbc64b27d"
 subdirectory = "python/visionapi"
 
 [[package]]
@@ -3326,4 +3326,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "2228abde9fa0ebd1c4565ec5702e086534b04825e36de8836ba0b0a470c32211"
+content-hash = "4f3afd9585869e715b735dd207acdf26689bb8da35cadd19a019d5429867c799"

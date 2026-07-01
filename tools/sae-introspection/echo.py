@@ -4,7 +4,7 @@ import redis
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.message import Message
 from visionapi.analytics_pb2 import DetectionCountMessage
-from visionapi.sae_pb2 import PositionMessage, SaeMessage
+from visionapi.sae_pb2 import EventMessage, PositionMessage, SaeMessage
 from visionlib.pipeline.consumer import RedisConsumer
 
 from common import (InternalMessageType, choose_streams, default_arg_parser,
@@ -68,3 +68,5 @@ if __name__ == '__main__':
                 handle_generic_message(proto_data, PositionMessage())
             elif message_type == InternalMessageType.DETECTION_COUNT:
                 handle_generic_message(proto_data, DetectionCountMessage())
+            elif message_type == InternalMessageType.SAE_EVENT:
+                handle_generic_message(proto_data, EventMessage())
