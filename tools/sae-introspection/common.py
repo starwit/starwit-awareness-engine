@@ -18,6 +18,7 @@ class InternalMessageType(str, Enum):
     SAE = 'SAE'
     DETECTION_COUNT = 'DETECTION_COUNT'
     POSITION = 'POSITION'
+    SAE_EVENT = 'SAE_EVENT'
 
 def choose_stream(redis_client) -> str:
     available_streams = sorted(map(lambda b: b.decode('utf-8'), redis_client.scan(_type='STREAM', count=100)[1]))
@@ -126,11 +127,18 @@ def determine_message_type(message_bytes: bytes) -> InternalMessageType:
         return InternalMessageType.DETECTION_COUNT
     elif msg.type == MessageType.POSITION:
         return InternalMessageType.POSITION
-    
-    # Then try the legacy heuristics 
-    if check_legacy_sae_message(message_bytes):
-        return InternalMessageType.SAE
-    elif check_legacy_detection_count_message(message_bytes):
-        return InternalMessageType.DETECTION_COUNT
+    elif msg.type == MessageType.SAE_EVENT:
+        return InternalMessageType.SAE_EVENT
+    elif msg.type == MessageType.UNSPECIFIED:
+        # Try legacy heuristics
+        try:
+            if check_legacy_sae_message(message_bytes):
+                return InternalMessageType.SAE
+            elif check_legacy_detection_count_message(message_bytes):
+                return InternalMessageType.DETECTION_COUNT
+            else:
+                raise ValueError('Unknown message type. Could not determine message type.')
+        except Exception as e:
+            raise ValueError('Unknown message type. Exception while parsing message', e)
     else:
-        raise ValueError('Unknown message type. Could not determine message type.')
+        raise ValueError('Unsupported message type (type={msg.type})')
