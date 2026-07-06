@@ -164,6 +164,24 @@ databaseWriter:
       password: password
       hypertable: tablename
 
+api:
+  image:
+    repository: starwitorg/sae-api
+    tag: 0.3.0
+  enabled: false
+  settingsYaml:
+    log_level: INFO
+    instance_id: sae-instance-1
+    backend_valkey:
+      host: host
+      port: 6379
+    event_reporting:
+      output_stream_prefix: saeapi-event
+    frame_forwarding:
+      video_source_stream_prefix: videosource
+      output_stream_prefix: saeapi-frame
+      poll_interval_s: 600
+
 valkey:
   architecture: standalone
   auth:
@@ -208,7 +226,7 @@ prometheus:
       relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
           action: keep
-          regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter)
+          regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter|api)
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: pod
