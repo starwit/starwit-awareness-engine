@@ -179,3 +179,18 @@ databaseWriter:
       username: username
       password: password
       hypertable: tablename                 # Table name. Does not have to be a Hypertable.
+
+api:
+  enabled: false                            # If the api should be deployed (reports lifecycle events and forwards frames to a remote backend)
+  settingsYaml:                             # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
+    instance_id: sae-instance-1             # Identifies this SAE instance; reflected in all output stream names (the local source valkey is injected automatically)
+    backend_valkey:                         # The remote (cloud) backend Valkey that all output is written to
+      host: backend-valkey
+      port: 6379
+    event_reporting:
+      output_stream_prefix: saeapi-event    # Event messages are written to '{output_stream_prefix}:{instance_id}' on the backend
+    frame_forwarding:
+      video_source_stream_prefix: videosource # Source streams are discovered by scanning '{video_source_stream_prefix}:*' on the local valkey
+      output_stream_prefix: saeapi-frame    # Forwarded frames are written to '{output_stream_prefix}:{source_id}' on the backend
+      poll_interval_s: 600                  # How often (in seconds) the latest frame of each source is forwarded

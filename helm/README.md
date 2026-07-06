@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 11.2.0
+- Add `api` (disabled by default; reports lifecycle events and forwards frames to a remote backend Valkey)
+
 ## 11.1.0
 - Add optional scheduled restart for `object-detector`
 
