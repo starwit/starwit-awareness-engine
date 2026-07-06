@@ -1,0 +1,15 @@
+log_level: INFO
+instance_id: sae-instance-1
+source_valkey:
+  host: valkey
+  port: 6379
+backend_valkey:
+  host: backend-valkey
+  port: 6379
+event_reporting:
+  output_stream_prefix: saeapi-event
+frame_forwarding:
+  video_source_stream_prefix: videosource
+  output_stream_prefix: saeapi-frame
+  poll_interval_s: 5
+prometheus_port: 8000

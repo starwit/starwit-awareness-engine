@@ -1,0 +1,41 @@
+include:
+  - docker-compose.yml
+
+name: sae
+
+services:
+  redis-writer:
+    image: ${IMAGE_REGISTRY}/sae-redis-writer:${REDIS_WRITER_VERSION}
+    volumes:
+      - ./redis-writer/redis-writer.settings.yaml:/code/settings.yaml
+      - ./redis-writer/certs/:/code/certs/
+    depends_on:
+      valkey:
+        condition: service_healthy
+      backend-valkey:
+        condition: service_healthy
+
+  api:
+    image: ${IMAGE_REGISTRY}/sae-api:${API_VERSION}
+    volumes:
+      - ./api/api.settings.yaml:/code/settings.yaml
+    depends_on:
+      valkey:
+        condition: service_healthy
+      backend-valkey:
+        condition: service_healthy
+  
+  backend-valkey:
+    image: valkey/valkey:9.0.3
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
+    ports:
+      - 16379:6379
+      - 16380:6380
+    volumes:
+      - ./backend-valkey/backend-valkey.conf:/usr/local/etc/valkey/valkey.conf
+      - ./backend-valkey/certs/:/certs/
+    healthcheck:
+      test: "[ \"$(valkey-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+  
