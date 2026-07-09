@@ -30,12 +30,11 @@ services:
     command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
     ports:
       - 16379:6379
-      - 16380:6380
     volumes:
       - ./backend-valkey/backend-valkey.conf:/usr/local/etc/valkey/valkey.conf
-      - ./backend-valkey/certs/:/certs/
     healthcheck:
       test: "[ \"$(valkey-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
       interval: 1s
       start_period: 5s
+
   
