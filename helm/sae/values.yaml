@@ -4,6 +4,8 @@ fullnameOverride: ""
 # extraImagePullSecrets:
 #   - name: extra-pull-secret
 
+intelGpuDriver: i915
+
 positionSource:
   image:
     repository: starwitorg/sae-position-source

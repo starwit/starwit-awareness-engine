@@ -55,7 +55,7 @@ spec:
           {{- if $isUsingIntel }}
           resources:
             limits:
-              gpu.intel.com/i915: 1
+              gpu.intel.com/{{ required "intelGpuDriver is required when using an intel device" $.Values.intelGpuDriver }}: 1
           {{- end }}
           env:
             - name: REDIS__HOST

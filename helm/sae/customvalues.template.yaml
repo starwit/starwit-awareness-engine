@@ -1,3 +1,5 @@
+intelGpuDriver: i915                        # Only relevant for stages running on an intel device: kernel driver the GPU is bound to (i915 for older, xe for newer GPUs). Determines the requested resource (gpu.intel.com/<driver>).
+
 positionSource:
   enabled: false
   settingsYaml:                               # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
