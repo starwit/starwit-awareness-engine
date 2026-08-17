@@ -1,4 +1,5 @@
 {{- with .Values.objectDetector }}
+{{- if .enabled }}
 {{- with .settingsYaml }}
 apiVersion: v1
 kind: ConfigMap
@@ -7,5 +8,6 @@ metadata:
 data:
   settings.yaml: |
     {{- toYaml . | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end }}

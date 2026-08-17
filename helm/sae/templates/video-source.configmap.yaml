@@ -1,4 +1,5 @@
 {{- with .Values.videoSource }}
+{{- if .enabled }}
 {{- range .settingsYamls -}}
 {{- $instanceName := printf "video-source-%s" (lower .id) }}
 apiVersion: v1
@@ -9,5 +10,6 @@ data:
   settings.yaml: |
     {{- toYaml . | nindent 4 }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
