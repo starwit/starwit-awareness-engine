@@ -1,63 +1,45 @@
-{{- with .Values.objectDetector }}
+{{- with .Values.axisAdapter }}
 {{- if .enabled }}
-{{- $imageRepo := required "image repository for object-detector is required" .image.repository }}
-{{- $imageTag := required "image tag for object-detector is required" .image.tag }}
-{{- $isUsingNvidia := hasPrefix "cuda" .settingsYaml.model.device }}
-{{- $isUsingIntel := hasPrefix "intel" .settingsYaml.model.device }}
+{{- $imageRepo := required "image repository for axis-adapter is required" .image.repository }}
+{{- $imageTag := required "image tag for axis-adapter is required" .image.tag }}
+{{- range .instances -}}
+{{- $instanceName := printf "axis-adapter-%s" (lower .name) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "sae.fullname" $ }}-object-detector
+  name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
   labels:
     {{- include "sae.labels" $ | nindent 4 }}
-    app.kubernetes.io/component: object-detector
+    app.kubernetes.io/component: axis-adapter
 spec:
   selector:
     matchLabels:
       {{- include "sae.selectorLabels" $ | nindent 6 }}
-      app.kubernetes.io/component: object-detector
+      app.kubernetes.io/component: {{ $instanceName }}
   template:
     metadata:
       annotations:
-        sae.starwit.de/stage: object-detector
-        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/object-detector.configmap.yaml") $ | sha256sum }}
+        sae.starwit.de/stage: axis-adapter
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/axis-adapter.configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "sae.selectorLabels" $ | nindent 8 }}
-        app.kubernetes.io/component: object-detector
+        app.kubernetes.io/component: {{ $instanceName }}
     spec:
       serviceAccountName: {{ include "sae.serviceAccountName" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
-      {{- if $isUsingNvidia }}
-      runtimeClassName: nvidia
-      {{- end }}
       initContainers:
         - name: wait-for-valkey
           image: valkey/valkey:7.2.6-alpine
           command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.valkeyServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for valkey\"; sleep 1; done"]
-        {{- if .customWeights.enabled }}
-        - name: install-model-weights
-          image: starwitorg/sae-object-detector-weights:{{ .customWeights.imageTag }}
-          volumeMounts:
-            - name: custom-weights
-              mountPath: /weights_target
-        {{- end }}
       containers:
-        - name: object-detector
+        - name: {{ $instanceName }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           image: "{{ $imageRepo }}:{{ $imageTag }}"
           imagePullPolicy: IfNotPresent
-          {{- if $isUsingNvidia }}
           resources:
-            limits:
-              nvidia.com/gpu: 1
-          {{- end }}
-          {{- if $isUsingIntel }}
-          resources:
-            limits:
-              gpu.intel.com/{{ required "intelGpuDriver is required when using an intel device" $.Values.intelGpuDriver }}: 1
-          {{- end }}
+            {{- toYaml $.Values.resources | nindent 12 }}
           env:
             - name: REDIS__HOST
               value: {{ include "sae.valkeyServiceName" $ }}
@@ -70,14 +52,10 @@ spec:
             - name: config
               mountPath: /code/settings.yaml
               subPath: settings.yaml
-            - name: custom-weights
-              mountPath: /code/custom_weights
       volumes:
         - name: config
           configMap:
-            name: object-detector-config
-        - name: custom-weights
-          emptyDir: {}
+            name: {{ $instanceName }}-config
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -90,5 +68,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+---
+{{- end }}
 {{- end }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.objectDetector.enabled }}
 {{- with .Values.objectDetector.restart }}
 {{- if .enabled }}
 apiVersion: v1
@@ -72,5 +73,6 @@ spec:
                     -n {{ $.Release.Namespace }} \
                     --ignore-not-found \
                     --wait=false
+{{- end }}
 {{- end }}
 {{- end }}

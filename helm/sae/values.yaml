@@ -34,18 +34,61 @@ positionSource:
       sleep 3600
 
 videoSource:
-  image: 
+  image:
     repository: starwitorg/sae-video-source-py
     tag: 2.3.3
+  enabled: true
   settingsYamls:
   - id: stream1
     uri: 'uri'
     log_level: INFO
 
+axisAdapter:
+  image:
+    repository: starwitorg/sae-axis-adapter
+    tag: 0.2.0
+  enabled: false
+  instances:
+    - name: cam1
+      settingsYaml:
+        log_level: INFO
+        redis:
+          stream_id: stream1
+          output_stream_prefix: axisadapter
+        mqtt:
+          host: mqtt-broker
+          port: 1883
+          topic: axis/AABBCCDDEEFF/scene/frame/v1/1
+          qos: 0
+        frame_shape:
+          width: 1920
+          height: 1080
+          channels: 3
+        class_mapping:
+          Car:
+            id: 2
+            name: car
+          Human:
+            id: 1
+            name: person
+          Bus:
+            id: 5
+            name: bus
+          Truck:
+            id: 7
+            name: truck
+          Bike:
+            id: 3
+            name: bicycle
+          Motorcycle:
+            id: 4
+            name: motorcycle
+
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
     tag: 4.2.1
+  enabled: true
   customWeights:
     enabled: false
     imageTag: weights-image-tag
@@ -61,6 +104,7 @@ objectDetector:
       weights_path: yolov8n.pt
       device: cpu
       nms_agnostic: false
+
       inference_size: [ 640, 640 ]
       classes: null
     drop_edge_detections: false
@@ -228,7 +272,7 @@ prometheus:
       relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
           action: keep
-          regex: (video-source|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter|api)
+          regex: (video-source|axis-adapter|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter|api)
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: pod

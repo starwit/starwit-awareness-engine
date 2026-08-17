@@ -25,6 +25,7 @@ positionSource:
       sleep 3600
 
 videoSource:
+  enabled: true                             # If the video-source should be deployed (e.g. set to false in AXIS-only deployments, see axisAdapter below)
   settingsYamls:                            # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
   - id: stream1                             # The name of the video stream. Will be used as Redis stream key and as camera_id in database output.
     uri: 'uri'                              # Where to retrieve the video from. Must be in a format that OpenCV VideoCapture understands. RTSP stream makes the most sense.
@@ -37,7 +38,57 @@ videoSource:
     #  max_position_skew: 1000              # max absolute offset in ms between frame time and position update time
     #  drop_frames_if_no_position: False    # if true, frames will be discarded if there is no position or position is stale (according to skew)
 
+axisAdapter:
+  enabled: false                            # If the axis-adapter should be deployed (bridges "AXIS Scene Metadata" from MQTT into SAE messages)
+                                            # AXIS cameras already deliver detections and tracking ids, i.e. one axis-adapter instance replaces
+                                            # video-source + object-detector + object-tracker for that camera (but delivers no images!)
+  instances:                                # One instance per AXIS camera (one instance == one MQTT topic == one output stream)
+    - name: cam1                            # A unique name to identify the instance (only used for resource naming)
+      settingsYaml:                         # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
+        log_level: INFO                     # Options: ERROR, WARNING, INFO, DEBUG
+        redis:
+          stream_id: stream1                # The name of the stream. Output is written to '{output_stream_prefix}:{stream_id}' and used as camera_id in database output.
+          output_stream_prefix: axisadapter # Downstream stages need to read from this prefix (e.g. set geoMapper input_stream_prefix accordingly)
+        mqtt:
+          host: mqtt-broker                 # The MQTT broker the camera publishes to (must be provided externally, the chart does not deploy one)
+          port: 1883
+          topic: axis/AABBCCDDEEFF/scene/frame/v1/1  # Usually 'axis/<CAMERA-MAC>/scene/frame/v1/<channel>'
+          qos: 0
+          #client_id: axis-adapter-cam1
+          #username: user                   # Beware: credentials are stored in plaintext in a ConfigMap
+          #password: secret
+          #tls:
+          #  enabled: true
+          #  ca_certs: /path/to/ca.crt      # Paths inside the container (i.e. you need to mount them yourself)
+          #  #certfile: /path/to/client.crt
+          #  #keyfile: /path/to/client.key
+          #  insecure: false
+        frame_shape:                        # Resolution of the camera stream. AXIS bounding boxes are normalized (0..1), downstream consumers need this to reconstruct pixel coordinates.
+          width: 1920
+          height: 1080
+          channels: 3
+        class_mapping:                      # Maps AXIS class types onto SAE (class id, name) tuples. Beware: unmapped detections are dropped!
+          Car:
+            id: 2
+            name: car
+          Human:
+            id: 1
+            name: person
+          Bus:
+            id: 5
+            name: bus
+          Truck:
+            id: 7
+            name: truck
+          Bike:
+            id: 3
+            name: bicycle
+          Motorcycle:
+            id: 4
+            name: motorcycle
+
 objectDetector:
+  enabled: true                             # If the object-detector should be deployed (e.g. set to false in AXIS-only deployments, see axisAdapter above)
   customWeights:
     enabled: false                          # Whether to inject custom weights from init container (into custom_weights/*)
     imageTag: weights-image-tag             # Which tag of the starwitorg/sae-object-detector-weights image to use
@@ -58,6 +109,7 @@ objectDetector:
         - stream1                           # On which video streams to detect objects on. Mostly all video source stream ids.
 
 objectTracker:
+  enabled: true                             # If the object-tracker should be deployed (e.g. set to false in AXIS-only deployments, AXIS cameras track objects themselves)
   streamIds:                                # On which video streams to track objects (the same as object-detector stream ids above)
     - stream1
   settingsYaml:                             # Tracker specific config (see object-tracker repo / Boxmot for details)
@@ -79,6 +131,8 @@ geoMapper:
   enabled: false                            # If the geomapper should be deployed (by default it reads from "objecttracker:*"" and outputs into "geomapper:*")
   settingsYaml:
     log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
+    #redis:
+    #  input_stream_prefix: axisadapter     # Set this if the input comes from the axis-adapter (default is `objecttracker`)
     cameras:                                # Parameters have to be specified for each camera (it makes no sense to run this without correct-ish parameters)
       - stream_id: stream1                  # This must match one of the existing camera streams
         mode: map                           # Either `map` (actual geomapping using all spatial parameters) or `copy` (i.e. map to a point, see below)
