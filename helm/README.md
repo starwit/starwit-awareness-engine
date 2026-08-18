@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 11.5.0
+- Update `ai-control` to 0.2.0 (adds option `cooldown_seconds`)
+
 ## 11.4.0
 - Add `axis-adapter` (disabled by default; bridges "AXIS Scene Metadata" from MQTT into SAE messages; supports multiple instances)
 - Add `enabled` flag to `video-source` and `object-detector` (both default `true`), i.e. every component can now be switched on and off individually
