@@ -5,8 +5,13 @@
 
 set -euo pipefail
 
+if [ $# -ne 1 ]; then
+  echo "usage: $(basename "$0") OUTPUT_DIR" >&2
+  exit 1
+fi
+
 SOURCE_CMD="set -o pipefail; poetry run python echo.py -f | jq -r .frame.frameDataJpeg"
-OUTDIR="frames"
+OUTDIR="$1"
 mkdir -p "$OUTDIR"
 FIXED_TIME="200001010000"   # touch -t format: YYYYMMDDhhmm[.ss]
 
