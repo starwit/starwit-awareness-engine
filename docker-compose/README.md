@@ -7,13 +7,12 @@ A longer explanation of the architecture and the technical setup can be found in
 ## Quickstart
 1. Copy .env.template and change the name of the copy to .env. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
 2. Run `docker compose up` (the first time may take a while, some images are quite big)
-3. Change into `../tools/sae_introspection`
-  1. Install python3 venv (e.g. sudo apt install python3.11-venv)
-  2. Create and activate a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`)
-  3. Install dependencies (`pip install -r requirements.txt`)
-  4. Run `python watch.py` and choose a stream to watch
+3. Install [sae-introspection](https://github.com/starwit/sae-introspection) to look into the running pipeline
+  1. Install libturbojpeg on your OS (e.g. `sudo apt install libturbojpeg`)
+  2. Install the tools (`pipx install git+https://github.com/starwit/sae-introspection.git`)
+  3. Run `sae-watch` and choose a stream to watch
 
-Hint: You need Python 3.11 for sae components. If you just want to test with scripts in `tools\sae_introspection`, you can use Python 3.12.
+Hint: You need Python 3.11 for sae components. The introspection tools only need Python 3.10 or newer and are installed into their own environment by pipx.
 
 If you do not get a consistent framerate or your machine gets slow, try lowering the `max_fps` value on the video-source (i.e. 5 fps) in `./video-source-py/video-source-stream1.settings.yaml`. Also, you might want to try setting up your Nvidia GPU, if you have one (see below).
 
@@ -36,7 +35,7 @@ For the video source you either need to have a video stream readily available (a
 If you have a Nvidia GPU in your system, you can try changing the `device` on object-detector and -tracker from `cpu` to `cuda`. No guarantees whether that will work!
 
 ## Visual Pipeline Introspection
-The `../tools/watch.py` script can be used to visually look into the data flows within the pipeline. See more detailed description it its readme.
+The `sae-watch` tool from [sae-introspection](https://github.com/starwit/sae-introspection) can be used to visually look into the data flows within the pipeline. See more detailed description in its readme.
 
 ## How-To Use Nvidia GPU
 - Install `nvidia-container-toolkit` (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)

@@ -35,7 +35,7 @@ Please note, that regardless of deployment method - SAE works in all of them wit
         ```sh
         helm install <release-name> oci://registry-1.docker.io/starwitorg/sae -f my.values.yaml
         ```
-4. Set up and use the watch tool (see [here](../../tools/sae-introspection/README.md)) to inspect the pipeline visually
+4. Set up and use the watch tool (see [sae-introspection](https://github.com/starwit/sae-introspection)) to inspect the pipeline visually
 5. Check out the internal pipeline metrics
     - Forward Grafana port to your local machine and log in (user admin, password admin)
 

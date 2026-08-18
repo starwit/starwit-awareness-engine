@@ -11,6 +11,11 @@ So far the following scenarios are supported:
 
 Please note, that regardless of deployment method - SAE works in all of them with the same general concepts described [here](../README.md).
 
+## Tools
+[**sae-introspection**](https://github.com/starwit/sae-introspection) is the toolbox for looking into a running pipeline.
+It contains scripts to visualize frames with annotations, draw objects onto a map, record and play pipeline state to/from a file and more.
+This is usually the first thing you want after a fresh installation to check whether the pipeline works as expected.
+
 ## Repositories
 The components of the vision pipeline can be found in the following repositories:
 | Component            | Repository / URI                                           |
@@ -30,7 +35,7 @@ The components of the vision pipeline can be found in the following repositories
 - [`/doc`](doc/README.md) - Documentation of the architecture and some details of the technical setup
 - [`/helm/sae`](helm/sae) - The SAE Helm chart
 - [`/docker-compose`](docker-compose/README.md) - A docker compose version of the pipeline (usually up-to-date with the Helm version)
-- [`/tools`](tools/README.md) - Contains scripts which help introspecting the pipeline state and developing new components. E.g. visualizing frames with annotations, drawing objects onto a map or recording and playing pipeline state to/from a file.
+- [`/tools`](tools/) - Contains various helper scripts, Jupyter notebooks for detail analysis, etc.
 - [`/nvidia`](nvidia/notes.md) - Some rough documentation about setting up K3s with Nvidia properly.
 - [`/dashboards`](dashboards/) - A place to save created dashboards for viewing the pipeline metrics (not part of the compose setup yet)
 
