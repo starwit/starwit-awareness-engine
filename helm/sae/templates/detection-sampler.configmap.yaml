@@ -1,7 +1,7 @@
-{{- with .Values.aiControl }}
+{{- with .Values.detectionSampler }}
 {{- if .enabled }}
 {{- range .instances }}
-{{- $instanceName := printf "ai-control-%s" (lower .name) }}
+{{- $instanceName := printf "detection-sampler-%s" (lower .name) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
