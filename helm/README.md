@@ -24,6 +24,10 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 12.0.0
+- `ai-control` supports multiple instances now
+- Breaking config change: `aiControl.settingsYaml` is now a list `aiControl.instances` (each entry with a unique `name` and its own `settingsYaml`, analogous to `axisAdapter` and `redisWriter`)
+
 ## 11.5.0
 - Update `ai-control` to 0.2.0 (adds option `cooldown_seconds`)
 

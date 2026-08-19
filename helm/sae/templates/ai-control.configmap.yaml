@@ -1,13 +1,14 @@
 {{- with .Values.aiControl }}
 {{- if .enabled }}
-{{- with .settingsYaml }}
+{{- range .instances }}
+{{- $instanceName := printf "ai-control-%s" (lower .name) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ai-control-config
+  name: {{ $instanceName }}-config
 data:
   settings.yaml: |
-    {{- toYaml . | nindent 4 }}
+    {{- toYaml .settingsYaml | nindent 4 }}
 ---
 {{- end }}
 {{- end }}

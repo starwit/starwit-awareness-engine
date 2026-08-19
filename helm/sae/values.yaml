@@ -162,9 +162,11 @@ aiControl:
     repository: starwitorg/sae-ai-control
     tag: 0.2.0
   enabled: false
-  settingsYaml:
-    log_level: INFO
-    time_past: 1d
+  instances:
+    - name: stream1
+      settingsYaml:
+        log_level: INFO
+        time_past: 1d
 
 cleaningStatusFilter:
   image:

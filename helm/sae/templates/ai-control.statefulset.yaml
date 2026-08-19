@@ -2,9 +2,8 @@
 {{- if .enabled }}
 {{- $imageRepo := required "image repository for ai-control is required" .image.repository }}
 {{- $imageTag := required "image tag for ai-control is required" .image.tag }}
-{{- $rootConfig := . }}
-{{- with .settingsYaml -}}
-{{- $instanceName := printf "ai-control" }}
+{{- range .instances -}}
+{{- $instanceName := printf "ai-control-%s" (lower .name) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
