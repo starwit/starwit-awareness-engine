@@ -1,18 +1,41 @@
 cameras:
-  - stream_id: stream1
-    mode: map
-    view_x_deg: 90
+  - stream_id: stream1                      # The stream id / suffix to read from and write to
+    mode: map                               # `copy` (copy camera location to detections, i.e. map to a point) or `map` (do geomapping according to parameters below)
+    # The parameters below are only relevant in `map` mode
+    view_x_deg: 90                          # Horizontal angle of view in degrees. If you only specify view_x_deg, view_y_deg is chosen according to the image aspect ratio
     view_y_deg: 54
     image_width_px: 3840
     image_height_px: 2160
-    tilt_deg: 64.2
-    elevation_m: 7.73
-    heading_deg: 155
-    abc_distortion_a: -0.074
+    # focallength_mm: 20                    # view_*_deg and image dimensions are equivalent (only one set of parameters should be set!). Sensor size is harder to obtain and therefore only second choice.
+    # sensor_height_mm: 16                  # See above
+    # sensor_width_mm: 9                    # See above
+    tilt_deg: 64.2                          # 0° => camera facing straight down (image plane parallel to the ground), 90° => camera pointed at horizon (image plane 90° to the ground)
+    elevation_m: 7.73                       # Camera height above ground
+    heading_deg: 155                        # Camera heading (i.e. in which direction the camera is pointed)
+    # roll_deg: 0                           # Rotation of the camera along the optical axis
+    # brown_distortion_k1: null             # You must only specify not-null parameters for one of the distortion models (or none at all, if no correction is needed)
+    # brown_distortion_k2: null
+    # brown_distortion_k3: null
+    abc_distortion_a: -0.074                # See above
     abc_distortion_b: 0.345
     abc_distortion_c: -0.705
+    # mapping_area:                         # Must be a geojson `Polygon`. If set, only detections within that polygon will be mapped (i.e. will have coordinates set). This only really makes sense if the camera has a static location.
+    #   type: Polygon
+    #   coordinates: [[                     # [lon, lat] format. The last point must equal the first!
+    #       [10.01, 50.01],
+    #       [10.02, 50.02],
+    #       [10.02, 50.03],
+    #       [10.03, 50.02],
+    #       [10.01, 50.01]
+    #     ]]
+    # ignore_edge_detections: false         # If set, detections whose bounding box reaches the image border (within a small tolerance) will not be mapped (i.e. will have no coordinates set). Those detections are usually only partly visible and therefore map very inaccurately.
+    # remove_unmapped_detections: false     # If unmapped detections should be removed (i.e. detections filtered by mapping_area or ignore_edge_detections, see above)
+
+# object_center_elevation_m: 0              # Elevation of the object center above ground (used for correcting perspective when mapping object locations into 3D space). In many cases 1.0m makes sense as a starting point.
 
 log_level: INFO
 redis:
   host: valkey
   port: 6379
+
+# prometheus_port: 8000

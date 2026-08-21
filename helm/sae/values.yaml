@@ -87,7 +87,7 @@ axisAdapter:
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
-    tag: 4.2.1
+    tag: 4.3.0
   enabled: true
   customWeights:
     enabled: false

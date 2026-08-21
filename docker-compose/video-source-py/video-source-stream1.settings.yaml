@@ -1,11 +1,19 @@
-id: stream1
+id: stream1                                 # Used as part of the stream identifier in Redis
 uri: rtsp://streaming-server:8554/video-stream
-reconnect_backoff_time: 1
-max_fps: 10
-jpeg_encode: True
+reconnect_backoff_time: 1                   # How long to wait in sec before retrying after a lost connection
+scale_width: 1280                           # If > 0, scale the image to the given width (preserving aspect ratio)
+max_fps: 10                                 # Lower bound on frame times (i.e. frames are skipped), 0 means no limit
+jpeg_encode: True                           # Encode the video frame data as JPEG (using libturbojpeg)
+# jpeg_quality: 80                          # JPEG quality 0 - 100; Starting points: 2160 = 80, 1080 = 90, <720 = 95
+# mask_path: null                           # Path to a b/w mask (same resolution as scaled frame), black=blacken, white=keep
+# hw_video_decoder: NONE                    # Hardware video decoder to use (options: NONE, NVIDIA_JETSON)
 log_level: INFO
-camera_position_source:
-  stream_id: "positionsource:self"
+camera_position_source:                     # If not configured, frames will have no cameraLocation set (i.e. disabled)
+  stream_id: "positionsource:self"          # Where to read position data from
+  # max_position_skew: 1000                 # Max absolute offset in ms between frame time and position update time
+  # drop_frames_if_no_position: False       # Drop frames if there is no position or it is stale (according to skew)
 redis:
   host: valkey
   port: 6379
+
+# prometheus_port: 8000

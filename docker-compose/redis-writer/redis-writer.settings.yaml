@@ -1,11 +1,19 @@
 log_level: DEBUG
+# remove_frame_data: true
 redis:
   host: valkey
   port: 6379
 target_redis:
   host: backend-valkey
   port: 6379
-  buffer_length: 100
-  target_stream_maxlen: 100
+  buffer_length: 100                        # How many messages the internal ring buffer will hold before discarding old messages
+  target_stream_maxlen: 100                 # maxlen for redis XADD (Redis will delete oldest messages from stream to stay within maxlen)
+  # tls: false                              # Whether to use mutual TLS for communication. See README for details on how to configure.
+  # socket_timeout_s: 5                     # This is passed to the Valkey client and sets both socket timeout and socket connection timeout (set this to a rather small value, as we need to be aware of outages as soon as possible)
+
+# this configures mapping between source and target streams
+# if no target name is configured, source stream will be forwarded to target stream of the same name
 mapping_config:
   - source: geomapper:stream1
+
+# prometheus_port: 8000

@@ -1,11 +1,22 @@
 model:
-  weights_path: yolov8n.pt
-  device: "cpu"
-  inference_size: [ 640, 640 ]
-  classes: [ 2 ]
+  weights_path: yolov8n.pt                  # Load yolo weights from file; If auto_download is enabled then this needs to match "yolov8[nsmlx].pt"
+  device: "cpu"                             # device to run model on: "cpu", "cuda" (nvidia), "intel:gpu" (must be openvino model)
+  inference_size: [ 640, 640 ]              # Inference size [height, width] in px
+  classes: [ 2 ]                            # Class filter; Delete property to disable filter
+  # auto_download: True                     # Whether to automatically attempt to download yolov*.pt standard models
+  # nms_agnostic: False                     # Whether to treat all bounding boxes as the same class during non max suppression
+# max_batch_size: 1                         # Maximum batch size (model needs to support dynamic batch sizes > 1)
+# max_batch_interval: 0                     # Maximum time to wait in sec for a batch to fill
+# drop_edge_detections: False               # Whether to drop detections touching the frame edge
 log_level: DEBUG
 redis:
   host: valkey
   port: 6379
   stream_ids:
     - stream1
+  # input_backpressure:
+  #   enabled: False                        # Whether to join the shared consumer group on the input streams, which lets the upstream stage sense our lag and throttle itself (only useful for batch/replay scenarios)
+  # output_backpressure:
+  #   enabled: False                        # Whether to throttle publishing when the downstream stage cannot keep up (only useful for batch/replay scenarios)
+  #   threshold: 5                          # Consumer group lag (in messages) above which publishing is throttled; Delete property to use the visionlib default
+  #   fail_open_timeout: 2                  # Time in sec without any live consumer after which publishing resumes (and messages are dropped again)

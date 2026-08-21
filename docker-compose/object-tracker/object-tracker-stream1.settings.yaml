@@ -8,9 +8,13 @@ tracker_config:
   asso_func: 'iou'
   inertia: 0.2
   use_byte: False
+  # Q_xy_scaling: 0.01
+  # Q_s_scaling: 0.0001
 
 log_level: DEBUG
 redis:
   host: valkey
   port: 6379
   stream_id: stream1
+
+# prometheus_port: 8000

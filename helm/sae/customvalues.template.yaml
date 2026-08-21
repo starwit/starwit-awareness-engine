@@ -107,6 +107,12 @@ objectDetector:
     redis:
       stream_ids:
         - stream1                           # On which video streams to detect objects on. Mostly all video source stream ids.
+      #input_backpressure:
+      #  enabled: false                     # Whether to join the shared consumer group on the input streams, which lets the upstream stage sense our lag and throttle itself (only useful for batch/replay scenarios)
+      #output_backpressure:
+      #  enabled: false                     # Whether to throttle publishing when the downstream stage cannot keep up (only useful for batch/replay scenarios)
+      #  threshold: 5                       # Consumer group lag (in messages) above which publishing is throttled; delete property to use the visionlib default
+      #  fail_open_timeout: 2               # Time in sec without any live consumer after which publishing resumes (and messages are dropped again)
 
 objectTracker:
   enabled: true                             # If the object-tracker should be deployed (e.g. set to false in AXIS-only deployments, AXIS cameras track objects themselves)
