@@ -24,6 +24,14 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 12.0.0
+- Rename `ai-control` to `detection-sampler` and update it to 1.0.0
+  - Breaking config change: `aiControl` is now `detectionSampler`
+  - Breaking config change: the filter options `min_confidence`, `min_width`, `min_height`, `max_detections`, `time_past` and `cooldown_seconds` are replaced by a list of independent `filters` (a message is forwarded if any of them matches) plus a top level `heartbeat_interval`. Refer to the updated values template and the detection-sampler [changelog](https://github.com/starwit/sae-detection-sampler?tab=readme-ov-file#changelog) for the migration
+  - The default stream prefixes now match the component defaults (input `objecttracker`, output `detectionsampler`); adapt downstream stages accordingly
+- `detection-sampler` supports multiple instances now
+  - Breaking config change: `settingsYaml` is now a list `instances` (each entry with a unique `name` and its own `settingsYaml`, analogous to `axisAdapter` and `redisWriter`)
+
 ## 11.5.0
 - Update `ai-control` to 0.2.0 (adds option `cooldown_seconds`)
 

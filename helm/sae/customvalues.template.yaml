@@ -165,19 +165,24 @@ detectionAggregator:
         latitude: 0
         longitude: 0
 
-aiControl:
-  enabled: false
-  settingsYaml:
-    log_level: INFO                      # Options: ERROR, WARNING, INFO, DEBUG 
-    min_confidence: 0.2                  # minimum confidence below which a message is sent
-    min_width: 0.001                     # minimum bounding box width below which a message is sent
-    min_height: 0.001                    # minimum bounding box height below which a message is sent
-    max_detections: 20                   # maximum number of detections in a message above which a message is sent
-    time_past: 1d                        # e.g. 1d, 5h, 10m, 30s time interval after which a message is sent even if no other criteria are met
-    redis:
-      stream_id: stream1                      # On which video streams to detect objects on. Mostly all video source stream ids.
-      input_stream_prefix: objectdetector     # Prefix of the input stream to read from
-      output_stream_prefix: aicontrol         # Prefix of the output stream to write to
+detectionSampler:
+  enabled: false                           # If the detection-sampler should be deployed (forwards interesting frames, e.g. to mine training data)
+  instances:                               # One instance per stream (one instance == one input stream == one output stream)
+    - name: stream1                        # A unique name to identify the instance (only used for resource naming)
+      settingsYaml:                        # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
+        log_level: INFO                        # Options: ERROR, WARNING, INFO, DEBUG
+        redis:
+          stream_id: stream1                      # On which stream to sample detections. Mostly one of the video source stream ids.
+          input_stream_prefix: objecttracker      # Prefix of the input stream to read from
+          output_stream_prefix: detectionsampler  # Prefix of the output stream to write to
+        heartbeat_interval: 1 day              # Forward a message if none has been forwarded for this long; delete to disable
+        filters:                               # A message is forwarded if any filter matches; see https://github.com/starwit/sae-detection-sampler#filtering
+          - name: low_confidence
+            match_detection:
+              confidence_below: 0.2
+            cooldown: 5s                       # Minimum interval between messages forwarded by this filter
+          - name: crowded
+            matching_count_above: 20           # More than this many detections
 
 cleaningStatusFilter:
   enabled: false

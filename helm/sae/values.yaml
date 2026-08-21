@@ -157,14 +157,20 @@ detectionAggregator:
         latitude: 0
         longitude: 0
 
-aiControl:
+detectionSampler:
   image:
-    repository: starwitorg/sae-ai-control
-    tag: 0.2.0
+    repository: starwitorg/sae-detection-sampler
+    tag: 1.0.0
   enabled: false
-  settingsYaml:
-    log_level: INFO
-    time_past: 1d
+  instances:
+    - name: stream1
+      settingsYaml:
+        log_level: INFO
+        heartbeat_interval: 1 day
+        filters:
+          - name: low_confidence
+            match_detection:
+              confidence_below: 0.2
 
 cleaningStatusFilter:
   image:
