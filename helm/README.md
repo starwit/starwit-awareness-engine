@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 12.1.0
+- Update `geo-mapper` to 1.1.0 (adds option `ignore_edge_detections`; default `false`)
+
 ## 12.0.0
 - Rename `ai-control` to `detection-sampler` and update it to 1.0.0
   - Breaking config change: `aiControl` is now `detectionSampler`

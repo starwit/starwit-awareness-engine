@@ -151,6 +151,7 @@ geoMapper:
         #      [10, 50],
         #    ]]
         #remove_unmapped_detections: false  # If unmapped detections should be removed (i.e. detections filtered by mapping_area, see above)
+        #ignore_edge_detections: false      # Do not map detections at the edge of the frame (partial objects boxes do not reflect the true object center)
       - stream_id: stream1-copy
         mode: copy
 
