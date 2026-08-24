@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 12.3.0
+- Add `frame-anonymizer` (disabled by default; blurs the bounding boxes of privacy sensitive detections within the frame)
+
 ## 12.2.0
 - Update `object-detector` to 4.3.0 (adds options `redis.input_backpressure` and `redis.output_backpressure`; both disabled by default)
 

@@ -1,0 +1,15 @@
+{{- with .Values.frameAnonymizer }}
+{{- if .enabled }}
+{{- range .instances }}
+{{- $instanceName := printf "frame-anonymizer-%s" (lower .name) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $instanceName }}-config
+data:
+  settings.yaml: |
+    {{- toYaml .settingsYaml | nindent 4 }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

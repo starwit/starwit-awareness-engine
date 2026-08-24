@@ -1,0 +1,14 @@
+anonymization:
+  class_ids: [0, 2, 5, 7]                            # Class ids whose detections are blurred (refer to coco object classes). Detections of any other class are left untouched.
+  blur_strength: 0.05                       # Blur radius as a fraction of the smaller bounding box dimension (i.e. independent of object size and frame resolution). Raise for stronger anonymization.
+  jpeg_quality: 90                          # Quality used to re-encode frames that arrived as JPEG (ignored for uncompressed frames)
+
+log_level: INFO
+redis:
+  host: valkey
+  port: 6379
+  stream_id: stream1
+  input_stream_prefix: objecttracker        # Prefix of the input stream to read from
+  output_stream_prefix: frameanonymizer     # Downstream stages need to read from this prefix
+
+# prometheus_port: 8000

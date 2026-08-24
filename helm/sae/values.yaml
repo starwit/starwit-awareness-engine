@@ -134,6 +134,24 @@ objectTracker:
       Q_xy_scaling: 1
       Q_s_scaling: 1
 
+frameAnonymizer:
+  image:
+    repository: starwitorg/sae-frame-anonymizer
+    tag: 0.2.0
+  enabled: false
+  instances:
+    - name: stream1
+      settingsYaml:
+        log_level: INFO
+        anonymization:
+          class_ids: [0]
+          blur_strength: 0.05
+          jpeg_quality: 90
+        redis:
+          stream_id: stream1
+          input_stream_prefix: objecttracker
+          output_stream_prefix: frameanonymizer
+
 geoMapper:
   image:
     repository: starwitorg/sae-geo-mapper
@@ -278,7 +296,7 @@ prometheus:
       relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
           action: keep
-          regex: (video-source|axis-adapter|object-detector|object-tracker|geo-mapper|redis-writer|cleaning-status-filter|api)
+          regex: (video-source|axis-adapter|object-detector|object-tracker|frame-anonymizer|geo-mapper|redis-writer|cleaning-status-filter|api)
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: pod

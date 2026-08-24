@@ -45,6 +45,14 @@ services:
       valkey:
         condition: service_healthy
 
+  frame-anonymizer-stream1:
+    image: ${IMAGE_REGISTRY}/sae-frame-anonymizer:${FRAME_ANONYMIZER_VERSION}
+    volumes:
+      - ./frame-anonymizer/frame-anonymizer-stream1.settings.yaml:/code/settings.yaml
+    depends_on:
+      valkey:
+        condition: service_healthy
+
   streaming-server:
     image: bluenviron/mediamtx:1.18.0-ffmpeg
     volumes:

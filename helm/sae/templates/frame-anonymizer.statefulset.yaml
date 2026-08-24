@@ -1,0 +1,74 @@
+{{- with .Values.frameAnonymizer }}
+{{- if .enabled }}
+{{- $imageRepo := required "image repository for frame-anonymizer is required" .image.repository }}
+{{- $imageTag := required "image tag for frame-anonymizer is required" .image.tag }}
+{{- range .instances -}}
+{{- $instanceName := printf "frame-anonymizer-%s" (lower .name) }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sae.fullname" $ }}-{{ $instanceName }}
+  labels:
+    {{- include "sae.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: frame-anonymizer
+spec:
+  selector:
+    matchLabels:
+      {{- include "sae.selectorLabels" $ | nindent 6 }}
+      app.kubernetes.io/component: {{ $instanceName }}
+  template:
+    metadata:
+      annotations:
+        sae.starwit.de/stage: frame-anonymizer
+        sae.starwit.de/config-checksum: {{ include (print $.Template.BasePath "/frame-anonymizer.configmap.yaml") $ | sha256sum }}
+      labels:
+        {{- include "sae.selectorLabels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $instanceName }}
+    spec:
+      serviceAccountName: {{ include "sae.serviceAccountName" $ }}
+      securityContext:
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-valkey
+          image: valkey/valkey:7.2.6-alpine
+          command: ["sh", "-c", "while ! redis-cli -h {{ include "sae.valkeyServiceName" $ }} ping ; do echo \"$(date -Iseconds) - still waiting for valkey\"; sleep 1; done"]
+      containers:
+        - name: {{ $instanceName }}
+          securityContext:
+            {{- toYaml $.Values.securityContext | nindent 12 }}
+          image: "{{ $imageRepo }}:{{ $imageTag }}"
+          imagePullPolicy: IfNotPresent
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+          env:
+            - name: REDIS__HOST
+              value: {{ include "sae.valkeyServiceName" $ }}
+            - name: REDIS__PORT
+              value: {{ include "sae.valkeyServicePort" $ }}
+          ports:
+            - name: prometheus
+              containerPort: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /code/settings.yaml
+              subPath: settings.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $instanceName }}-config
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
