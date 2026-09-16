@@ -178,7 +178,7 @@ detectionAggregator:
 detectionSampler:
   image:
     repository: starwitorg/sae-detection-sampler
-    tag: 1.0.0
+    tag: 1.1.0
   enabled: false
   instances:
     - name: stream1

@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 12.4.0
+- Update `detection-sampler` to 1.1.0 (adds filter predicate `is_edge`)
+
 ## 12.3.0
 - Add `frame-anonymizer` (disabled by default; blurs the bounding boxes of privacy sensitive detections within the frame)
 
