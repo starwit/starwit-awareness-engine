@@ -32,11 +32,6 @@ sae-watch
 
 Select a stream to inspect the pipeline visually.
 
-## Configuration
-- `.env`: local paths and environment variables
-- `video-source-py/video-source-stream1.settings.yaml`: video source settings
-- `object-detector/...settings.yaml`: detector settings
-
 ## Use database output - PostgreSQL
 Store the tracker output in a Postgres DB (what prod deployments do).
 
