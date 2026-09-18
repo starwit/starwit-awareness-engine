@@ -2,9 +2,8 @@
 {{- if .enabled }}
 {{- $imageRepo := required "image repository for video-source is required" .image.repository }}
 {{- $imageTag := required "image tag for video-source is required" .image.tag }}
-{{- $rootConfig := . }}
-{{- range .settingsYamls -}}
-{{- $instanceName := printf "video-source-%s" (lower .id) }}
+{{- range .instances -}}
+{{- $instanceName := printf "video-source-%s" (lower .name) }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -53,10 +52,20 @@ spec:
             - name: config
               mountPath: /code/settings.yaml
               subPath: settings.yaml
+            {{- if .maskConfigMap }}
+            - name: mask
+              mountPath: /code/mask
+              readOnly: true
+            {{- end }}
       volumes:
         - name: config
           configMap:
             name: {{ $instanceName }}-config
+        {{- if .maskConfigMap }}
+        - name: mask
+          configMap:
+            name: {{ .maskConfigMap }}
+        {{- end }}
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

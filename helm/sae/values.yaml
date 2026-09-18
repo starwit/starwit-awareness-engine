@@ -38,10 +38,12 @@ videoSource:
     repository: starwitorg/sae-video-source-py
     tag: 2.3.3
   enabled: true
-  settingsYamls:
-  - id: stream1
-    uri: 'uri'
-    log_level: INFO
+  instances:
+    - name: stream1
+      settingsYaml:
+        id: stream1
+        uri: 'uri'
+        log_level: INFO
 
 axisAdapter:
   image:
