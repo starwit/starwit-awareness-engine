@@ -3,36 +3,36 @@ Run the Vision pipeline locally with Docker Compose, mirroring the Kubernetes de
 
 ## Requirements
 - Docker with Docker Compose
-- An H.264-encoded video is required. If needed, see [this FFmpeg example](https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar#answer-1056632).
+- An H.264-encoded video showing cars is required. See [this FFmpeg example](https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar#answer-1056632) for video conversion.
+- Python >= 3.10, for [sae-introspection](https://github.com/starwit/sae-introspection).
 
 ## Quickstart
-1. Copy `.env.template` to `.env`: 
+1. Copy `.env.template` to `.env`:
 ```SHELL
 cp .env.template .env
 ```
-2. Set `VIDEO_PATH` in `.env`: `VIDEO_PATH=/absolute/path/to/car_video.mp4` 
-> **Important:** `VIDEO_PATH` is mounted into `streaming-server`.
-> The `video source` expects a paced stream. Otherwise 
-> it will consume the file as fast as possible.
-3. Run (the first time may take a while, some images are large)  
+2. Set `VIDEO_PATH` in `.env`: `VIDEO_PATH=/absolute/path/to/car_video.mp4`
+3. Run `docker compose up` (the first time may take a while, some images are quite big):
 ```SHELL
 docker compose up -d
-``` 
-
-## Inspect the pipeline using sae-watch
-Use `sae-watch` from [sae-introspection](https://github.com/starwit/sae-introspection) to inspect pipeline streams visually.
-
-Requires Python >= 3.10
-
-```SHELL
-sudo apt install libturbojpeg0
-pipx install git+https://github.com/starwit/sae-introspection.git
-sae-watch
 ```
+4. Install [sae-introspection](https://github.com/starwit/sae-introspection) to look into the running pipeline:
+  1. Install requirements: `libturbojpeg0` and `sae-introspection`:
+    ```SHELL
+    sudo apt install libturbojpeg0
+    pipx install git+https://github.com/starwit/sae-introspection.git
+    ```
+  2. Run the introspection tool:
+    ```SHELL
+    sae-watch
+    ```
+  3. Select a stream to inspect the pipeline visually. If you only see `"positionsource:self"
+` wait a few seconds and retry. Otherwise see [Troubleshooting](#troubleshooting)
 
-Select a stream to inspect the pipeline visually.
+NOTES:
+- `VIDEO_PATH` is mounted into `streaming-server`. The `video source` expects a paced stream. Otherwise it will consume the file as fast as possible.
 
-## Use database output - PostgreSQL
+## Database Output - PostgreSQL
 Store the tracker output in a Postgres DB (what prod deployments do).
 
 Run the pipeline with PostgreSQL enabled:
@@ -45,7 +45,7 @@ Then visit http://localhost:5050 in your browser (pgadmin web UI).
 ## Troubleshooting
 
 ### Low FPS / high CPU
-If oyu get inconsistent framerates or your machine gets slow, try lowering the max_fps value on the video-source.
+If you get inconsistent framerates or your machine gets slow, try lowering the max_fps value on the video-source.
 Or try [NVIDIA GPU support](#nvidia-gpu-support).
 
 Lower `max_fps` in:
