@@ -24,6 +24,9 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 13.1.0
+- Add redis-writer Grafana dashboard
+
 ## 13.0.0
 - `video-source` supports optional frame masking now
   - Set `maskConfigMap` on an instance to mount an externally managed configmap (containing the mask image) at `/code/mask` and point `settingsYaml.mask_path` to the mask file (e.g. `/code/mask/mask.png`)
