@@ -1,0 +1,44 @@
+name: sae
+
+services:
+  valkey:
+    image: valkey/valkey:9.0.3
+    command: ["valkey-server", "/usr/local/etc/valkey/valkey.conf"]
+    ports:
+      - 6379:6379
+    volumes:
+      - ./valkey/valkey.conf:/usr/local/etc/valkey/valkey.conf
+    healthcheck:
+      test: "[ \"$(valkey-cli ping)\" = \"PONG\" ] && exit 0 || exit 1"
+      interval: 1s
+      start_period: 5s
+
+  cronist-source:
+    image: ${IMAGE_REGISTRY}/sae-cronist-source:${CRONIST_SOURCE_VERSION}
+    volumes:
+      - ./cronist-source/cronist-source.settings.yaml:/code/settings.yaml
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+  object-detector:
+    image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
+    volumes:
+      - ./object-detector/object-detector-cronist.settings.yaml:/code/settings.yaml
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+  object-tracker-stream1:
+    image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
+    volumes:
+      - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+    depends_on:
+      valkey:
+        condition: service_healthy
+
+networks:
+  default:
+    name: sae

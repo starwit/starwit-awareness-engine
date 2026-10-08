@@ -86,6 +86,20 @@ axisAdapter:
             id: 4
             name: motorcycle
 
+cronistSource:
+  image:
+    repository: starwitorg/sae-cronist-source
+    tag: 0.2.0
+  enabled: false
+  settingsYaml:
+    log_level: INFO
+    sae_id: sae-1
+    stream_id: stream1
+    cronist:
+      base_url: http://cronist:8081/cronist
+    redis:
+      output_stream_prefix: cronistsource
+
 objectDetector:
   image:
     repository: starwitorg/sae-object-detector
@@ -298,7 +312,7 @@ prometheus:
       relabel_configs:
         - source_labels: [__meta_kubernetes_pod_annotation_sae_starwit_de_stage]
           action: keep
-          regex: (video-source|axis-adapter|object-detector|object-tracker|frame-anonymizer|geo-mapper|redis-writer|cleaning-status-filter|api)
+          regex: (video-source|axis-adapter|cronist-source|object-detector|object-tracker|frame-anonymizer|geo-mapper|redis-writer|cleaning-status-filter|api)
         - source_labels: [__meta_kubernetes_pod_name]
           action: replace
           target_label: pod

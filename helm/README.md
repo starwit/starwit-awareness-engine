@@ -24,6 +24,10 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml 
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 13.2.0
+- Add `cronist-source` (disabled by default; single instance; plays videos assigned by [cronist](https://github.com/starwit/cronist) into the pipeline)
+  - Downstream stages need to read from its output prefix (default `cronistsource`) and should enable input backpressure (e.g. `objectDetector.settingsYaml.redis.input_backpressure.enabled`)
+
 ## 13.1.0
 - Add redis-writer Grafana dashboard
 

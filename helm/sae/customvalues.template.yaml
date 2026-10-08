@@ -91,6 +91,37 @@ axisAdapter:
             id: 4
             name: motorcycle
 
+cronistSource:
+  enabled: false                            # If the cronist-source should be deployed (plays videos assigned by cronist into the pipeline; replaces video-source)
+                                            # Single instance only: one cronist-source == one sae_id in cronist == one output stream
+                                            # Downstream stages need to read from its output prefix and should enable backpressure, e.g. on objectDetector:
+                                            #   redis.input_stream_prefix: cronistsource, redis.input_backpressure.enabled: true
+  settingsYaml:                             # Everything below this is passed as content of the settings.yaml (notice snake_case vs camelCase)
+    log_level: INFO                         # Options: ERROR, WARNING, INFO, DEBUG
+    sae_id: sae-1                           # The id this SAE reports to cronist as (tasks are assigned to it in cronist)
+    stream_id: stream1                      # Output is written to '{output_stream_prefix}:{stream_id}'; also used as source_id / camera_id
+    cronist:
+      base_url: http://cronist:8081/cronist # Where to reach the cronist API
+      sync_interval: 2.0                    # Seconds between desired state polls (must stay well below cronist's `sae.state-expiry`)
+      request_timeout: 5.0
+      #auth:                                # Only needed if cronist runs with the `auth` profile (OAuth2 client credentials)
+      #  token_url: http://keycloak:8080/realms/cronist/protocol/openid-connect/token
+      #  client_id: sae
+      #  client_secret: secret              # Beware: credentials are stored in plaintext in a ConfigMap
+    redis:
+      output_stream_prefix: cronistsource   # Downstream stages need to read from this prefix (e.g. set objectDetector input_stream_prefix accordingly)
+      stream_maxlen: 200                    # Keep `stream_maxlen - backpressure.threshold` well above `publish rate x monitor_interval`, otherwise unread frames get trimmed
+      reset_stream_on_task_start: true      # Trim the output stream on task start, s.t. frames of a previous task are not fed downstream
+      backpressure:
+        #threshold: 100                     # Consumer group lag (in messages) above which publishing is throttled (defaults to stream_maxlen / 2)
+        fail_open_timeout: 30.0             # Time in sec without any live consumer after which publishing resumes (and frames may be lost)
+    source:
+      #target_fps: 10                       # If set, frames are dropped to reach the given frame rate (default: original frame rate)
+      encoding:
+        jpeg_quality: 90                    # JPEG quality 0 - 100
+        scale_width: 0                      # If > 0, scale the image to the given width (preserving aspect ratio)
+      download_timeout: 30.0                # Timeout in sec for the video download
+
 objectDetector:
   enabled: true                             # If the object-detector should be deployed (e.g. set to false in AXIS-only deployments, see axisAdapter above)
   customWeights:

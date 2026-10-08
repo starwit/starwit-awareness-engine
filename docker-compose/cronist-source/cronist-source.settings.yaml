@@ -1,0 +1,28 @@
+log_level: DEBUG
+sae_id: sae-1                               # Id this SAE reports to cronist as
+stream_id: stream1                          # Output stream suffix and VideoFrame.source_id
+cronist:
+  base_url: http://host.docker.internal:8081/cronist  # Assumes cronist runs on the docker host
+  sync_interval: 2.0
+  request_timeout: 5.0
+  # auth:                                   # Only needed if cronist runs with the `auth` profile
+  #   token_url: http://host.docker.internal:8080/realms/cronist/protocol/openid-connect/token
+  #   client_id: sae
+  #   client_secret: secret
+redis:
+  host: valkey
+  port: 6379
+  output_stream_prefix: cronistsource
+  stream_maxlen: 200
+  reset_stream_on_task_start: true
+  backpressure:
+    # threshold: 100                        # defaults to stream_maxlen / 2
+    fail_open_timeout: 30.0
+source:
+  target_fps: 10
+  encoding:
+    jpeg_quality: 90
+    scale_width: 0
+  download_timeout: 30.0
+
+# prometheus_port: 8000

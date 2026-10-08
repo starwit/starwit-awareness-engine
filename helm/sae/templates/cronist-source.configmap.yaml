@@ -1,0 +1,13 @@
+{{- with .Values.cronistSource }}
+{{- if .enabled }}
+{{- with .settingsYaml }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cronist-source-config
+data:
+  settings.yaml: |
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

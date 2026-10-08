@@ -19,6 +19,12 @@ If you do not get a consistent framerate or your machine gets slow, try lowering
 ### Database output
 If you want to have database output, i.e. store the tracker output in a Postgres DB (which is what prod deployments do), you can replace step 3 from above to `docker compose -f docker-compose-with-db.yaml up`. You'll find a pgadmin web UI to browse the database at http://localhost:5050.
 
+### Cronist setup
+`docker compose -f docker-compose-cronist.yml up` starts a pipeline that plays videos assigned by [cronist](https://github.com/starwit/cronist) (valkey, cronist-source, object-detector, object-tracker). It does not need `VIDEO_PATH` or the streaming-server.
+- cronist is expected to run on the docker host at `http://localhost:8081/cronist` (see `./cronist-source/cronist-source.settings.yaml`)
+- the object-detector reads from `cronistsource:stream1` with input backpressure enabled, i.e. playback is paced by the detector (see `./object-detector/object-detector-cronist.settings.yaml`)
+- point observatory at stream key `objecttracker:stream1` on the internal valkey (host port 6379)
+
 ## How-To Dev
 All relevant components (Valkey and Postgres) have healthchecks in place, s.t. `docker compose up` should "just work".\
 In order to have more control you might want to start all components separately (e.g. in tmux panes).
