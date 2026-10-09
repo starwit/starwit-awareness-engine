@@ -27,6 +27,10 @@ services:
     image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
       - ./object-detector/object-detector-cronist.settings.yaml:/code/settings.yaml
+    environment:
+      REDIS__STREAM_IDS: "[\"sae-1\"]"
+      REDIS__INPUT_STREAM_PREFIX: cronistsource
+      REDIS__INPUT_BACKPRESSURE__ENABLED: true
     depends_on:
       valkey:
         condition: service_healthy
@@ -35,6 +39,8 @@ services:
     image: ${IMAGE_REGISTRY}/sae-object-tracker:${OBJECT_TRACKER_VERSION}
     volumes:
       - ./object-tracker/object-tracker-stream1.settings.yaml:/code/settings.yaml
+    environment:
+      REDIS__STREAM_ID: "sae-1"
     depends_on:
       valkey:
         condition: service_healthy
