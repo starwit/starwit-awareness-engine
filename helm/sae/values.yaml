@@ -89,7 +89,7 @@ axisAdapter:
 cronistSource:
   image:
     repository: starwitorg/sae-cronist-source
-    tag: 0.2.0
+    tag: 0.2.1
   enabled: false
   settingsYaml:
     log_level: INFO
