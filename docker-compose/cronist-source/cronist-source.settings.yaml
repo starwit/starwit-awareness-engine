@@ -1,6 +1,6 @@
 log_level: DEBUG
 sae_id: sae-1                               # Id this SAE reports to cronist as
-stream_id: stream1                          # Output stream suffix and VideoFrame.source_id
+stream_id: sae-1                          # Output stream suffix and VideoFrame.source_id
 cronist:
   base_url: http://host.docker.internal:8081/cronist  # Assumes cronist runs on the docker host
   sync_interval: 2.0
