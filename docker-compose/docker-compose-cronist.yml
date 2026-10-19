@@ -26,7 +26,7 @@ services:
   object-detector:
     image: ${IMAGE_REGISTRY}/sae-object-detector:${OBJECT_DETECTOR_VERSION}
     volumes:
-      - ./object-detector/object-detector-cronist.settings.yaml:/code/settings.yaml
+      - ./object-detector/object-detector.settings.yaml:/code/settings.yaml
     environment:
       REDIS__STREAM_IDS: "[\"sae-1\"]"
       REDIS__INPUT_STREAM_PREFIX: cronistsource
