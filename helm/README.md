@@ -17,10 +17,31 @@
 
 # Image Provisioning
 In case you need to pre-download images onto your target machine, you need a list of images to pull (e.g. with `sudo k3s ctr images pull` in the K3s case)
-Create your values first, then run this command:
+Toggle the components you need in the heredoc, then run the command below (all other values are the chart defaults).
 ```bash
-helm template sae oci://registry-1.docker.io/starwitorg/sae -f YOUR_VALUES.yaml | grep image: | sort | uniq | sed -r 's/^.*image: "?(.+?)"?$/\1/'
+helm template sae oci://registry-1.docker.io/starwitorg/sae \
+  $(sed -E '/^\s*(#|$)/d; s/^\s*(\S+)\s+(\S+).*/--set \1.enabled=\2/' <<'EOF'
+# component            enabled
+positionSource         true
+videoSource            true
+axisAdapter            false
+cronistSource          false
+objectDetector         true
+objectTracker          true
+frameAnonymizer        true
+geoMapper              true
+detectionAggregator    false
+detectionSampler       true
+cleaningStatusFilter   false
+redisWriter            true
+databaseWriter         false
+api                    true
+EOF
+) | grep 'image:' \
+  | sed -E 's/^.*image: *"?([^"]+)"?.*$/\1/; /^[^/]+$/s|^|docker.io/library/|; /^(localhost|[^/]*[.:][^/]*)\//!s|^|docker.io/|' \
+  | sort -u
 ```
+**Note:** If you use custom model weights for `object-detector` (`objectDetector.customWeights.enabled`), you also need to pull the weights image `docker.io/starwitorg/sae-object-detector-weights:<objectDetector.customWeights.imageTag>`, which is not part of the list above.
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
