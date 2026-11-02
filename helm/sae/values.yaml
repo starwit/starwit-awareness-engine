@@ -215,6 +215,10 @@ cleaningStatusFilter:
     imageTag: weights-image-tag
   settingsYaml:
     log_level: INFO
+    mirror_detection:
+      model:
+        weights_path: custom_weights/model.pt
+        device: cpu
 
 redisWriter:
   image:

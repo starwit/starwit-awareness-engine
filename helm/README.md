@@ -45,6 +45,9 @@ EOF
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 13.2.2
+- Make chart render successfully with default values and all components enabled
+
 ## 13.2.1
 - Update `cronist-source` to 0.2.1 (improve http error logging)
 
