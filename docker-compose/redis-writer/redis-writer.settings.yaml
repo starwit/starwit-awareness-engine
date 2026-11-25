@@ -10,6 +10,7 @@ target_redis:
   target_stream_maxlen: 100                 # maxlen for redis XADD (Redis will delete oldest messages from stream to stay within maxlen)
   # tls: false                              # Whether to use mutual TLS for communication. See README for details on how to configure.
   # socket_timeout_s: 5                     # This is passed to the Valkey client and sets both socket timeout and socket connection timeout (set this to a rather small value, as we need to be aware of outages as soon as possible)
+  # b64_encode: true                        # If false, raw protobuf bytes are written to field `proto_data` instead of base64 into `proto_data_b64`
 
 # this configures mapping between source and target streams
 # if no target name is configured, source stream will be forwarded to target stream of the same name

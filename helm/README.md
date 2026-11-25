@@ -44,6 +44,9 @@ EOF
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 14.1.0
+- Update `redis-writer` to 2.2.0 (update `vision-lib` to 1.4.0; add config option `target_redis.b64_encode` (default `true`); if set to `false`, raw protobuf bytes are written to field `proto_data` instead of base64 into `proto_data_b64`)
+
 ## 14.0.0
 - Remove `cronist-source` (will be deployed via its own Helm chart from the [cronist-source](https://github.com/starwit/sae-cronist-source) repository)
   - **Breaking:** The `cronistSource` values section has been removed
