@@ -25,7 +25,6 @@ helm template sae oci://registry-1.docker.io/starwitorg/sae \
 positionSource         true
 videoSource            true
 axisAdapter            false
-cronistSource          false
 objectDetector         true
 objectTracker          true
 frameAnonymizer        true
@@ -45,6 +44,10 @@ EOF
 
 # Changelog
 **Breaking changes (esp. with regard to config format) should only happen on major version bumps (i.e. you should be fine with just upgrading in all other cases)**
+## 14.0.0
+- Remove `cronist-source` (will be deployed via its own Helm chart from the [cronist-source](https://github.com/starwit/sae-cronist-source) repository)
+  - **Breaking:** The `cronistSource` values section has been removed
+
 ## 13.2.2
 - Make chart render successfully with default values and all components enabled
 
