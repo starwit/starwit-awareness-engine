@@ -1,43 +1,96 @@
-# Docker-Compose Version Of The Vision Pipeline
-This repository aims at replicating the Helm/Kubernetes-based vision pipeline for local development as closely as possible. It might not always be up-to-date...
+# Vision Pipeline - Docker Compose
+Run the Vision pipeline locally with Docker Compose, mirroring the Kubernetes deployment.
 
-## Documentation
-A longer explanation of the architecture and the technical setup can be found in `../doc/README.md`.
+## Requirements
+- Docker with Docker Compose
+- An H.264-encoded video showing cars is required. See [this FFmpeg example](https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar#answer-1056632) for video conversion.
+- Python >= 3.10, for [sae-introspection](https://github.com/starwit/sae-introspection).
 
 ## Quickstart
-1. Copy .env.template and change the name of the copy to .env. Change `VIDEO_PATH` in `.env` to a suitable video file (showing cars) on your machine
-2. Run `docker compose up` (the first time may take a while, some images are quite big)
-3. Install [sae-introspection](https://github.com/starwit/sae-introspection) to look into the running pipeline
-  1. Install libturbojpeg on your OS (e.g. `sudo apt install libturbojpeg`)
-  2. Install the tools (`pipx install git+https://github.com/starwit/sae-introspection.git`)
-  3. Run `sae-watch` and choose a stream to watch
+1. Copy `.env.template` to `.env`:
+```SHELL
+cp .env.template .env
+```
+2. Set `VIDEO_PATH` in `.env`: `VIDEO_PATH=/absolute/path/to/car_video.mp4`
+3. Run `docker compose up` (the first time may take a while, some images are quite big):
+```SHELL
+docker compose up -d
+```
+4. Install [sae-introspection](https://github.com/starwit/sae-introspection) to look into the running pipeline:
+  1. Install requirements: `libturbojpeg0` and `sae-introspection`:
+    ```SHELL
+    sudo apt install libturbojpeg0
+    pipx install git+https://github.com/starwit/sae-introspection.git
+    ```
+  2. Run the introspection tool:
+    ```SHELL
+    sae-watch
+    ```
+  3. Select a stream to inspect the pipeline visually. If you only see `"positionsource:self"
+` wait a few seconds and retry. Otherwise see [Troubleshooting](#troubleshooting)
 
-Hint: You need Python 3.11 for sae components. The introspection tools only need Python 3.10 or newer and are installed into their own environment by pipx.
+NOTES:
+- `VIDEO_PATH` is mounted into `streaming-server`. The `video source` expects a paced stream. Otherwise it will consume the file as fast as possible.
 
-If you do not get a consistent framerate or your machine gets slow, try lowering the `max_fps` value on the video-source (i.e. 5 fps) in `./video-source-py/video-source-stream1.settings.yaml`. Also, you might want to try setting up your Nvidia GPU, if you have one (see below).
+## Database Output - PostgreSQL
+Store the tracker output in a Postgres DB (what prod deployments do).
 
-### Database output
-If you want to have database output, i.e. store the tracker output in a Postgres DB (which is what prod deployments do), you can replace step 3 from above to `docker compose -f docker-compose-with-db.yaml up`. You'll find a pgadmin web UI to browse the database at http://localhost:5050.
+Run the pipeline with PostgreSQL enabled:
+```SHELL
+docker compose -f docker-compose-with-db.yaml up -d
+```
 
-## How-To Dev
-All relevant components (Valkey and Postgres) have healthchecks in place, s.t. `docker compose up` should "just work".\
-In order to have more control you might want to start all components separately (e.g. in tmux panes).
-For a working (basic) pipeline you need (at least) the following components running (which is what `docker compose up` will give you by default):
-- valkey
-- video-source-py
-- object-detector
-- object-tracker
-- streaming-server
+Then visit http://localhost:5050 in your browser (pgadmin web UI).
 
-For the video source you either need to have a video stream readily available (and configure its uri accordingly) or you can use the streaming-server compose service, which will play a video file on demand (that you have to mount, that is what `VIDEO_PATH` in `.env` is for).\
-**Caution:** Do not try to mount the video file directly into the video source container. This is currently not supported as the video source relies on the source to pace itself, the video source will read frames as fast as possible!
+## Troubleshooting
 
-If you have a Nvidia GPU in your system, you can try changing the `device` on object-detector and -tracker from `cpu` to `cuda`. No guarantees whether that will work!
+### Low FPS / high CPU
+If you get inconsistent framerates or your machine gets slow, try lowering the max_fps value on the video-source.
+Or try [NVIDIA GPU support](#nvidia-gpu-support).
 
-## Visual Pipeline Introspection
-The `sae-watch` tool from [sae-introspection](https://github.com/starwit/sae-introspection) can be used to visually look into the data flows within the pipeline. See more detailed description in its readme.
+Lower `max_fps` in:
+`video-source-py/video-source-stream1.settings.yaml`
 
-## How-To Use Nvidia GPU
+For example:
+```yaml
+max_fps: 5
+```
+
+### sae-watch doesn't recognise vidoestreams
+Is your video H.264-encoded?
+
+Running `sae-watch` only shows this available stream:
+```
+"positionsource:self"
+```
+
+1. Stop the setup: 
+```SHELL
+docker compose down -v
+```
+2. Reencode your video, using [ffmpeg](https://trac.ffmpeg.org/wiki/Encode/H.264):
+```SHELL
+ffmpeg -i input.webm -c:v libx264 -crf 23 output.mp4
+```
+3. Fix the `VIDEO_PATH` in `.env` to the newly encoded file
+4. Run the setup:
+```SHELL
+docker compose up -d
+```
+
+## Documentation
+The default Compose setup runs:
+
+Valkey --> video source --> object detector --> object tracker --> streaming server
+
+See [architecture and technical documentation](../doc/README.md).
+
+
+## NVIDIA GPU support
+If you have a Nvidia GPU in your system:
+- Try changing the `device` on object-detector and -tracker from `cpu` to `cuda`. 
+No guarantees whether that will work!
+
 - Install `nvidia-container-toolkit` (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
 - Configure NVIDIA container toolkit (see https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker)
 - Test if the Nvidia runtime works (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/sample-workload.html#running-a-sample-workload-with-docker)
@@ -53,4 +106,4 @@ The `sae-watch` tool from [sae-introspection](https://github.com/starwit/sae-int
             capabilities: [gpu]
   ```
 - Configure application to use Nvidia CUDA
-  - In the case of `object-detector` change `model.device` in its settings file (by default at `./object-detector/object-detector.settings.yaml`) from `cpu` to `cuda`
+  - In the case of `object-detector` change `model.device` in its settings file (by default at `./object-detector/object-detector.settings.yaml`) from `cpu` to `cuda`.
